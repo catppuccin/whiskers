@@ -1,16 +1,16 @@
-{
-  clippy,
-  rustfmt,
-  callPackage,
-  rust-analyzer,
-}:
+{ callPackage, toolchain }:
 let
   mainPkg = callPackage ./default.nix { };
+  toolchainWithComponents = (
+    toolchain.stable.latest.default.override {
+      extensions = [
+        "rustfmt"
+        "rust-analyzer"
+        "clippy"
+      ];
+    }
+  );
 in
 mainPkg.overrideAttrs (oa: {
-  nativeBuildInputs = [
-    clippy
-    rustfmt
-    rust-analyzer
-  ] ++ (oa.nativeBuildInputs or [ ]);
+  nativeBuildInputs = [ toolchainWithComponents ] ++ (oa.nativeBuildInputs or [ ]);
 })
