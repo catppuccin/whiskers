@@ -3,11 +3,16 @@ name = "catppuccin-whiskers"
 version = "2.3.0"
 authors = ["backwardspy <backwardspy@pigeon.life>"]
 edition = "2021"
-description = "Soothing port creation tool for the high-spirited!"
+description = "😾 Soothing port creation tool for the high-spirited!"
 readme = "README.md"
-homepage = "https://github.com/catppuccin/toolbox/tree/main/whiskers"
-repository = "https://github.com/catppuccin/toolbox"
+homepage = "https://github.com/catppuccin/whiskers/tree/main/whiskers"
+repository = "https://github.com/catppuccin/whiskers"
 license = "MIT"
+
+[profile.release]
+lto = true
+opt-level = "z"
+strip = true
 
 [lib]
 name = "whiskers"

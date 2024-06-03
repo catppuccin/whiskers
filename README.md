@@ -6,9 +6,9 @@
 </h3>
 
 <p align="center">
-  <a href="https://github.com/catppuccin/toolbox/stargazers"><img src="https://img.shields.io/github/stars/catppuccin/toolbox?colorA=363a4f&colorB=b7bdf8&style=for-the-badge"></a>
-  <a href="https://github.com/catppuccin/toolbox/issues?label=whiskers"><img src="https://img.shields.io/github/issues/catppuccin/toolbox?colorA=363a4f&colorB=f5a97f&style=for-the-badge"></a>
-  <a href="https://github.com/catppuccin/toolbox/contributors"><img src="https://img.shields.io/github/contributors/catppuccin/toolbox?colorA=363a4f&colorB=a6da95&style=for-the-badge"></a>
+  <a href="https://github.com/catppuccin/whiskers/stargazers"><img src="https://img.shields.io/github/stars/catppuccin/whiskers?colorA=363a4f&colorB=b7bdf8&style=for-the-badge"></a>
+  <a href="https://github.com/catppuccin/whiskers/issues"><img src="https://img.shields.io/github/issues/catppuccin/whiskers?colorA=363a4f&colorB=f5a97f&style=for-the-badge"></a>
+  <a href="https://github.com/catppuccin/whiskers/contributors"><img src="https://img.shields.io/github/contributors/catppuccin/whiskers?colorA=363a4f&colorB=a6da95&style=for-the-badge"></a>
 </p>
 
 &nbsp;
@@ -22,10 +22,10 @@ You can install Whiskers using one of the methods below:
 | Installation Method                   | Instructions                                                                                                        |
 | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | crates.io                             | `cargo install catppuccin-whiskers`                                                                                 |
-| Source                                | `cargo install --git https://github.com/catppuccin/toolbox catppuccin-whiskers`                                     |
+| Source                                | `cargo install --git https://github.com/catppuccin/whiskers catppuccin-whiskers`                                     |
 | Homebrew                              | `brew install catppuccin/tap/whiskers`                                                                              |
-| Nix                                   | `nix profile install github:catppuccin/toolbox#whiskers`<br/>`nix run github:catppuccin/toolbox#whiskers -- <args>` |
-| Binaries<br/>(Windows, MacOS & Linux) | Available from the [latest GitHub release](https://github.com/catppuccin/toolbox/releases?q=whiskers).              |
+| Nix                                   | `nix profile install github:catppuccin/whiskers`<br/>`nix run github:catppuccin/whiskers -- <args>` |
+| Binaries<br/>(Windows, MacOS & Linux) | Available from the [latest GitHub release](https://github.com/catppuccin/whiskers/releases?q=whiskers).              |
 
 ## Usage
 
