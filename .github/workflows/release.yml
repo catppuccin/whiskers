@@ -1,0 +1,77 @@
+name: release
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+
+  release:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-latest", "macos-latest", "windows-latest"]
+
+    runs-on: ${{ matrix.os }}
+
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      EXECUTABLE: "whiskers"
+      CARGO_REGISTRIES_CRATES_IO_PROTOCOL: sparse
+      EXE_SUFFIX: ${{ matrix.os == 'windows-latest' && '.exe' || '' }}
+
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('./Cargo.lock') }}-release
+
+      - name: Build
+        id: build
+        run: |
+          cargo build --release --locked
+          cargo test --release --locked
+
+          export BINARY_NAME="${EXECUTABLE}-$(rustc --version --verbose | grep host | cut -d ' ' -f 2)${EXE_SUFFIX}"
+          mv "target/release/${EXECUTABLE}${EXE_SUFFIX}" "./${BINARY_NAME}"
+          echo "binary=${BINARY_NAME}" >> $GITHUB_OUTPUT
+
+      - name: Publish to crates.io
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish
+
+      - name: Upload to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ needs.release-please.outputs.tag_name }}" ${{ steps.build.outputs.binary }}
+
+      - name: Upload to artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{steps.build.outputs.binary}}
+          path: ${{steps.build.outputs.binary}}
