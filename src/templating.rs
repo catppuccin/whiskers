@@ -1,8 +1,9 @@
 use std::path::Path;
 
 use indexmap::IndexMap;
+use itertools::Itertools as _;
 
-use crate::{filters, functions};
+use crate::{filters, functions, markdown};
 
 /// Allows creation of a [`FilterExample`] with the following syntax:
 ///
@@ -213,6 +214,82 @@ pub struct FilterExample {
     pub value: String,
     pub inputs: IndexMap<String, String>,
     pub output: String,
+}
+
+impl markdown::TableDisplay for Function {
+    fn table_headings() -> Box<[String]> {
+        Box::new([
+            "Name".to_string(),
+            "Description".to_string(),
+            "Examples".to_string(),
+        ])
+    }
+
+    fn table_row(&self) -> Box<[String]> {
+        Box::new([
+            format!("`{}`", self.name),
+            self.description.clone(),
+            if self.examples.is_empty() {
+                "None".to_string()
+            } else {
+                self.examples.first().map_or_else(String::new, |example| {
+                    format!(
+                        "`{name}({input})` ⇒ `{output}`",
+                        name = self.name,
+                        input = example
+                            .inputs
+                            .iter()
+                            .map(|(k, v)| format!("{k}={v}"))
+                            .join(", "),
+                        output = example.output
+                    )
+                })
+            },
+        ])
+    }
+}
+
+impl markdown::TableDisplay for Filter {
+    fn table_headings() -> Box<[String]> {
+        Box::new([
+            "Name".to_string(),
+            "Description".to_string(),
+            "Examples".to_string(),
+        ])
+    }
+
+    fn table_row(&self) -> Box<[String]> {
+        Box::new([
+            format!("`{}`", self.name),
+            self.description.clone(),
+            if self.examples.is_empty() {
+                "None".to_string()
+            } else {
+                self.examples.first().map_or_else(String::new, |example| {
+                    if example.inputs.is_empty() {
+                        format!(
+                            "`{value} \\| {name}` ⇒ `{output}`",
+                            value = example.value,
+                            name = self.name,
+                            output = example.output
+                        )
+                    } else {
+                        format!(
+                            "`{value} \\| {name}({input})` ⇒ `{output}`",
+                            value = example.value,
+                            name = self.name,
+                            input = example
+                                .inputs
+                                .iter()
+                                .map(|(k, v)| format!("{k}={v}"))
+                                .join(", "),
+                            output = example.output
+                        )
+                    }
+                })
+            },
+        ])
+    }
 }
 
 #[cfg(test)]

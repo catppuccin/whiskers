@@ -167,30 +167,30 @@ These types are designed to closely match the [palette.json](https://github.com/
 
 ### Functions
 
-| Name | Description | Examples |
-|------|-------------|----------|
-| `if` | Return one value if a condition is true, and another if it's false | `if(cond=true, t=1, f=0)` => `1` |
-| `object` | Create an object from the input | `object(a=1, b=2)` => `{a: 1, b: 2}` |
-| `css_rgb` | Convert a color to an RGB CSS string | `css_rgb(color=red)` => `rgb(210, 15, 57)` |
-| `css_rgba` | Convert a color to an RGBA CSS string | `css_rgba(color=red)` => `rgba(210, 15, 57, 1.00)` |
-| `css_hsl` | Convert a color to an HSL CSS string | `css_hsl(color=red)` => `hsl(347, 87%, 44%)` |
-| `css_hsla` | Convert a color to an HSLA CSS string | `css_hsla(color=red)` => `hsla(347, 87%, 44%, 1.00)` |
-| `read_file` | Read and include the contents of a file, path is relative to the template file | `read_file(path="abc.txt")` => `abc` |
+| Name        | Description                                                                    | Examples                                              |
+| ----------- | ------------------------------------------------------------------------------ | ----------------------------------------------------- |
+| `if`        | Return one value if a condition is true, and another if it's false             | `if(cond=true, t=1, f=0)` ⇒ `1`                       |
+| `object`    | Create an object from the input                                                | `object(a=1, b=2)` ⇒ `{a: 1, b: 2}`                   |
+| `css_rgb`   | Convert a color to an RGB CSS string                                           | `css_rgb(color=red)` ⇒ `rgb(210, 15, 57)`             |
+| `css_rgba`  | Convert a color to an RGBA CSS string                                          | `css_rgba(color=red)` ⇒ `rgba(210, 15, 57, 1.00)`     |
+| `css_hsl`   | Convert a color to an HSL CSS string                                           | `css_hsl(color=red)` ⇒ `hsl(347, 87%, 44%)`           |
+| `css_hsla`  | Convert a color to an HSLA CSS string                                          | `css_hsla(color=red)` ⇒ `hsla(347, 87%, 44%, 1.00)`   |
+| `read_file` | Read and include the contents of a file, path is relative to the template file | `read_file(path="abc.txt")` ⇒ `abc`                   |
 
 ### Filters
 
-| Name | Description | Examples |
-|------|-------------|----------|
-| `add` | Add a value to a color | `red \| add(hue=30)` => `#ff6666` |
-| `sub` | Subtract a value from a color | `red \| sub(hue=30)` => `#d30f9b` |
-| `mod` | Modify a color | `red \| mod(lightness=80)` => `#f8a0b3` |
-| `mix` | Mix two colors together | `red \| mix(color=base, amount=0.5)` => `#e08097` |
-| `urlencode_lzma` | Serialize an object into a URL-safe string with LZMA compression | `red \| urlencode_lzma` => `#ff6666` |
-| `trunc` | Truncate a number to a certain number of places | `1.123456 \| trunc(places=3)` => `1.123` |
-| `css_rgb` | Convert a color to an RGB CSS string | `red \| css_rgb` => `rgb(210, 15, 57)` |
-| `css_rgba` | Convert a color to an RGBA CSS string | `red \| css_rgba` => `rgba(210, 15, 57, 1.00)` |
-| `css_hsl` | Convert a color to an HSL CSS string | `red \| css_hsl` => `hsl(347, 87%, 44%)` |
-| `css_hsla` | Convert a color to an HSLA CSS string | `red \| css_hsla` => `hsla(347, 87%, 44%, 1.00)` |
+| Name             | Description                                                      | Examples                                           |
+| ---------------- | ---------------------------------------------------------------- | -------------------------------------------------- |
+| `add`            | Add a value to a color                                           | `red \| add(hue=30)` ⇒ `#ff6666`                   |
+| `sub`            | Subtract a value from a color                                    | `red \| sub(hue=30)` ⇒ `#d30f9b`                   |
+| `mod`            | Modify a color                                                   | `red \| mod(lightness=80)` ⇒ `#f8a0b3`             |
+| `mix`            | Mix two colors together                                          | `red \| mix(color=base, amount=0.5)` ⇒ `#e08097`   |
+| `urlencode_lzma` | Serialize an object into a URL-safe string with LZMA compression | `red \| urlencode_lzma` ⇒ `#ff6666`                |
+| `trunc`          | Truncate a number to a certain number of places                  | `1.123456 \| trunc(places=3)` ⇒ `1.123`            |
+| `css_rgb`        | Convert a color to an RGB CSS string                             | `red \| css_rgb` ⇒ `rgb(210, 15, 57)`              |
+| `css_rgba`       | Convert a color to an RGBA CSS string                            | `red \| css_rgba` ⇒ `rgba(210, 15, 57, 1.00)`      |
+| `css_hsl`        | Convert a color to an HSL CSS string                             | `red \| css_hsl` ⇒ `hsl(347, 87%, 44%)`            |
+| `css_hsla`       | Convert a color to an HSLA CSS string                            | `red \| css_hsla` ⇒ `hsla(347, 87%, 44%, 1.00)`    |
 
 > [!NOTE]
 > You also have access to all of Tera's own built-in filters and functions.

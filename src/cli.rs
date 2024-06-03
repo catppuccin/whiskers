@@ -111,8 +111,11 @@ pub enum OutputFormat {
     Json,
     Yaml,
     Markdown,
-    MarkdownTable,
     Plain,
+
+    /// Deprecated, now equivalent to `Markdown`
+    #[clap(hide = true)]
+    MarkdownTable,
 }
 
 fn json_map<T>(s: &str) -> Result<T, Error>

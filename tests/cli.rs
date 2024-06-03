@@ -37,7 +37,7 @@ mod happy_path {
         ));
     }
 
-    /// Test that the CLI can render a template which uses read_file
+    /// Test that the CLI can render a template which uses `read_file`
     #[test]
     fn test_read_file() {
         let mut cmd = Command::cargo_bin("whiskers").expect("binary exists");
