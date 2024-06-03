@@ -1,0 +1,26 @@
+name: Lint
+
+on:
+  pull_request:
+    paths: ["**.rs", "**.toml", "**.lock"]
+  push:
+    branches: [main]
+    paths: ["**.rs", "**.toml", "**.lock"]
+
+jobs:
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: DeterminateSystems/nix-installer-action@main
+
+      - run: nix develop
+
+      - name: clippy
+        run: |
+          cargo clippy
+
+      - name: rustfmt check
+        run: |
+          cargo fmt --all --check
