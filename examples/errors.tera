@@ -1,5 +1,0 @@
-a: b
----
-this file is total junk
-{{ nonexistent }}
-{{ these words dont work }}
