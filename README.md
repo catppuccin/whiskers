@@ -13,7 +13,11 @@
 
 &nbsp;
 
-A templating tool to simplify the creation of Catppuccin ports.
+> [!IMPORTANT]
+> This repository has been migrated from
+> [catppuccin/toolbox](https://github.com/catppuccin/toolbox/tree/main/whiskers). To view releases
+> prior to [v2.3.0](https://github.com/catppuccin/whiskers/releases/tag/v2.3.0),
+> see the [releases from catppuccin/toolbox](https://github.com/catppuccin/toolbox/releases?q=whiskers&expanded=true).
 
 ## Installation
 
