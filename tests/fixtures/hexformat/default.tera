@@ -1,0 +1,9 @@
+---
+# test the default hex format
+whiskers:
+  version: "2"
+---
+{%- set translucent_red = flavors.latte.colors.red | mod(opacity=0.5) -%}
+{{flavors.latte.colors.red.hex}} == d20f39
+{{flavors.macchiato.colors.sky.hex}} == 91d7e3
+{{translucent_red.hex}} == d20f3980

@@ -16,19 +16,22 @@ use whiskers::{
     context::merge_values,
     frontmatter, markdown,
     matrix::{self, Matrix},
-    models, templating,
+    models::{self, HEX_FORMAT},
+    templating,
 };
 
 const FRONTMATTER_OPTIONS_SECTION: &str = "whiskers";
+
+fn default_hex_format() -> String {
+    "{{r}}{{g}}{{b}}{{z}}".to_string()
+}
 
 #[derive(Default, Debug, serde::Deserialize)]
 struct TemplateOptions {
     version: Option<semver::VersionReq>,
     matrix: Option<Matrix>,
     filename: Option<String>,
-    hex_prefix: Option<String>,
-    #[serde(default)]
-    capitalize_hex: bool,
+    hex_format: String,
 }
 
 impl TemplateOptions {
@@ -42,6 +45,7 @@ impl TemplateOptions {
             version: Option<semver::VersionReq>,
             matrix: Option<Vec<tera::Value>>,
             filename: Option<String>,
+            hex_format: Option<String>,
             hex_prefix: Option<String>,
             #[serde(default)]
             capitalize_hex: bool,
@@ -50,20 +54,47 @@ impl TemplateOptions {
         if let Some(opts) = frontmatter.get(FRONTMATTER_OPTIONS_SECTION) {
             let opts: RawTemplateOptions = tera::from_value(opts.clone())
                 .context("Frontmatter `whiskers` section is invalid")?;
+
             let matrix = opts
                 .matrix
                 .map(|m| matrix::from_values(m, only_flavor))
                 .transpose()
                 .context("Frontmatter matrix is invalid")?;
+
+            // if there's no hex_format but there is hex_prefix and/or capitalize_hex,
+            // we can construct a hex_format from those.
+            let hex_format = if let Some(hex_format) = opts.hex_format {
+                hex_format
+            } else {
+                // throw a deprecation warning for hex_prefix and capitalize_hex
+                if opts.hex_prefix.is_some() {
+                    eprintln!("Warning: `hex_prefix` is deprecated and will be removed in a future version. Use `hex_format` instead.");
+                }
+
+                if opts.capitalize_hex {
+                    eprintln!("Warning: `capitalize_hex` is deprecated and will be removed in a future version. Use `hex_format` instead.");
+                }
+
+                let prefix = opts.hex_prefix.unwrap_or_default();
+                let components = default_hex_format();
+                if opts.capitalize_hex {
+                    format!("{prefix}{}", components.to_uppercase())
+                } else {
+                    format!("{prefix}{components}")
+                }
+            };
+
             Ok(Self {
                 version: opts.version,
                 matrix,
                 filename: opts.filename,
-                hex_prefix: opts.hex_prefix,
-                capitalize_hex: opts.capitalize_hex,
+                hex_format,
             })
         } else {
-            Ok(Self::default())
+            Ok(Self {
+                hex_format: default_hex_format(),
+                ..Default::default()
+            })
         }
     }
 }
@@ -126,13 +157,13 @@ fn main() -> anyhow::Result<()> {
         ctx.insert(key, &value);
     }
 
+    HEX_FORMAT
+        .set(template_opts.hex_format)
+        .expect("can always set HEX_FORMAT");
+
     // build the palette and add it to the templating context
-    let palette = models::build_palette(
-        template_opts.capitalize_hex,
-        template_opts.hex_prefix.as_deref(),
-        args.color_overrides.as_ref(),
-    )
-    .context("Palette context cannot be built")?;
+    let palette = models::build_palette(args.color_overrides.as_ref())
+        .context("Palette context cannot be built")?;
 
     ctx.insert("flavors", &palette.flavors);
     if let Some(flavor) = args.flavor {
