@@ -23,7 +23,7 @@ name = "whiskers"
 path = "src/main.rs"
 
 [package.metadata.binstall]
-pkg-url = "{ repo }/releases/download/whiskers-v{ version }/whiskers-{ target }{ archive-suffix }"
+pkg-url = "{ repo }/releases/download/v{ version }/whiskers-{ target }{ archive-suffix }"
 pkg-fmt = "bin"
 
 [lints.clippy]
