@@ -13,6 +13,10 @@
 
 &nbsp;
 
+Whiskers is a port creation helper tool that is custom-built for Catppuccin,
+allowing developers to define template files which the palette can be injected
+into.
+
 > [!IMPORTANT]
 > This repository has been migrated from
 > [catppuccin/toolbox](https://github.com/catppuccin/toolbox/tree/main/whiskers). To view releases
@@ -32,10 +36,6 @@ You can install Whiskers using one of the methods below:
 | Binaries<br/>(Windows, MacOS & Linux) | Available from the [latest GitHub release](https://github.com/catppuccin/whiskers/releases?q=whiskers).              |
 
 ## Usage
-
-Whiskers is a port creation helper tool that is custom-built for Catppuccin,
-allowing developers to define template files which the palette can be injected
-into.
 
 ```console
 $ whiskers --help
