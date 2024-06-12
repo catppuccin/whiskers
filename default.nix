@@ -11,7 +11,6 @@ rustPlatform.buildRustPackage {
         ./Cargo.lock
         ./src
         ./tests
-        ./examples
         ./LICENSE
       ]
     );
