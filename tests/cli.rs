@@ -107,7 +107,7 @@ mod sad_path {
     #[test]
     fn invalid_flavor() {
         let mut cmd = Command::cargo_bin("whiskers").expect("binary exists");
-        cmd.arg("examples/demo/input.tera")
+        cmd.arg("tests/fixtures/single/single.tera")
             .args(["--flavor", "invalid"]);
         cmd.assert().failure().stderr(predicate::str::contains(
             "error: invalid value 'invalid' for '--flavor <FLAVOR>'",
@@ -117,7 +117,7 @@ mod sad_path {
     #[test]
     fn template_contains_invalid_syntax() {
         let mut cmd = Command::cargo_bin("whiskers").expect("binary exists");
-        cmd.arg("examples/errors.tera").args(["-f", "mocha"]);
+        cmd.arg("tests/fixtures/errors.tera").args(["-f", "mocha"]);
         cmd.assert()
             .failure()
             .stderr(predicate::str::contains("Error: Template is invalid"));
