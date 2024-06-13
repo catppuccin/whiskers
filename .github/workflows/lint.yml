@@ -12,9 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - uses: dtolnay/rust-toolchain@stable
-
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
       - uses: actions/cache@v4
         with:
           path: |
@@ -23,15 +21,8 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('./Cargo.lock') }}-test
 
-      - run: cargo install clippy-sarif sarif-fmt
-
       - name: clippy
-        run: cargo clippy --message-format=json | clippy-sarif | tee rust-clippy-results.sarif | sarif-fmt
-        continue-on-error: true  # otherwise the results aren't uploaded
-
-      - uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: rust-clippy-results.sarif
+        run: cargo clippy
 
       - name: rustfmt check
         run: cargo fmt --all --check
