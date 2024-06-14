@@ -1,5 +1,9 @@
+use std::sync::OnceLock;
+
 use css_colors::Color as _;
 use indexmap::IndexMap;
+use serde_json::json;
+use tera::Tera;
 
 use crate::cli::ColorOverrides;
 
@@ -49,39 +53,63 @@ pub struct HSL {
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
+    #[error("Hex formatting failed: {0}")]
+    HexFormat(#[from] tera::Error),
     #[error("Failed to parse hex color: {0}")]
     ParseHex(#[from] std::num::ParseIntError),
 }
 
-/// attempt to canonicalize a hex string, optionally capitalizing it and adding a prefix.
-fn format_hex(hex: &str, capitalize_hex_strings: bool, hex_prefix: Option<&str>) -> String {
-    let hex = hex.trim_start_matches('#');
-    let hex = if capitalize_hex_strings {
-        hex.to_uppercase()
-    } else {
-        hex.to_string()
+// we have many functions that need to know how to format hex colors.
+// they can't know this at build time, as the format may be provided by the template.
+// we have little to no available state in many of these functions to store this information.
+// these possible solutions were evaluated:
+// 1. pass the format string to every function that needs it. this is cumbersome and error-prone.
+// 2. store the format string in the `Colour` struct, thus duplicating it for every color. this is wasteful.
+// 3. store it in a global static, and initialize it when the template frontmatter is read.
+// we opted for the third option, with a convenience macro for accessing it.
+pub static HEX_FORMAT: OnceLock<String> = OnceLock::new();
+macro_rules! format_hex {
+    ($r:expr, $g:expr, $b: expr, $a: expr) => {
+        format_hex(
+            $r,
+            $g,
+            $b,
+            $a,
+            &*HEX_FORMAT.get().expect("HEX_FORMAT was never set"),
+        )
     };
-    if let Some(prefix) = hex_prefix {
-        format!("{prefix}{hex}")
-    } else {
-        hex
-    }
 }
 
-fn color_from_hex(
-    hex: &str,
-    blueprint: &catppuccin::Color,
-    capitalize_hex_strings: bool,
-    hex_prefix: Option<&str>,
-) -> Result<Color, Error> {
+/// attempt to canonicalize a hex string, using the provided format string.
+fn format_hex(r: u8, g: u8, b: u8, a: u8, hex_format: &str) -> tera::Result<String> {
+    Tera::one_off(
+        hex_format,
+        &tera::Context::from_serialize(json!({
+            "r": format!("{r:02x}"),
+            "g": format!("{g:02x}"),
+            "b": format!("{b:02x}"),
+            "a": format!("{a:02x}"),
+            "z": if a == 0xFF { String::new() } else { format!("{a:02x}") },
+            "R": format!("{r:02X}"),
+            "G": format!("{g:02X}"),
+            "B": format!("{b:02X}"),
+            "A": format!("{a:02X}"),
+            "Z": if a == 0xFF { String::new() } else { format!("{a:02X}") },
+        }))
+        .expect("hardcoded context is always valid"),
+        true,
+    )
+}
+
+fn color_from_hex_override(hex: &str, blueprint: &catppuccin::Color) -> Result<Color, Error> {
     let i = u32::from_str_radix(hex, 16)?;
     let rgb = RGB {
-        r: ((i >> 16) & 0xff) as u8,
-        g: ((i >> 8) & 0xff) as u8,
-        b: (i & 0xff) as u8,
+        r: ((i >> 16) & 0xFF) as u8,
+        g: ((i >> 8) & 0xFF) as u8,
+        b: (i & 0xFF) as u8,
     };
     let hsl = css_colors::rgb(rgb.r, rgb.g, rgb.b).to_hsl();
-    let hex = format_hex(hex, capitalize_hex_strings, hex_prefix);
+    let hex = format_hex!(rgb.r, rgb.g, rgb.b, 0xFF)?;
     Ok(Color {
         name: blueprint.name.to_string(),
         identifier: blueprint.name.identifier().to_string(),
@@ -94,17 +122,13 @@ fn color_from_hex(
             s: hsl.s.as_f32(),
             l: hsl.l.as_f32(),
         },
-        opacity: 255,
+        opacity: 0xFF,
     })
 }
 
-fn color_from_catppuccin(
-    color: &catppuccin::Color,
-    capitalize_hex_strings: bool,
-    hex_prefix: Option<&str>,
-) -> Color {
-    let hex = format_hex(&color.hex.to_string(), capitalize_hex_strings, hex_prefix);
-    Color {
+fn color_from_catppuccin(color: &catppuccin::Color) -> tera::Result<Color> {
+    let hex = format_hex!(color.rgb.r, color.rgb.g, color.rgb.b, 0xFF)?;
+    Ok(Color {
         name: color.name.to_string(),
         identifier: color.name.identifier().to_string(),
         order: color.order,
@@ -121,15 +145,11 @@ fn color_from_catppuccin(
             l: color.hsl.l as f32,
         },
         opacity: 255,
-    }
+    })
 }
 
 /// Build a [`Palette`] from [`catppuccin::PALETTE`], optionally applying color overrides.
-pub fn build_palette(
-    capitalize_hex_strings: bool,
-    hex_prefix: Option<&str>,
-    color_overrides: Option<&ColorOverrides>,
-) -> Result<Palette, Error> {
+pub fn build_palette(color_overrides: Option<&ColorOverrides>) -> Result<Palette, Error> {
     // make a `Color` from a `catppuccin::Color`, taking into account `color_overrides`.
     // overrides apply in this order:
     // 1. base color
@@ -145,17 +165,17 @@ pub fn build_palette(
                     catppuccin::FlavorName::Mocha => &co.mocha,
                 })
                 .and_then(|o| o.get(color.name.identifier()).cloned())
-                .map(|s| color_from_hex(&s, color, capitalize_hex_strings, hex_prefix))
+                .map(|s| color_from_hex_override(&s, color))
                 .transpose()?;
 
             let all_override = color_overrides
                 .and_then(|co| co.all.get(color.name.identifier()).cloned())
-                .map(|s| color_from_hex(&s, color, capitalize_hex_strings, hex_prefix))
+                .map(|s| color_from_hex_override(&s, color))
                 .transpose()?;
 
-            Ok(flavor_override.or(all_override).unwrap_or_else(|| {
-                color_from_catppuccin(color, capitalize_hex_strings, hex_prefix)
-            }))
+            let base_color = color_from_catppuccin(color)?;
+
+            Ok(flavor_override.or(all_override).unwrap_or(base_color))
         };
 
     let mut flavors = IndexMap::new();
@@ -215,16 +235,12 @@ impl<'a> IntoIterator for &'a Flavor {
     }
 }
 
-fn rgb_to_hex(rgb: &RGB, opacity: u8) -> String {
-    if opacity < 255 {
-        format!("{:02x}{:02x}{:02x}{:02x}", rgb.r, rgb.g, rgb.b, opacity)
-    } else {
-        format!("{:02x}{:02x}{:02x}", rgb.r, rgb.g, rgb.b)
-    }
+fn rgb_to_hex(rgb: &RGB, opacity: u8) -> tera::Result<String> {
+    format_hex!(rgb.r, rgb.g, rgb.b, opacity)
 }
 
 impl Color {
-    fn from_hsla(hsla: css_colors::HSLA, blueprint: &Self) -> Self {
+    fn from_hsla(hsla: css_colors::HSLA, blueprint: &Self) -> tera::Result<Self> {
         let rgb = hsla.to_rgb();
         let rgb = RGB {
             r: rgb.r.as_u8(),
@@ -237,19 +253,19 @@ impl Color {
             l: hsla.l.as_f32(),
         };
         let opacity = hsla.a.as_u8();
-        Self {
+        Ok(Self {
             name: blueprint.name.clone(),
             identifier: blueprint.identifier.clone(),
             order: blueprint.order,
             accent: blueprint.accent,
-            hex: rgb_to_hex(&rgb, opacity),
+            hex: rgb_to_hex(&rgb, opacity)?,
             rgb,
             hsl,
             opacity,
-        }
+        })
     }
 
-    fn from_rgba(rgba: css_colors::RGBA, blueprint: &Self) -> Self {
+    fn from_rgba(rgba: css_colors::RGBA, blueprint: &Self) -> tera::Result<Self> {
         let hsl = rgba.to_hsl();
         let rgb = RGB {
             r: rgba.r.as_u8(),
@@ -262,20 +278,19 @@ impl Color {
             l: hsl.l.as_f32(),
         };
         let opacity = rgba.a.as_u8();
-        Self {
+        Ok(Self {
             name: blueprint.name.clone(),
             identifier: blueprint.identifier.clone(),
             order: blueprint.order,
             accent: blueprint.accent,
-            hex: rgb_to_hex(&rgb, opacity),
+            hex: rgb_to_hex(&rgb, opacity)?,
             rgb,
             hsl,
             opacity,
-        }
+        })
     }
 
-    #[must_use]
-    pub fn mix(base: &Self, blend: &Self, amount: f64) -> Self {
+    pub fn mix(base: &Self, blend: &Self, amount: f64) -> tera::Result<Self> {
         let amount = (amount * 100.0).clamp(0.0, 100.0).round() as u8;
         let blueprint = base;
         let base: css_colors::RGBA = base.into();
@@ -285,99 +300,87 @@ impl Color {
         Self::from_rgba(result, blueprint)
     }
 
-    #[must_use]
-    pub fn mod_hue(&self, hue: i32) -> Self {
+    pub fn mod_hue(&self, hue: i32) -> tera::Result<Self> {
         let mut hsl: css_colors::HSL = self.into();
         hsl.h = css_colors::deg(hue);
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
-    #[must_use]
-    pub fn add_hue(&self, hue: i32) -> Self {
+    pub fn add_hue(&self, hue: i32) -> tera::Result<Self> {
         let hsl: css_colors::HSL = self.into();
         let hsl = hsl.spin(css_colors::deg(hue));
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
-    #[must_use]
-    pub fn sub_hue(&self, hue: i32) -> Self {
+    pub fn sub_hue(&self, hue: i32) -> tera::Result<Self> {
         let hsl: css_colors::HSL = self.into();
         let hsl = hsl.spin(-css_colors::deg(hue));
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
-    #[must_use]
-    pub fn mod_saturation(&self, saturation: u8) -> Self {
+    pub fn mod_saturation(&self, saturation: u8) -> tera::Result<Self> {
         let mut hsl: css_colors::HSL = self.into();
         hsl.s = css_colors::percent(saturation);
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
-    #[must_use]
-    pub fn add_saturation(&self, saturation: u8) -> Self {
+    pub fn add_saturation(&self, saturation: u8) -> tera::Result<Self> {
         let hsl: css_colors::HSL = self.into();
         let hsl = hsl.saturate(css_colors::percent(saturation));
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
-    #[must_use]
-    pub fn sub_saturation(&self, saturation: u8) -> Self {
+    pub fn sub_saturation(&self, saturation: u8) -> tera::Result<Self> {
         let hsl: css_colors::HSL = self.into();
         let hsl = hsl.desaturate(css_colors::percent(saturation));
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
-    #[must_use]
-    pub fn mod_lightness(&self, lightness: u8) -> Self {
+    pub fn mod_lightness(&self, lightness: u8) -> tera::Result<Self> {
         let mut hsl: css_colors::HSL = self.into();
         hsl.l = css_colors::percent(lightness);
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
-    #[must_use]
-    pub fn add_lightness(&self, lightness: u8) -> Self {
+    pub fn add_lightness(&self, lightness: u8) -> tera::Result<Self> {
         let hsl: css_colors::HSL = self.into();
         let hsl = hsl.lighten(css_colors::percent(lightness));
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
-    #[must_use]
-    pub fn sub_lightness(&self, lightness: u8) -> Self {
+    pub fn sub_lightness(&self, lightness: u8) -> tera::Result<Self> {
         let hsl: css_colors::HSL = self.into();
         let hsl = hsl.darken(css_colors::percent(lightness));
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
-    #[must_use]
-    pub fn mod_opacity(&self, opacity: f32) -> Self {
+    pub fn mod_opacity(&self, opacity: f32) -> tera::Result<Self> {
         let opacity = (opacity * 255.0).round() as u8;
-        Self {
+        Ok(Self {
             opacity,
-            hex: rgb_to_hex(&self.rgb, opacity),
+            hex: rgb_to_hex(&self.rgb, opacity)?,
             ..self.clone()
-        }
+        })
     }
 
-    #[must_use]
-    pub fn add_opacity(&self, opacity: f32) -> Self {
+    pub fn add_opacity(&self, opacity: f32) -> tera::Result<Self> {
         let opacity = (opacity * 255.0).round() as u8;
         let opacity = self.opacity.saturating_add(opacity);
-        Self {
+        Ok(Self {
             opacity,
-            hex: rgb_to_hex(&self.rgb, opacity),
+            hex: rgb_to_hex(&self.rgb, opacity)?,
             ..self.clone()
-        }
+        })
     }
 
-    #[must_use]
-    pub fn sub_opacity(&self, opacity: f32) -> Self {
+    pub fn sub_opacity(&self, opacity: f32) -> tera::Result<Self> {
         let opacity = (opacity * 255.0).round() as u8;
         let opacity = self.opacity.saturating_sub(opacity);
-        Self {
+        Ok(Self {
             opacity,
-            hex: rgb_to_hex(&self.rgb, opacity),
+            hex: rgb_to_hex(&self.rgb, opacity)?,
             ..self.clone()
-        }
+        })
     }
 }
 

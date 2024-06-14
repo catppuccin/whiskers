@@ -88,6 +88,28 @@ mod happy_path {
             .success()
             .stdout(predicate::str::contains("it worked!"));
     }
+
+    /// Test that the default hex format is rrggbb and full alpha is hidden
+    #[test]
+    fn test_default_hex_format() {
+        let mut cmd = Command::cargo_bin("whiskers").expect("binary exists");
+        let assert = cmd.args(["tests/fixtures/hexformat/default.tera"]).assert();
+        assert
+            .success()
+            .stdout(include_str!("fixtures/hexformat/default.txt"));
+    }
+
+    /// Test that the CLI can render a template with a custom hex format
+    #[test]
+    fn test_custom_hex_format() {
+        let mut cmd = Command::cargo_bin("whiskers").expect("binary exists");
+        let assert = cmd
+            .args(["tests/fixtures/hexformat/custom.tera", "-f", "latte"])
+            .assert();
+        assert
+            .success()
+            .stdout(include_str!("fixtures/hexformat/custom.txt"));
+    }
 }
 
 #[cfg(test)]
