@@ -1,7 +1,10 @@
 { lib, rustPlatform }:
+let
+  toml = (lib.importTOML ./Cargo.toml).package;
+in
 rustPlatform.buildRustPackage {
   pname = "catppuccin-whiskers";
-  inherit ((lib.importTOML ./Cargo.toml).package) version;
+  inherit (toml) version;
 
   src = lib.fileset.toSource {
     root = ./.;
@@ -11,7 +14,6 @@ rustPlatform.buildRustPackage {
         ./Cargo.lock
         ./src
         ./tests
-        ./examples
         ./LICENSE
       ]
     );
@@ -20,8 +22,7 @@ rustPlatform.buildRustPackage {
   cargoLock.lockFile = ./Cargo.lock;
 
   meta = {
-    homepage = "https://github.com/catppuccin/whiskers";
-    description = "😾 Soothing port creation tool for the high-spirited!";
+    inherit (toml) homepage description;
     license = lib.licenses.mit;
     mainProgram = "whiskers";
   };
