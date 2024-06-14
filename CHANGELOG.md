@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.4.0](https://github.com/catppuccin/whiskers/compare/v2.3.0...v2.4.0) (2024-06-14)
+
+
+### Features
+
+* add custom hex formatting ([#18](https://github.com/catppuccin/whiskers/issues/18)) ([dfc700e](https://github.com/catppuccin/whiskers/commit/dfc700e749c3c57f31f7e0fa676a78c10bc0f6cb))
+* nix flake ([e02f0d4](https://github.com/catppuccin/whiskers/commit/e02f0d436c75cbf5721374d0c4260bb19a5ef955))
+* **whiskers:** tidy up output formats, general clean up ([#235](https://github.com/catppuccin/whiskers/issues/235)) ([9ad3f14](https://github.com/catppuccin/whiskers/commit/9ad3f1499b23ce6b26e7d0ef05cd1cc50716f3af))
+
+
+### Bug Fixes
+
+* **deps:** update rust crate clap to v4.5.6 ([#11](https://github.com/catppuccin/whiskers/issues/11)) ([73c6550](https://github.com/catppuccin/whiskers/commit/73c65503a9204d006db4a9f4682725c65b35a7ad))
+* **deps:** update rust crate clap to v4.5.7 ([#17](https://github.com/catppuccin/whiskers/issues/17)) ([7f6c57b](https://github.com/catppuccin/whiskers/commit/7f6c57b6f4afc4405795bb3e791626d29ea13ea0))
+
 ## [2.3.0](https://github.com/catppuccin/toolbox/compare/whiskers-v2.2.0...whiskers-v2.3.0) (2024-05-27)
 
 
