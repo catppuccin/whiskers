@@ -33,7 +33,7 @@ You can install Whiskers using one of the methods below:
 | Source                                | `cargo install --git https://github.com/catppuccin/whiskers catppuccin-whiskers`                        |
 | Homebrew                              | `brew install catppuccin/tap/whiskers`                                                                  |
 | Nix                                   | `nix profile install github:catppuccin/whiskers`<br/>`nix run github:catppuccin/whiskers -- <args>`     |
-| Gentoo                                | `eselect repository 151 && emerge --sync guru && emerge -a catppuccin-whiskers`                         |
+| Gentoo                                | `emerge -a eselect-repository`<br/>`eselect repository 151`<br/>`emerge --sync guru`<br/>`emerge -a catppuccin-whiskers`                         |
 | Binaries<br/>(Windows, MacOS & Linux) | Available from the [latest GitHub release](https://github.com/catppuccin/whiskers/releases?q=whiskers). |
 
 ## Usage
