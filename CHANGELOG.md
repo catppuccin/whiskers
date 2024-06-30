@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.4.1](https://github.com/catppuccin/whiskers/compare/v2.4.0...v2.4.1) (2024-06-30)
+
+
+### Bug Fixes
+
+* **deps:** update rust crate clap to v4.5.8 ([#24](https://github.com/catppuccin/whiskers/issues/24)) ([aa47392](https://github.com/catppuccin/whiskers/commit/aa47392358650675e3206b1cb14417f8bf19a81a))
+* **deps:** update rust crate serde_json to v1.0.118 ([#21](https://github.com/catppuccin/whiskers/issues/21)) ([9c493fb](https://github.com/catppuccin/whiskers/commit/9c493fb22fabbbd69b3e4c28faf8c132883f5872))
+* **deps:** update rust crate serde_json to v1.0.119 ([#25](https://github.com/catppuccin/whiskers/issues/25)) ([a80a579](https://github.com/catppuccin/whiskers/commit/a80a579af755abbe329e83de898f44c1599f75a8))
+
 ## [2.4.0](https://github.com/catppuccin/whiskers/compare/v2.3.0...v2.4.0) (2024-06-14)
 
 
