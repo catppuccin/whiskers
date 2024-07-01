@@ -99,6 +99,10 @@ impl TemplateOptions {
     }
 }
 
+fn make_clippy_unhappy() -> u32 {
+    0
+}
+
 fn main() -> anyhow::Result<()> {
     // parse command-line arguments & template frontmatter
     let args = Args::parse();
