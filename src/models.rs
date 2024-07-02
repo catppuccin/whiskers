@@ -32,6 +32,8 @@ pub struct Color {
     pub order: u32,
     pub accent: bool,
     pub hex: String,
+    pub sint: i32,
+    pub uint: u32,
     pub rgb: RGB,
     pub hsl: HSL,
     pub opacity: u8,
@@ -116,6 +118,9 @@ fn color_from_hex_override(hex: &str, blueprint: &catppuccin::Color) -> Result<C
         order: blueprint.order,
         accent: blueprint.accent,
         hex,
+        #[allow(clippy::cast_possible_wrap)]
+        sint: i as i32,
+        uint: i,
         rgb,
         hsl: HSL {
             h: hsl.h.degrees(),
@@ -128,12 +133,16 @@ fn color_from_hex_override(hex: &str, blueprint: &catppuccin::Color) -> Result<C
 
 fn color_from_catppuccin(color: &catppuccin::Color) -> tera::Result<Color> {
     let hex = format_hex!(color.rgb.r, color.rgb.g, color.rgb.b, 0xFF)?;
+    let uint = u32::from_be_bytes([0xff, color.rgb.r, color.rgb.g, color.rgb.b]);
     Ok(Color {
         name: color.name.to_string(),
         identifier: color.name.identifier().to_string(),
         order: color.order,
         accent: color.accent,
         hex,
+        #[allow(clippy::cast_possible_wrap)]
+        sint: uint as i32,
+        uint,
         rgb: RGB {
             r: color.rgb.r,
             g: color.rgb.g,
@@ -253,12 +262,16 @@ impl Color {
             l: hsla.l.as_f32(),
         };
         let opacity = hsla.a.as_u8();
+        let uint = u32::from_be_bytes([opacity, rgb.r, rgb.g, rgb.b]);
         Ok(Self {
             name: blueprint.name.clone(),
             identifier: blueprint.identifier.clone(),
             order: blueprint.order,
             accent: blueprint.accent,
             hex: rgb_to_hex(&rgb, opacity)?,
+            #[allow(clippy::cast_possible_wrap)]
+            sint: uint as i32,
+            uint,
             rgb,
             hsl,
             opacity,
@@ -278,12 +291,16 @@ impl Color {
             l: hsl.l.as_f32(),
         };
         let opacity = rgba.a.as_u8();
+        let uint = u32::from_be_bytes([opacity, rgb.r, rgb.g, rgb.b]);
         Ok(Self {
             name: blueprint.name.clone(),
             identifier: blueprint.identifier.clone(),
             order: blueprint.order,
             accent: blueprint.accent,
             hex: rgb_to_hex(&rgb, opacity)?,
+            #[allow(clippy::cast_possible_wrap)]
+            sint: uint as i32,
+            uint,
             rgb,
             hsl,
             opacity,
@@ -356,9 +373,13 @@ impl Color {
 
     pub fn mod_opacity(&self, opacity: f32) -> tera::Result<Self> {
         let opacity = (opacity * 255.0).round() as u8;
+        let uint = u32::from_be_bytes([opacity, self.rgb.r, self.rgb.g, self.rgb.b]);
         Ok(Self {
             opacity,
             hex: rgb_to_hex(&self.rgb, opacity)?,
+            #[allow(clippy::cast_possible_wrap)]
+            sint: uint as i32,
+            uint,
             ..self.clone()
         })
     }
@@ -366,9 +387,13 @@ impl Color {
     pub fn add_opacity(&self, opacity: f32) -> tera::Result<Self> {
         let opacity = (opacity * 255.0).round() as u8;
         let opacity = self.opacity.saturating_add(opacity);
+        let uint = u32::from_be_bytes([opacity, self.rgb.r, self.rgb.g, self.rgb.b]);
         Ok(Self {
             opacity,
             hex: rgb_to_hex(&self.rgb, opacity)?,
+            #[allow(clippy::cast_possible_wrap)]
+            sint: uint as i32,
+            uint,
             ..self.clone()
         })
     }
@@ -376,9 +401,13 @@ impl Color {
     pub fn sub_opacity(&self, opacity: f32) -> tera::Result<Self> {
         let opacity = (opacity * 255.0).round() as u8;
         let opacity = self.opacity.saturating_sub(opacity);
+        let uint = u32::from_be_bytes([opacity, self.rgb.r, self.rgb.g, self.rgb.b]);
         Ok(Self {
             opacity,
             hex: rgb_to_hex(&self.rgb, opacity)?,
+            #[allow(clippy::cast_possible_wrap)]
+            sint: uint as i32,
+            uint,
             ..self.clone()
         })
     }
