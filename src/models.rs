@@ -32,8 +32,9 @@ pub struct Color {
     pub order: u32,
     pub accent: bool,
     pub hex: String,
-    pub sint: i32,
-    pub uint: u32,
+    pub int24: u32,
+    pub uint32: u32,
+    pub sint32: i32,
     pub rgb: RGB,
     pub hsl: HSL,
     pub opacity: u8,
@@ -103,6 +104,18 @@ fn format_hex(r: u8, g: u8, b: u8, a: u8, hex_format: &str) -> tera::Result<Stri
     )
 }
 
+/// produce three values from a given rgb value and opacity:
+/// 1. a 24-bit unsigned integer with the format `0xRRGGBB`
+/// 2. a 32-bit unsigned integer with the format `0xAARRGGBB`
+/// 3. a 32-bit signed integer with the format `0xAARRGGBB`
+/// opacity is optional, and defaults to `0xFF`.
+fn rgb_to_ints(rgb: &RGB, opacity: Option<u8>) -> (u32, u32, i32) {
+    let opacity = opacity.unwrap_or(0xFF);
+    let uint24 = u32::from_be_bytes([0x00, rgb.r, rgb.g, rgb.b]);
+    let uint32 = u32::from_be_bytes([opacity, rgb.r, rgb.g, rgb.b]);
+    (uint24, uint32, uint32 as i32)
+}
+
 fn color_from_hex_override(hex: &str, blueprint: &catppuccin::Color) -> Result<Color, Error> {
     let i = u32::from_str_radix(hex, 16)?;
     let rgb = RGB {
@@ -112,15 +125,16 @@ fn color_from_hex_override(hex: &str, blueprint: &catppuccin::Color) -> Result<C
     };
     let hsl = css_colors::rgb(rgb.r, rgb.g, rgb.b).to_hsl();
     let hex = format_hex!(rgb.r, rgb.g, rgb.b, 0xFF)?;
+    let (int24, uint32, sint32) = rgb_to_ints(&rgb, None);
     Ok(Color {
         name: blueprint.name.to_string(),
         identifier: blueprint.name.identifier().to_string(),
         order: blueprint.order,
         accent: blueprint.accent,
         hex,
-        #[allow(clippy::cast_possible_wrap)]
-        sint: i as i32,
-        uint: i,
+        int24,
+        uint32,
+        sint32,
         rgb,
         hsl: HSL {
             h: hsl.h.degrees(),
@@ -133,16 +147,17 @@ fn color_from_hex_override(hex: &str, blueprint: &catppuccin::Color) -> Result<C
 
 fn color_from_catppuccin(color: &catppuccin::Color) -> tera::Result<Color> {
     let hex = format_hex!(color.rgb.r, color.rgb.g, color.rgb.b, 0xFF)?;
-    let uint = u32::from_be_bytes([0xff, color.rgb.r, color.rgb.g, color.rgb.b]);
+    let rgb: RGB = color.rgb.into();
+    let (int24, uint32, sint32) = rgb_to_ints(&rgb, None);
     Ok(Color {
         name: color.name.to_string(),
         identifier: color.name.identifier().to_string(),
         order: color.order,
         accent: color.accent,
         hex,
-        #[allow(clippy::cast_possible_wrap)]
-        sint: uint as i32,
-        uint,
+        int24,
+        uint32,
+        sint32,
         rgb: RGB {
             r: color.rgb.r,
             g: color.rgb.g,
@@ -262,16 +277,16 @@ impl Color {
             l: hsla.l.as_f32(),
         };
         let opacity = hsla.a.as_u8();
-        let uint = u32::from_be_bytes([opacity, rgb.r, rgb.g, rgb.b]);
+        let (int24, uint32, sint32) = rgb_to_ints(&rgb, Some(opacity));
         Ok(Self {
             name: blueprint.name.clone(),
             identifier: blueprint.identifier.clone(),
             order: blueprint.order,
             accent: blueprint.accent,
             hex: rgb_to_hex(&rgb, opacity)?,
-            #[allow(clippy::cast_possible_wrap)]
-            sint: uint as i32,
-            uint,
+            int24,
+            uint32,
+            sint32,
             rgb,
             hsl,
             opacity,
@@ -291,16 +306,16 @@ impl Color {
             l: hsl.l.as_f32(),
         };
         let opacity = rgba.a.as_u8();
-        let uint = u32::from_be_bytes([opacity, rgb.r, rgb.g, rgb.b]);
+        let (int24, uint32, sint32) = rgb_to_ints(&rgb, Some(opacity));
         Ok(Self {
             name: blueprint.name.clone(),
             identifier: blueprint.identifier.clone(),
             order: blueprint.order,
             accent: blueprint.accent,
             hex: rgb_to_hex(&rgb, opacity)?,
-            #[allow(clippy::cast_possible_wrap)]
-            sint: uint as i32,
-            uint,
+            int24,
+            uint32,
+            sint32,
             rgb,
             hsl,
             opacity,
@@ -373,13 +388,13 @@ impl Color {
 
     pub fn mod_opacity(&self, opacity: f32) -> tera::Result<Self> {
         let opacity = (opacity * 255.0).round() as u8;
-        let uint = u32::from_be_bytes([opacity, self.rgb.r, self.rgb.g, self.rgb.b]);
+        let (int24, uint32, sint32) = rgb_to_ints(&self.rgb, Some(opacity));
         Ok(Self {
             opacity,
             hex: rgb_to_hex(&self.rgb, opacity)?,
-            #[allow(clippy::cast_possible_wrap)]
-            sint: uint as i32,
-            uint,
+            int24,
+            uint32,
+            sint32,
             ..self.clone()
         })
     }
@@ -387,13 +402,13 @@ impl Color {
     pub fn add_opacity(&self, opacity: f32) -> tera::Result<Self> {
         let opacity = (opacity * 255.0).round() as u8;
         let opacity = self.opacity.saturating_add(opacity);
-        let uint = u32::from_be_bytes([opacity, self.rgb.r, self.rgb.g, self.rgb.b]);
+        let (int24, uint32, sint32) = rgb_to_ints(&self.rgb, Some(opacity));
         Ok(Self {
             opacity,
             hex: rgb_to_hex(&self.rgb, opacity)?,
-            #[allow(clippy::cast_possible_wrap)]
-            sint: uint as i32,
-            uint,
+            int24,
+            uint32,
+            sint32,
             ..self.clone()
         })
     }
@@ -401,13 +416,13 @@ impl Color {
     pub fn sub_opacity(&self, opacity: f32) -> tera::Result<Self> {
         let opacity = (opacity * 255.0).round() as u8;
         let opacity = self.opacity.saturating_sub(opacity);
-        let uint = u32::from_be_bytes([opacity, self.rgb.r, self.rgb.g, self.rgb.b]);
+        let (int24, uint32, sint32) = rgb_to_ints(&self.rgb, Some(opacity));
         Ok(Self {
             opacity,
             hex: rgb_to_hex(&self.rgb, opacity)?,
-            #[allow(clippy::cast_possible_wrap)]
-            sint: uint as i32,
-            uint,
+            int24,
+            uint32,
+            sint32,
             ..self.clone()
         })
     }
@@ -451,6 +466,16 @@ impl From<&Color> for css_colors::HSLA {
             s: css_colors::Ratio::from_f32(c.hsl.s),
             l: css_colors::Ratio::from_f32(c.hsl.l),
             a: css_colors::Ratio::from_u8(c.opacity),
+        }
+    }
+}
+
+impl From<catppuccin::Rgb> for RGB {
+    fn from(rgb: catppuccin::Rgb) -> Self {
+        Self {
+            r: rgb.r,
+            g: rgb.g,
+            b: rgb.b,
         }
     }
 }

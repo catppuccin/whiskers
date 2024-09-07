@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod happy_path {
     use assert_cmd::Command;
-    use predicates::prelude::predicate;
+    use predicates::prelude::{predicate, PredicateBooleanExt};
 
     /// Test that the CLI can render a single-flavor template file
     #[test]
@@ -47,6 +47,20 @@ mod happy_path {
         assert
             .success()
             .stdout(include_str!("fixtures/read_file/read_file.md"));
+    }
+
+    /// Test that the CLI can render colours in specific formats
+    #[test]
+    fn test_formats() {
+        let mut cmd = Command::cargo_bin("whiskers").expect("binary exists");
+        let assert = cmd
+            .args(["tests/fixtures/formats.tera", "-f", "latte"])
+            .assert();
+        assert.success().stdout(
+            predicate::str::contains("24-bit red: 13766457")
+                .and(predicate::str::contains("unsigned 32-bit red: 4291956537"))
+                .and(predicate::str::contains("signed 32-bit red: -3010759")),
+        );
     }
 
     /// Test that the CLI can render a UTF-8 template file
