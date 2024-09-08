@@ -104,17 +104,17 @@ fn main() -> anyhow::Result<()> {
     let args = Args::parse();
     handle_list_flags(&args);
 
-    let template = args
+    let template_arg = args
         .template
-        .as_ref()
+        .clone()
         .expect("args.template is guaranteed by clap to be set");
-    let template_from_stdin = matches!(template.source, clap_stdin::Source::Stdin);
-    let template_name = template_name(template);
+    let template_from_stdin = template_arg.is_stdin();
+    let template_name = template_name(&template_arg);
     let template_directory =
-        template_directory(template).context("Template file does not exist")?;
+        template_directory(&template_arg).context("Template file does not exist")?;
 
     let mut decoder = DecodeReaderBytes::new(
-        template
+        template_arg
             .into_reader()
             .context("Failed to open template file")?,
     );
@@ -421,23 +421,25 @@ fn list_accents(format: OutputFormat) {
 }
 
 fn template_name(template: &clap_stdin::FileOrStdin) -> String {
-    match &template.source {
-        clap_stdin::Source::Stdin => "template".to_string(),
-        clap_stdin::Source::Arg(arg) => Path::new(&arg).file_name().map_or_else(
+    if template.is_stdin() {
+        "template".to_string()
+    } else {
+        Path::new(template.filename()).file_name().map_or_else(
             || "template".to_string(),
             |name| name.to_string_lossy().to_string(),
-        ),
+        )
     }
 }
 
 fn template_directory(template: &clap_stdin::FileOrStdin) -> anyhow::Result<PathBuf> {
-    match &template.source {
-        clap_stdin::Source::Stdin => Ok(std::env::current_dir()?),
-        clap_stdin::Source::Arg(arg) => Ok(Path::new(&arg)
+    if template.is_stdin() {
+        Ok(std::env::current_dir()?)
+    } else {
+        Ok(Path::new(template.filename())
             .canonicalize()?
             .parent()
             .expect("file path must have a parent")
-            .to_owned()),
+            .to_owned())
     }
 }
 
