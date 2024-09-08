@@ -142,16 +142,19 @@ These types are designed to closely match the [palette.json](https://github.com/
 
 ##### Color
 
-| Field        | Type     | Description                             | Examples                               |
-| ------------ | -------- | --------------------------------------- | -------------------------------------- |
-| `name`       | `String` | The name of the color.                  | `"Rosewater"`, `"Surface 0"`, `"Base"` |
-| `identifier` | `String` | The identifier of the color.            | `"rosewater"`, `"surface0"`, `"base"`  |
-| `order`      | `u32`    | Order of the color in the palette spec. | `0` to `25`                            |
-| `accent`     | `bool`   | Whether the color is an accent color.   |                                        |
-| `hex`        | `String` | The color in hexadecimal format.        | `"1e1e2e"`                             |
-| `rgb`        | `RGB`    | The color in RGB format.                |                                        |
-| `hsl`        | `HSL`    | The color in HSL format.                |                                        |
-| `opacity`    | `u8`     | The opacity of the color.               | `0` to `255`                           |
+| Field        | Type     | Description                                     | Examples                               |
+| ------------ | -------- | ----------------------------------------------- | -------------------------------------- |
+| `name`       | `String` | The name of the color.                          | `"Rosewater"`, `"Surface 0"`, `"Base"` |
+| `identifier` | `String` | The identifier of the color.                    | `"rosewater"`, `"surface0"`, `"base"`  |
+| `order`      | `u32`    | Order of the color in the palette spec.         | `0` to `25`                            |
+| `accent`     | `bool`   | Whether the color is an accent color.           |                                        |
+| `hex`        | `String` | The color in hexadecimal format.                | `"1e1e2e"`                             |
+| `int24`      | `u32`    | Big-endian 24-bit color in RGB order.           | `1973806`                              |
+| `uint32`     | `u32`    | Big-endian unsigned 32-bit color in ARGB order. | `4280163886`                           |
+| `sint32`     | `i32`    | Big-endian signed 32-bit color in ARGB order.   | `-14803410`                            |
+| `rgb`        | `RGB`    | The color in RGB format.                        |                                        |
+| `hsl`        | `HSL`    | The color in HSL format.                        |                                        |
+| `opacity`    | `u8`     | The opacity of the color.                       | `0` to `255`                           |
 
 ##### RGB
 
