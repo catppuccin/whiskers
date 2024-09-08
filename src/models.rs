@@ -108,11 +108,13 @@ fn format_hex(r: u8, g: u8, b: u8, a: u8, hex_format: &str) -> tera::Result<Stri
 /// 1. a 24-bit unsigned integer with the format `0xRRGGBB`
 /// 2. a 32-bit unsigned integer with the format `0xAARRGGBB`
 /// 3. a 32-bit signed integer with the format `0xAARRGGBB`
+///
 /// opacity is optional, and defaults to `0xFF`.
 fn rgb_to_ints(rgb: &RGB, opacity: Option<u8>) -> (u32, u32, i32) {
     let opacity = opacity.unwrap_or(0xFF);
     let uint24 = u32::from_be_bytes([0x00, rgb.r, rgb.g, rgb.b]);
     let uint32 = u32::from_be_bytes([opacity, rgb.r, rgb.g, rgb.b]);
+    #[allow(clippy::cast_possible_wrap)]
     (uint24, uint32, uint32 as i32)
 }
 
