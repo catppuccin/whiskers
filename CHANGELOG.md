@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.5.1](https://github.com/catppuccin/whiskers/compare/v2.5.0...v2.5.1) (2024-10-12)
+
+
+### Bug Fixes
+
+* **check:** wait until all diffs are shown before exiting ([#53](https://github.com/catppuccin/whiskers/issues/53)) ([66d6ffe](https://github.com/catppuccin/whiskers/commit/66d6ffe392eddef1f16634e33517cddff198aff1))
+* **deps:** update rust crate anyhow to v1.0.89 ([#46](https://github.com/catppuccin/whiskers/issues/46)) ([b0e9c20](https://github.com/catppuccin/whiskers/commit/b0e9c20105d492f4d4c1d544a58adb322b1542fe))
+* **deps:** update rust crate clap to v4.5.20 ([#47](https://github.com/catppuccin/whiskers/issues/47)) ([e80e369](https://github.com/catppuccin/whiskers/commit/e80e36937c2a462a8cfb7bda1c47efa1b378111d))
+* **deps:** update rust crate indexmap to v2.6.0 ([#50](https://github.com/catppuccin/whiskers/issues/50)) ([c579f55](https://github.com/catppuccin/whiskers/commit/c579f55399cc7ac50feaf37908a53c41bbda19d8))
+* **deps:** update rust crate serde to v1.0.210 ([#48](https://github.com/catppuccin/whiskers/issues/48)) ([3ddbf6e](https://github.com/catppuccin/whiskers/commit/3ddbf6e1173f39ce3056996e1a4459e21cdb575f))
+* **deps:** update rust crate serde_json to v1.0.128 ([#49](https://github.com/catppuccin/whiskers/issues/49)) ([00de490](https://github.com/catppuccin/whiskers/commit/00de49069d1e1a4d39688221bf98449bd266e014))
+* **deps:** update rust crate tempfile to v3.13.0 ([#52](https://github.com/catppuccin/whiskers/issues/52)) ([ac953a3](https://github.com/catppuccin/whiskers/commit/ac953a3a39fbb9386f3dfcfd9ad1356ba473affc))
+* **deps:** update rust crate thiserror to v1.0.64 ([#51](https://github.com/catppuccin/whiskers/issues/51)) ([f96deac](https://github.com/catppuccin/whiskers/commit/f96deac4962393aeeabdb36ee5a4abd39b714d9c))
+
 ## [2.5.0](https://github.com/catppuccin/whiskers/compare/v2.4.0...v2.5.0) (2024-09-08)
 
 
