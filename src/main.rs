@@ -498,7 +498,9 @@ fn render_single_output(
         .context("Template render failed")?;
 
     if let Some(path) = check {
-        check_result_with_file(&path, &result).context("Check mode failed")?;
+        if matches!(check_result_with_file(&path, &result).context("Check mode failed")?, CheckResult::Fail) {
+            std::process::exit(1);
+        }
     } else if let Some(filename) = filename {
         write_template(dry_run, &filename, result)?;
     } else {
