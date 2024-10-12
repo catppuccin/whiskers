@@ -498,7 +498,12 @@ fn render_single_output(
         .context("Template render failed")?;
 
     if let Some(path) = check {
-        check_result_with_file(&path, &result).context("Check mode failed")?;
+        if matches!(
+            check_result_with_file(&path, &result).context("Check mode failed")?,
+            CheckResult::Fail
+        ) {
+            std::process::exit(1);
+        }
     } else if let Some(filename) = filename {
         write_template(dry_run, &filename, result)?;
     } else {
@@ -522,6 +527,7 @@ fn render_multi_output(
         .map(|(key, iterable)| iterable.into_iter().map(move |v| (key.clone(), v)))
         .multi_cartesian_product()
         .collect::<Vec<_>>();
+    let mut check_results: Vec<CheckResult> = Vec::with_capacity(iterables.len());
 
     for iterable in iterables {
         let mut ctx = ctx.clone();
@@ -549,10 +555,15 @@ fn render_multi_output(
             .context("Filename template render failed")?;
 
         if args.check.is_some() {
-            check_result_with_file(&filename, &result).context("Check mode failed")?;
+            check_results
+                .push(check_result_with_file(&filename, &result).context("Check mode failed")?);
         } else {
             write_template(args.dry_run, &filename, result)?;
         }
+    }
+
+    if check_results.iter().any(|r| matches!(r, CheckResult::Fail)) {
+        std::process::exit(1);
     }
 
     Ok(())
@@ -570,7 +581,13 @@ fn maybe_create_parents(filename: &Path) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn check_result_with_file<P>(path: &P, result: &str) -> anyhow::Result<()>
+#[must_use]
+enum CheckResult {
+    Pass,
+    Fail,
+}
+
+fn check_result_with_file<P>(path: &P, result: &str) -> anyhow::Result<CheckResult>
 where
     P: AsRef<Path>,
 {
@@ -581,12 +598,13 @@ where
             path.display()
         )
     })?;
-    if *result != expected {
+    if *result == expected {
+        Ok(CheckResult::Pass)
+    } else {
         eprintln!("Output does not match {}", path.display());
         invoke_difftool(result, path)?;
-        std::process::exit(1);
+        Ok(CheckResult::Fail)
     }
-    Ok(())
 }
 
 fn invoke_difftool<P>(actual: &str, expected_path: P) -> anyhow::Result<()>
