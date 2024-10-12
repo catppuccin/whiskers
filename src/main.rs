@@ -581,6 +581,7 @@ fn maybe_create_parents(filename: &Path) -> anyhow::Result<()> {
     Ok(())
 }
 
+#[must_use]
 enum CheckResult {
     Pass,
     Fail,
