@@ -30,7 +30,7 @@ pub fn from_values(
             tera::Value::String(s) => {
                 let iterable = iterables
                     .get(s.as_str())
-                    .ok_or(Error::UnknownIterable { name: s.clone() })?;
+                    .ok_or_else(|| Error::UnknownIterable { name: s.clone() })?;
                 Ok((s, iterable.clone()))
             }
             tera::Value::Object(o) => {
