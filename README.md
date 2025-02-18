@@ -27,13 +27,13 @@ into.
 
 You can install Whiskers using one of the methods below:
 
-| Installation Method                   | Instructions                                                                                            |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| crates.io                             | `cargo install catppuccin-whiskers`                                                                     |
-| Source                                | `cargo install --git https://github.com/catppuccin/whiskers catppuccin-whiskers`                        |
-| Homebrew                              | `brew install catppuccin/tap/whiskers`                                                                  |
-| Nix                                   | `nix profile install github:catppuccin/whiskers`<br/>`nix run github:catppuccin/whiskers -- <args>`     |
-| Binaries<br/>(Windows, MacOS & Linux) | Available from the [latest GitHub release](https://github.com/catppuccin/whiskers/releases?q=whiskers). |
+| Installation Method                   | Instructions                                                                                        |
+| ------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| crates.io                             | `cargo install catppuccin-whiskers`                                                                 |
+| Source                                | `cargo install --git https://github.com/catppuccin/whiskers catppuccin-whiskers`                    |
+| Homebrew                              | `brew install catppuccin/tap/whiskers`                                                              |
+| Nix                                   | `nix profile install github:catppuccin/whiskers`<br/>`nix run github:catppuccin/whiskers -- <args>` |
+| Binaries<br/>(Windows, MacOS & Linux) | Available from the [latest GitHub release](https://github.com/catppuccin/whiskers/releases).        |
 
 ## Usage
 
@@ -214,22 +214,37 @@ take the form of valid YAML set between triple-dashed lines.
 
 ### Template Version
 
-The most important frontmatter key is the Whiskers version. This key allows
-Whiskers to ensure that it is rendering a template that it can understand.
+The most important frontmatter key is the Whiskers version requirement. This key
+allows Whiskers to ensure it is rendering a template that it can understand.
 
-Example:
+Syntax:
 
 ```yaml
 ---
 whiskers:
-  version: "2.0.0"
+  version: "^2.5.1"
 ---
 ... standard template content goes here ...
 ```
 
+Whiskers supports specifying version requirements in a number of ways:
+
+- `^X.Y.Z`: exactly `X`, with any minor and patch version >= `Y.Z`. **This is the
+  recommended approach unless a more specific constraint is required.**
+- `~X.Y.Z`: exactly `X.Y`, with any patch version >= `Z`.
+- `=X.Y.Z`: only version `X.Y.Z`.
+- `=X.Y` or `=X`: any version matching `X.Y.*` or `X.*.*`.
+- `>ver`: any version newer than `ver`, not including `ver`.
+- `>=ver`: version `ver` or newer.
+- `<ver`: any version older than `ver`, not including `ver`.
+- `<=ver`: version `ver` or older.
+- `X.Y.*`, `X.*`, or `*`: wildcard, any value in the specified position.
+
+Full technical detail of the supported version requirement syntax can be found in [the semver crate documentation](https://docs.rs/semver/1.0.25/semver/enum.Op.html).
+
 If the version key is not present, Whiskers will display a warning and attempt
-to render the template anyway. However, it is recommended to always include the
-version key to ensure compatibility with future versions of Whiskers.
+to render the template anyway. It is recommended to always include the version
+key to ensure compatibility with future versions of Whiskers.
 
 ### Hex Format
 
@@ -249,7 +264,7 @@ Example:
 ```
 ---
 whiskers:
-  version: "2.0.0"
+  version: "^2.5.1"
   hex_format: "0x{{B}}{{G}}{{R}}{{A}}"
 ---
 {{red.hex}}
@@ -404,7 +419,7 @@ Example:
 ```
 ---
 whiskers:
-  version: 2.0.0
+  version: "^2.5.1"
   matrix:
     - variant: ["normal", "no-italics"]
     - flavor
@@ -478,10 +493,10 @@ For Visual Studio Code users we recommend the [Better Jinja](https://marketplace
 ## Further Reading
 
 - See the [examples](examples) directory which further showcase the utilities
-  and power of whiskers.
+  and power of Whiskers.
 - See the RFC,
   [CAT-0003-Whiskers](https://github.com/catppuccin/community/blob/main/rfc/CAT-0003-Whiskers.md),
-  to understand the motivation behind creating whiskers.
+  to understand the motivation behind creating Whiskers.
 
 &nbsp;
 

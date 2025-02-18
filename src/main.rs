@@ -28,7 +28,7 @@ fn default_hex_format() -> String {
 
 #[derive(Default, Debug, serde::Deserialize)]
 struct TemplateOptions {
-    version: Option<semver::VersionReq>,
+    version: Option<(semver::VersionReq, String)>,
     matrix: Option<Matrix>,
     filename: Option<String>,
     hex_format: String,
@@ -51,11 +51,11 @@ impl TemplateOptions {
             capitalize_hex: bool,
         }
 
-        if let Some(opts) = frontmatter.get(FRONTMATTER_OPTIONS_SECTION) {
-            let opts: RawTemplateOptions = tera::from_value(opts.clone())
+        if let Some(opts_section) = frontmatter.get(FRONTMATTER_OPTIONS_SECTION) {
+            let raw_opts: RawTemplateOptions = tera::from_value(opts_section.clone())
                 .context("Frontmatter `whiskers` section is invalid")?;
 
-            let matrix = opts
+            let matrix = raw_opts
                 .matrix
                 .map(|m| matrix::from_values(m, only_flavor))
                 .transpose()
@@ -63,21 +63,21 @@ impl TemplateOptions {
 
             // if there's no hex_format but there is hex_prefix and/or capitalize_hex,
             // we can construct a hex_format from those.
-            let hex_format = if let Some(hex_format) = opts.hex_format {
+            let hex_format = if let Some(hex_format) = raw_opts.hex_format {
                 hex_format
             } else {
                 // throw a deprecation warning for hex_prefix and capitalize_hex
-                if opts.hex_prefix.is_some() {
-                    eprintln!("Warning: `hex_prefix` is deprecated and will be removed in a future version. Use `hex_format` instead.");
+                if raw_opts.hex_prefix.is_some() {
+                    eprintln!("warning: `hex_prefix` is deprecated and will be removed in a future version. Use `hex_format` instead.");
                 }
 
-                if opts.capitalize_hex {
-                    eprintln!("Warning: `capitalize_hex` is deprecated and will be removed in a future version. Use `hex_format` instead.");
+                if raw_opts.capitalize_hex {
+                    eprintln!("warning: `capitalize_hex` is deprecated and will be removed in a future version. Use `hex_format` instead.");
                 }
 
-                let prefix = opts.hex_prefix.unwrap_or_default();
+                let prefix = raw_opts.hex_prefix.unwrap_or_default();
                 let components = default_hex_format();
-                if opts.capitalize_hex {
+                if raw_opts.capitalize_hex {
                     format!("{prefix}{}", components.to_uppercase())
                 } else {
                     format!("{prefix}{components}")
@@ -85,9 +85,16 @@ impl TemplateOptions {
             };
 
             Ok(Self {
-                version: opts.version,
+                version: raw_opts.version.map(|version| {
+                    (
+                        version,
+                        opts_section["version"].as_str().map(String::from).expect(
+                            "version string is guaranteed to be Some if `raw_opts.version` is Some",
+                        ),
+                    )
+                }),
                 matrix,
-                filename: opts.filename,
+                filename: raw_opts.filename,
                 hex_format,
             })
         } else {
@@ -446,20 +453,33 @@ fn template_directory(template: &clap_stdin::FileOrStdin) -> anyhow::Result<Path
 fn template_is_compatible(template_opts: &TemplateOptions) -> bool {
     let whiskers_version = semver::Version::parse(env!("CARGO_PKG_VERSION"))
         .expect("CARGO_PKG_VERSION is always valid");
-    if let Some(template_version) = &template_opts.version {
+    if let Some((template_version, template_version_raw)) = &template_opts.version {
+        // warn if the template is using an implicit constraint instead of an explicit one
+        // i.e. `version: "2.5.1"` instead of `version: "^2.5.1"`
+        if let &[comp] = &template_version.comparators.as_slice() {
+            if comp.op == semver::Op::Caret && !template_version_raw.starts_with('^') {
+                eprintln!("warning: Template specifies an implicit constraint of {template_version_raw}, consider explicitly specifying ^{template_version_raw} instead");
+            }
+        }
+
         if !template_version.matches(&whiskers_version) {
-            eprintln!("Template requires whiskers version {template_version}, but you are running whiskers {whiskers_version}");
+            eprintln!(
+                "error: This template requires a version of Whiskers compatible with \
+                \"{template_version}\", but you are running Whiskers \
+                {whiskers_version} which is not compatible with this \
+                requirement."
+            );
             return false;
         }
     } else {
-        eprintln!("Warning: No Whiskers version requirement specified in template.");
+        eprintln!("warning: No Whiskers version requirement specified in template.");
         eprintln!("This template may not be compatible with this version of Whiskers.");
         eprintln!();
-        eprintln!("To fix this, add the minimum supported Whiskers version to the template frontmatter as follows:");
+        eprintln!("To fix this, specify a Whiskers version requirement in the template frontmatter as follows:");
         eprintln!();
         eprintln!("---");
         eprintln!("whiskers:");
-        eprintln!("    version: \"{whiskers_version}\"");
+        eprintln!("    version: \"^{whiskers_version}\"");
         eprintln!("---");
         eprintln!();
     };
@@ -473,7 +493,7 @@ fn write_template(dry_run: bool, filename: &str, result: String) -> Result<(), a
     if dry_run || cfg!(test) {
         println!(
             "Would write {} bytes into {}",
-            result.as_bytes().len(),
+            result.len(),
             filename.display()
         );
     } else {
@@ -594,14 +614,14 @@ where
     let path = path.as_ref();
     let expected = std::fs::read_to_string(path).with_context(|| {
         format!(
-            "Couldn't read {} for comparison against result",
+            "error: Couldn't read {} for comparison against result",
             path.display()
         )
     })?;
     if *result == expected {
         Ok(CheckResult::Pass)
     } else {
-        eprintln!("Output does not match {}", path.display());
+        eprintln!("error: Output does not match {}", path.display());
         invoke_difftool(result, path)?;
         Ok(CheckResult::Fail)
     }
