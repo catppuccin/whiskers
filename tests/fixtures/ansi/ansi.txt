@@ -1,0 +1,25 @@
+Black: [0] #5c5f77
+Red: [1] #d20f39
+Green: [2] #40a02b
+Yellow: [3] #df8e1d
+Blue: [4] #1e66f5
+Magenta: [5] #ea76cb
+Cyan: [6] #179299
+White: [7] #acb0be
+Bright Black: [8] #6c6f85
+Bright Red: [9] #de293e
+Bright Green: [10] #49af3d
+Bright Yellow: [11] #eea02d
+Bright Blue: [12] #456eff
+Bright Magenta: [13] #fe85d8
+Bright Cyan: [14] #2d9fa8
+Bright White: [15] #bcc0cc
+
+Black: [0] #45475a | [8] #585b70
+Red: [1] #f38ba8 | [9] #f37799
+Green: [2] #a6e3a1 | [10] #89d88b
+Yellow: [3] #f9e2af | [11] #ebd391
+Blue: [4] #89b4fa | [12] #74a8fc
+Magenta: [5] #f5c2e7 | [13] #f2aede
+Cyan: [6] #94e2d5 | [14] #6bd7ca
+White: [7] #a6adc8 | [15] #bac2de
