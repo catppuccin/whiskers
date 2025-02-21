@@ -24,6 +24,7 @@ pub struct Flavor {
     pub light: bool,
     pub colors: IndexMap<String, Color>,
     pub ansi_colors: IndexMap<String, AnsiColor>,
+    pub ansi_color_pairs: IndexMap<String, AnsiColorPair>,
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
@@ -52,6 +53,15 @@ pub struct AnsiColor {
     pub sint32: i32,
     pub rgb: RGB,
     pub hsl: HSL,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+pub struct AnsiColorPair {
+    pub name: String,
+    pub identifier: String,
+    pub order: u32,
+    pub normal: AnsiColor,
+    pub bright: AnsiColor,
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
@@ -206,6 +216,18 @@ fn ansi_color_from_catppuccin(ansi_color: &catppuccin::AnsiColor) -> tera::Resul
     })
 }
 
+fn ansi_color_pair_from_catppuccin(
+    ansi_color_pair: &catppuccin::AnsiColorPair,
+) -> tera::Result<AnsiColorPair> {
+    Ok(AnsiColorPair {
+        name: ansi_color_pair.name.to_string(),
+        identifier: ansi_color_pair.name.identifier().to_string(),
+        order: ansi_color_pair.order,
+        normal: ansi_color_from_catppuccin(&ansi_color_pair.normal)?,
+        bright: ansi_color_from_catppuccin(&ansi_color_pair.bright)?,
+    })
+}
+
 /// Build a [`Palette`] from [`catppuccin::PALETTE`], optionally applying color overrides.
 pub fn build_palette(color_overrides: Option<&ColorOverrides>) -> Result<Palette, Error> {
     // make a `Color` from a `catppuccin::Color`, taking into account `color_overrides`.
@@ -254,6 +276,14 @@ pub fn build_palette(color_overrides: Option<&ColorOverrides>) -> Result<Palette
             );
         }
 
+        let mut ansi_color_pairs = IndexMap::new();
+        for ansi_color_pair in &flavor.ansi_colors.all_pairs() {
+            ansi_color_pairs.insert(
+                ansi_color_pair.name.identifier().to_string(),
+                ansi_color_pair_from_catppuccin(ansi_color_pair)?,
+            );
+        }
+
         flavors.insert(
             flavor.name.identifier().to_string(),
             Flavor {
@@ -265,6 +295,7 @@ pub fn build_palette(color_overrides: Option<&ColorOverrides>) -> Result<Palette
                 light: !flavor.dark,
                 colors,
                 ansi_colors,
+                ansi_color_pairs,
             },
         );
     }
