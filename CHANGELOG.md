@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.5.2](https://github.com/catppuccin/whiskers/compare/v2.5.1...v2.5.2) (2025-03-02)
+
+
+### Bug Fixes
+
+* **deps:** update rust crate anyhow to v1.0.96 ([#57](https://github.com/catppuccin/whiskers/issues/57)) ([eec49ec](https://github.com/catppuccin/whiskers/commit/eec49ec39b81cdd668b0c76e5ca9dfb15ecfa670))
+* **deps:** update rust crate serde to v1.0.218 ([#58](https://github.com/catppuccin/whiskers/issues/58)) ([83d393a](https://github.com/catppuccin/whiskers/commit/83d393aaf66f1b174e7e11095cd4ecce0a1cd95d))
+* **deps:** update rust crate serde_json to v1.0.139 ([#56](https://github.com/catppuccin/whiskers/issues/56)) ([9a7d0be](https://github.com/catppuccin/whiskers/commit/9a7d0be780793596c46a44ed294bdacace268682))
+
 ## [2.5.1](https://github.com/catppuccin/whiskers/compare/v2.5.0...v2.5.1) (2024-10-12)
 
 
