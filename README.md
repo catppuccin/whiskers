@@ -319,8 +319,8 @@ Rendering the above template produces the following output:
 bg = "#1e1e2e"
 fg = "#cdd6f4"
 border = "#cba6f7"
-diffaddfg = "#a6e3a1"
-diffaddbg = "#40b436"
+diffAddFg = "#a6e3a1"
+diffAddBg = "#40b436"
 ```
 
 ## Overrides
