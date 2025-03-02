@@ -1,0 +1,11 @@
+---
+whiskers:
+  version: "^2"
+  hex_format: "#{{r}}{{g}}{{b}}{{z}}"
+---
+{% for _, color in flavor.ansi_colors -%}
+{{ color.name }}: [{{ color.code }}] {{ color.hex }}
+{% endfor %}
+{% for _, pair in flavor.ansi_color_pairs -%}
+{{pair.name}}: [{{ pair.normal.code }}] {{ pair.normal.hex}} | [{{ pair.bright.code }}] {{ pair.bright.hex }}
+{% endfor -%}
