@@ -475,12 +475,7 @@ Templating would result in changes.
 
 ## Editor Support
 
-Tera's syntax is not natively supported by most editors. Some editors have
-extensions available that provide syntax highlighting and other features for
-Tera templates. In the case that your editor does not have a viable extension
-available, you can try using a Jinja extension instead. While not an exact
-match, Tera's syntax is similar enough to Jinja's that it can be used quite
-well in most cases.
+Tera support can be installed in Neovim as of v0.11 and with the latest nvim-treesitter. Support in Helix is unreleased but available on the master branch as of 2025-02-02. For Zed users, we recommend the [Tera extension for Zed](https://github.com/uncenter/zed-tera).
 
 For Visual Studio Code users we recommend the [Better Jinja](https://marketplace.visualstudio.com/items?itemName=samuelcolvin.jinjahtml) extension.
 
