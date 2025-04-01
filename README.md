@@ -28,7 +28,8 @@ You can install Whiskers using one of the methods below:
 | Homebrew                              | `brew install catppuccin/tap/whiskers`                                                                      |
 | Nix                                   | `nix profile install github:catppuccin/nix@whiskers`<br/>`nix run github:catppuccin/nix#whiskers -- <args>` |
 | Binaries<br/>(Windows, MacOS & Linux) | Available from the [latest GitHub release](https://github.com/catppuccin/whiskers/releases).                |
-| AUR                                   | https://aur.archlinux.org/packages/catppuccin-whiskers-bin                                                  |
+| AUR                                   | Install [catppuccin-whiskers-bin](https://aur.archlinux.org/packages/catppuccin-whiskers-bin)               |
+
 ## Usage
 
 ```console
