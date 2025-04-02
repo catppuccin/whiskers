@@ -31,7 +31,7 @@ jobs:
         run: |
           FILES=$(echo "${{ inputs.templates }}" | grep -v "^$")
           while IFS= read -r file; do
-            echo "::group::Checking $file"
+            echo "::group::$file"
             whiskers "$file" --check
             echo "::endgroup::"
           done <<< "$FILES"
