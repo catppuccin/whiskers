@@ -1,0 +1,30 @@
+name: Lint Whiskers Repository
+
+on:
+  workflow_call:
+    inputs:
+      templates:
+        required: true
+        type: string
+      whiskers-version:
+        required: false
+        type: string
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@4
+
+      - name: Setup Whiskers
+        if: ${{ inputs.whiskers-version }}
+        uses: catppuccin/setup-whiskers@feat/auto-detect
+        with:
+          whiskers-version: ${{ inputs.whiskers-version }}
+
+      - name: Setup Whiskers (Auto Detecting Version)
+        if: ${{ !inputs.whiskers-version }}
+        uses: catppuccin/setup-whiskers@feat/auto-detect
+
+      - run: echo "${{ inputs.templates }}" | grep -v "^$" | xargs -I {} sh -c 'whiskers {} --check'
