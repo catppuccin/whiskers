@@ -27,4 +27,5 @@ jobs:
         if: ${{ !inputs.whiskers-version }}
         uses: catppuccin/setup-whiskers@feat/auto-detect
 
-      - run: echo "${{ inputs.templates }}" | grep -v "^$" | xargs -I {} sh -c 'whiskers {} --check'
+      - name: Check Templates
+        run: echo "${{ inputs.templates }}" | grep -v "^$" | xargs -I {} sh -c 'whiskers {} --check'
