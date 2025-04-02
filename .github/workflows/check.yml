@@ -11,11 +11,11 @@ on:
         type: string
 
 jobs:
-  run:
+  check:
     runs-on: ubuntu-latest
     steps:
       - name: Clone Repository
-        uses: actions/checkout@4
+        uses: actions/checkout@v4
 
       - name: Setup Whiskers
         if: ${{ inputs.whiskers-version }}
