@@ -28,4 +28,11 @@ jobs:
         uses: catppuccin/setup-whiskers@feat/auto-detect
 
       - name: Check Templates
-        run: echo "${{ inputs.templates }}" | grep -v "^$" | xargs -I {} sh -c 'whiskers {} --check'
+        run: |
+          FILES=$(echo "${{ inputs.templates }}" | grep -v "^$")
+          while IFS= read -r file; do
+            echo "::group::Checking $file"
+            whiskers "$file" --check
+            echo "::endgroup::"
+          done <<< "$FILES"
+
