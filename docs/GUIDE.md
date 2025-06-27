@@ -8,22 +8,37 @@
 
 &nbsp;
 
-The top section of each Whiskers template, beginning and ending with `---`, is referred to as "frontmatter".
-This section conveys important information to Whiskers through the `whiskers` key, though you can also add your own variables that will be added to the context.
+## Terminology
 
-Let's consider the following frontmatter:
+### Frontmatter
+
+The section at the top of each Whiskers template, beginning and ending with `---` (three consecutive dashes), is referred to as "frontmatter".
+This section conveys important information to Whiskers through the `whiskers` key, and you can also add your own variables that will be added to the context.
+
+### Tera
+
+[Tera](https://keats.github.io/tera/) is the templating engine powering Whiskers. Please familiarize yourself with the syntax before writing your first Whiskers template.
+
+## Single file templates
+
+Let's consider the following template:
+
+`01-simple.tera`
 
 ```jinja
 ---
 whiskers:
-  version: "2.3.0"
+  version: "^2.5.1"
 ---
 {%- for _, flavor in flavors %}
-{{ flavor.emoji}} {{ flavor.name }}
+{{ flavor.emoji }} {{ flavor.name }}
 {%- endfor %}
 ```
 
-This is as simple as a Whiskers template can be. The frontmatter defines `whiskers.version` and nothing more. When compiled, Whiskers prints the following to your console:
+At the top, the frontmatter defines `whiskers.version`. This is a [Whiskers version requirement](./reference.md#version-requirement), allowing Whiskers to ensure it is rendering a template that it can understand.
+
+Below the frontmatter is the body of the Whiskers template. The body contains a for loop over the entries of the `flavors` object, discarding the key (`_`) and setting the value of each entry to `flavor`.
+We can compile this template with `whiskers 01-simple.tera`. Whiskers prints the following:
 
 ```
 🌻 Latte
@@ -32,38 +47,37 @@ This is as simple as a Whiskers template can be. The frontmatter defines `whiske
 🌿 Mocha
 ```
 
-Perfect! But we want this in a file. You can either [redirect the output](https://www.gnu.org/software/bash/manual/html_node/Redirections.html) with `>` (e.g. `whiskers <filename> > output.md`), or preferably define the `whiskers.filename` property in the frontmatter:
+To save this output to a file, we can define the `whiskers.filename` property in the frontmatter:
 
 ```diff
 ---
 whiskers:
-  version: "2.3.0"
-+ filename: "output.md"
+  version: "^2.5.1"
++ filename: "output.txt"
 ---
 {%- for _, flavor in flavors %}
-[{{ flavor.emoji}} {{ flavor.name }}]
+{{ flavor.emoji}} {{ flavor.name }}
 {%- endfor %}
 ```
 
-> [!TIP]
-> The `whiskers.filename` property also allows you to use Tera expressions within it, like a miniature template. This is helpful for more complex and dynamic output locations - see the below section on `whiskers.matrix`.
+This instructs Whiskers to write the output of the template to `output.txt`. If the given filepath contains directories (`path/to/abc/output.txt`), Whiskers will automatically create all necesssary parent directories.
 
-This instructs Whiskers to write the file for you, and helpfully it will also create any missing directories in the path.
+## Matrix templates
 
-In most cases, a single template will need to result in multiple files (one for each flavor, or occasionally one for each flavor and accent combination). This behavior is built-in to Whiskers through the `whiskers.matrix` property. The most basic usage of it is as follows:
+In most cases, a single template will need to result in multiple files (such as one for each flavor). This behavior is built-in to Whiskers through the `whiskers.matrix` property. The most basic usage of it is as follows:
 
 ```jinja
 ---
 whiskers:
-  version: "2.3.0"
+  version: "^2.5.1"
   matrix:
     - flavor
-  filename: "{{ flavor.identifier }}.md"
+  filename: "{{ flavor.identifier }}.txt"
 ---
 {{ flavor.emoji }} {{ flavor.name }}
 ```
 
-This template instructs Whiskers to execute the template once for each flavor through `whiskers.matrix`, which involves injecting the `flavor` variable of the current flavor of the matrix (equivalent to `flavors[flavor]` under the hood) in each iteration. The `flavor` variable is used twice, once in `whiskers.filename` to dynamically generate a filename based on the name of the flavor -- executing this template will output the following files: `latte.md`, `frappe.md`, `macchiato.md`, and `mocha.md` -- and secondly to display the `emoji` and `name` properties of each flavor (see https://github.com/catppuccin/palette/blob/main/palette.json).
+In this template, `whiskers.matrix` instructs Whiskers to generate the template once for each flavor. Whiskers injects the `flavor` variable, containing the [flavor object](./reference.md#flavor) of the current matrix iteration (equivalent to `flavors[flavor]` under the hood) in each iteration. The `flavor` variable is used twice, once in `whiskers.filename` to dynamically generate a filename based on the name of the flavor -- executing this template will output the following files: `latte.md`, `frappe.md`, `macchiato.md`, and `mocha.md` -- and secondly to display the `emoji` and `name` properties of each flavor (see https://github.com/catppuccin/palette/blob/main/palette.json).
 
 In addition to the mandatory `whiskers` object, you may define arbitrary keys in your frontmatter as an easier way of defining variables within the template's context. For example, consider the following template.
 

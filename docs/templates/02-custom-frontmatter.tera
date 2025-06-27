@@ -2,7 +2,7 @@
 accent: mauve
 my_variable: xyz
 whiskers:
-  version: "2.3.0"
+  version: "^2.5.1"
 ---
 accent: {{ accent }} -> #{{ flavors.mocha.colors[accent].hex }}
 my_variable: {{ my_variable }}
