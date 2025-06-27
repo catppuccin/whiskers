@@ -40,7 +40,7 @@ jobs:
     if: ${{ needs.release-please.outputs.release_created }}
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
       - uses: actions/cache@v4
         with:
           path: |
@@ -56,8 +56,8 @@ jobs:
           cargo test --release --locked
 
           export BINARY_NAME="${EXECUTABLE}-$(rustc --version --verbose | grep host | cut -d ' ' -f 2)${EXE_SUFFIX}"
-          mv "target/release/${EXECUTABLE}${EXE_SUFFIX}" "./${BINARY_NAME}"
-          echo "binary=${BINARY_NAME}" >> $GITHUB_OUTPUT
+          mv "target/release/${EXECUTABLE}${EXE_SUFFIX}" "./target/${BINARY_NAME}"
+          echo "binary=target/${BINARY_NAME}" >> $GITHUB_OUTPUT
 
       - name: Publish to crates.io
         if: ${{ matrix.os == 'ubuntu-latest' }}
@@ -69,9 +69,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release upload "${{ needs.release-please.outputs.tag_name }}" ${{ steps.build.outputs.binary }}
-
-      - name: Upload to artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{steps.build.outputs.binary}}
-          path: ${{steps.build.outputs.binary}}

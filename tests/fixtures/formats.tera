@@ -1,0 +1,7 @@
+---
+whiskers:
+    version: "2.0.0"
+---
+24-bit red: {{red.int24}}
+unsigned 32-bit red: {{red.uint32}}
+signed 32-bit red: {{red.sint32}}

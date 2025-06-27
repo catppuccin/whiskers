@@ -1,0 +1,10 @@
+---
+# test a custom hex format
+whiskers:
+  version: "2"
+  hex_format: "0x{{B}}{{G}}{{R}}{{A}}"
+---
+{%- set translucent_red = flavors.latte.colors.red | mod(opacity=0.5) -%}
+{{flavors.latte.colors.red.hex}} == 0x390FD2FF
+{{flavors.macchiato.colors.sky.hex}} == 0xE3D791FF
+{{translucent_red.hex}} == 0x390FD280

@@ -13,29 +13,24 @@
 
 &nbsp;
 
-> [!IMPORTANT]
-> This repository has been migrated from
-> [catppuccin/toolbox](https://github.com/catppuccin/toolbox/tree/main/whiskers). To view releases
-> prior to [v2.3.0](https://github.com/catppuccin/whiskers/releases/tag/v2.3.0),
-> see the [releases from catppuccin/toolbox](https://github.com/catppuccin/toolbox/releases?q=whiskers&expanded=true).
+Whiskers is a port creation helper tool that is custom-built for Catppuccin,
+allowing developers to define template files which the palette can be injected
+into.
 
 ## Installation
 
 You can install Whiskers using one of the methods below:
 
-| Installation Method                   | Instructions                                                                                                        |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| crates.io                             | `cargo install catppuccin-whiskers`                                                                                 |
-| Source                                | `cargo install --git https://github.com/catppuccin/whiskers catppuccin-whiskers`                                     |
-| Homebrew                              | `brew install catppuccin/tap/whiskers`                                                                              |
-| Nix                                   | `nix profile install github:catppuccin/whiskers`<br/>`nix run github:catppuccin/whiskers -- <args>` |
-| Binaries<br/>(Windows, MacOS & Linux) | Available from the [latest GitHub release](https://github.com/catppuccin/whiskers/releases?q=whiskers).              |
+| Installation Method                   | Instructions                                                                                                |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| crates.io                             | `cargo install catppuccin-whiskers`                                                                         |
+| Source                                | `cargo install --git https://github.com/catppuccin/whiskers catppuccin-whiskers`                            |
+| Homebrew                              | `brew install catppuccin/tap/whiskers`                                                                      |
+| Nix                                   | `nix profile install github:catppuccin/nix@whiskers`<br/>`nix run github:catppuccin/nix#whiskers -- <args>` |
+| Binaries<br/>(Windows, MacOS & Linux) | Available from the [latest GitHub release](https://github.com/catppuccin/whiskers/releases).                |
+| AUR                                   | Install [catppuccin-whiskers-bin](https://aur.archlinux.org/packages/catppuccin-whiskers-bin)               |
 
 ## Usage
-
-Whiskers is a port creation helper tool that is custom-built for Catppuccin,
-allowing developers to define template files which the palette can be injected
-into.
 
 ```console
 $ whiskers --help
@@ -50,7 +45,7 @@ Arguments:
 Options:
   -f, --flavor <FLAVOR>
           Render a single flavor instead of all four
-          
+
           [possible values: latte, frappe, macchiato, mocha]
 
       --color-overrides <COLOR_OVERRIDES>
@@ -61,7 +56,7 @@ Options:
 
       --check [<EXAMPLE_PATH>]
           Instead of creating an output, check it against an example
-          
+
           In single-output mode, a path to the example file must be provided. In multi-output mode, no path is required and, if one is provided, it will be ignored.
 
       --dry-run
@@ -78,7 +73,7 @@ Options:
 
   -o, --output-format <OUTPUT_FORMAT>
           Output format of --list-functions
-          
+
           [default: json]
           [possible values: json, yaml, markdown, markdown-table, plain]
 
@@ -111,18 +106,18 @@ The following variables are available for use in your templates:
 
 #### Single-Flavor Mode
 
-| Variable | Description |
-| - | - |
-| `flavor` ([`Flavor`](#flavor)) | The flavor being templated. |
-| `rosewater`, `flamingo`, `pink`, [etc.](https://github.com/catppuccin/catppuccin#-palette) ([`Color`](#color)) | All colors of the flavor being templated. |
-| Any Frontmatter | All frontmatter variables as described in the [Frontmatter](#Frontmatter) section. |
+| Variable                                                                                                       | Description                                                                        |
+| -------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `flavor` ([`Flavor`](#flavor))                                                                                 | The flavor being templated.                                                        |
+| `rosewater`, `flamingo`, `pink`, [etc.](https://github.com/catppuccin/catppuccin#-palette) ([`Color`](#color)) | All colors of the flavor being templated.                                          |
+| Any Frontmatter                                                                                                | All frontmatter variables as described in the [Frontmatter](#Frontmatter) section. |
 
 #### Multi-Flavor Mode
 
-| Variable | Description |
-| - | - |
-| `flavors` (Map\<String, [`Flavor`](#flavor)>) | An array containing all of the named flavors, with every other context variable. |
-| Any Frontmatter | All frontmatter variables as described in the [Frontmatter](#Frontmatter) section. |
+| Variable                                      | Description                                                                        |
+| --------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `flavors` (Map\<String, [`Flavor`](#flavor)>) | An array containing all of the named flavors, with every other context variable.   |
+| Any Frontmatter                               | All frontmatter variables as described in the [Frontmatter](#Frontmatter) section. |
 
 #### Types
 
@@ -130,71 +125,74 @@ These types are designed to closely match the [palette.json](https://github.com/
 
 ##### Flavor
 
-| Field | Type | Description | Examples |
-| - | - | - | - |
-| `name` | `String` | The name of the flavor. | `"Latte"`, `"Frappé"`, `"Macchiato"`, `"Mocha"` |
-| `identifier` | `String` | The identifier of the flavor. | `"latte"`, `"frappe"`, `"macchiato"`, `"mocha"` |
-| `emoji` | `char` | Emoji associated with the flavor. | `'🌻'`, `'🪴'`, `'🌺'`, `'🌿'` |
-| `order` | `u32` | Order of the flavor in the palette spec. | `0` to `3` |
-| `dark` | `bool` | Whether the flavor is dark. | `false` for Latte, `true` for others |
-| `light` | `bool` | Whether the flavor is light. | `true` for Latte, `false` for others |
-| `colors` | `Map<String, Color>` | A map of color identifiers to their respective values. | |
+| Field        | Type                 | Description                                            | Examples                                        |
+| ------------ | -------------------- | ------------------------------------------------------ | ----------------------------------------------- |
+| `name`       | `String`             | The name of the flavor.                                | `"Latte"`, `"Frappé"`, `"Macchiato"`, `"Mocha"` |
+| `identifier` | `String`             | The identifier of the flavor.                          | `"latte"`, `"frappe"`, `"macchiato"`, `"mocha"` |
+| `emoji`      | `char`               | Emoji associated with the flavor.                      | `'🌻'`, `'🪴'`, `'🌺'`, `'🌿'`                  |
+| `order`      | `u32`                | Order of the flavor in the palette spec.               | `0` to `3`                                      |
+| `dark`       | `bool`               | Whether the flavor is dark.                            | `false` for Latte, `true` for others            |
+| `light`      | `bool`               | Whether the flavor is light.                           | `true` for Latte, `false` for others            |
+| `colors`     | `Map<String, Color>` | A map of color identifiers to their respective values. |                                                 |
 
 ##### Color
 
-| Field | Type | Description | Examples |
-| - | - | - | - |
-| `name` | `String` | The name of the color. | `"Rosewater"`, `"Surface 0"`, `"Base"` |
-| `identifier` | `String` | The identifier of the color. | `"rosewater"`, `"surface0"`, `"base"` |
-| `order` | `u32` | Order of the color in the palette spec. | `0` to `25` |
-| `accent` | `bool` | Whether the color is an accent color. | |
-| `hex` | `String` | The color in hexadecimal format. | `"1e1e2e"` |
-| `rgb` | `RGB` | The color in RGB format. | |
-| `hsl` | `HSL` | The color in HSL format. | |
-| `opacity` | `u8` | The opacity of the color. | `0` to `255` |
+| Field        | Type     | Description                                     | Examples                               |
+| ------------ | -------- | ----------------------------------------------- | -------------------------------------- |
+| `name`       | `String` | The name of the color.                          | `"Rosewater"`, `"Surface 0"`, `"Base"` |
+| `identifier` | `String` | The identifier of the color.                    | `"rosewater"`, `"surface0"`, `"base"`  |
+| `order`      | `u32`    | Order of the color in the palette spec.         | `0` to `25`                            |
+| `accent`     | `bool`   | Whether the color is an accent color.           |                                        |
+| `hex`        | `String` | The color in hexadecimal format.                | `"1e1e2e"`                             |
+| `int24`      | `u32`    | Big-endian 24-bit color in RGB order.           | `1973806`                              |
+| `uint32`     | `u32`    | Big-endian unsigned 32-bit color in ARGB order. | `4280163886`                           |
+| `sint32`     | `i32`    | Big-endian signed 32-bit color in ARGB order.   | `-14803410`                            |
+| `rgb`        | `RGB`    | The color in RGB format.                        |                                        |
+| `hsl`        | `HSL`    | The color in HSL format.                        |                                        |
+| `opacity`    | `u8`     | The opacity of the color.                       | `0` to `255`                           |
 
 ##### RGB
 
-| Field | Type | Description |
-| - | - | - |
-| `r` | `u8` | The red channel of the color. |
-| `g` | `u8` | The green channel of the color. |
-| `b` | `u8` | The blue channel of the color. |
+| Field | Type | Description                     |
+| ----- | ---- | ------------------------------- |
+| `r`   | `u8` | The red channel of the color.   |
+| `g`   | `u8` | The green channel of the color. |
+| `b`   | `u8` | The blue channel of the color.  |
 
 ##### HSL
 
-| Field | Type | Description |
-| - | - | - |
-| `h` | `u16` | The hue of the color. |
-| `s` | `u8` | The saturation of the color. |
-| `l` | `u8` | The lightness of the color. |
+| Field | Type  | Description                  |
+| ----- | ----- | ---------------------------- |
+| `h`   | `u16` | The hue of the color.        |
+| `s`   | `u8`  | The saturation of the color. |
+| `l`   | `u8`  | The lightness of the color.  |
 
 ### Functions
 
-| Name        | Description                                                                    | Examples                                              |
-| ----------- | ------------------------------------------------------------------------------ | ----------------------------------------------------- |
-| `if`        | Return one value if a condition is true, and another if it's false             | `if(cond=true, t=1, f=0)` ⇒ `1`                       |
-| `object`    | Create an object from the input                                                | `object(a=1, b=2)` ⇒ `{a: 1, b: 2}`                   |
-| `css_rgb`   | Convert a color to an RGB CSS string                                           | `css_rgb(color=red)` ⇒ `rgb(210, 15, 57)`             |
-| `css_rgba`  | Convert a color to an RGBA CSS string                                          | `css_rgba(color=red)` ⇒ `rgba(210, 15, 57, 1.00)`     |
-| `css_hsl`   | Convert a color to an HSL CSS string                                           | `css_hsl(color=red)` ⇒ `hsl(347, 87%, 44%)`           |
-| `css_hsla`  | Convert a color to an HSLA CSS string                                          | `css_hsla(color=red)` ⇒ `hsla(347, 87%, 44%, 1.00)`   |
-| `read_file` | Read and include the contents of a file, path is relative to the template file | `read_file(path="abc.txt")` ⇒ `abc`                   |
+| Name        | Description                                                                    | Examples                                            |
+| ----------- | ------------------------------------------------------------------------------ | --------------------------------------------------- |
+| `if`        | Return one value if a condition is true, and another if it's false             | `if(cond=true, t=1, f=0)` ⇒ `1`                     |
+| `object`    | Create an object from the input                                                | `object(a=1, b=2)` ⇒ `{a: 1, b: 2}`                 |
+| `css_rgb`   | Convert a color to an RGB CSS string                                           | `css_rgb(color=red)` ⇒ `rgb(210, 15, 57)`           |
+| `css_rgba`  | Convert a color to an RGBA CSS string                                          | `css_rgba(color=red)` ⇒ `rgba(210, 15, 57, 1.00)`   |
+| `css_hsl`   | Convert a color to an HSL CSS string                                           | `css_hsl(color=red)` ⇒ `hsl(347, 87%, 44%)`         |
+| `css_hsla`  | Convert a color to an HSLA CSS string                                          | `css_hsla(color=red)` ⇒ `hsla(347, 87%, 44%, 1.00)` |
+| `read_file` | Read and include the contents of a file, path is relative to the template file | `read_file(path="abc.txt")` ⇒ `abc`                 |
 
 ### Filters
 
-| Name             | Description                                                      | Examples                                           |
-| ---------------- | ---------------------------------------------------------------- | -------------------------------------------------- |
-| `add`            | Add a value to a color                                           | `red \| add(hue=30)` ⇒ `#ff6666`                   |
-| `sub`            | Subtract a value from a color                                    | `red \| sub(hue=30)` ⇒ `#d30f9b`                   |
-| `mod`            | Modify a color                                                   | `red \| mod(lightness=80)` ⇒ `#f8a0b3`             |
-| `mix`            | Mix two colors together                                          | `red \| mix(color=base, amount=0.5)` ⇒ `#e08097`   |
-| `urlencode_lzma` | Serialize an object into a URL-safe string with LZMA compression | `red \| urlencode_lzma` ⇒ `#ff6666`                |
-| `trunc`          | Truncate a number to a certain number of places                  | `1.123456 \| trunc(places=3)` ⇒ `1.123`            |
-| `css_rgb`        | Convert a color to an RGB CSS string                             | `red \| css_rgb` ⇒ `rgb(210, 15, 57)`              |
-| `css_rgba`       | Convert a color to an RGBA CSS string                            | `red \| css_rgba` ⇒ `rgba(210, 15, 57, 1.00)`      |
-| `css_hsl`        | Convert a color to an HSL CSS string                             | `red \| css_hsl` ⇒ `hsl(347, 87%, 44%)`            |
-| `css_hsla`       | Convert a color to an HSLA CSS string                            | `red \| css_hsla` ⇒ `hsla(347, 87%, 44%, 1.00)`    |
+| Name             | Description                                                      | Examples                                         |
+| ---------------- | ---------------------------------------------------------------- | ------------------------------------------------ |
+| `add`            | Add a value to a color                                           | `red \| add(hue=30)` ⇒ `#ff6666`                 |
+| `sub`            | Subtract a value from a color                                    | `red \| sub(hue=30)` ⇒ `#d30f9b`                 |
+| `mod`            | Modify a color                                                   | `red \| mod(lightness=80)` ⇒ `#f8a0b3`           |
+| `mix`            | Mix two colors together                                          | `red \| mix(color=base, amount=0.5)` ⇒ `#e08097` |
+| `urlencode_lzma` | Serialize an object into a URL-safe string with LZMA compression | `red \| urlencode_lzma` ⇒ `#ff6666`              |
+| `trunc`          | Truncate a number to a certain number of places                  | `1.123456 \| trunc(places=3)` ⇒ `1.123`          |
+| `css_rgb`        | Convert a color to an RGB CSS string                             | `red \| css_rgb` ⇒ `rgb(210, 15, 57)`            |
+| `css_rgba`       | Convert a color to an RGBA CSS string                            | `red \| css_rgba` ⇒ `rgba(210, 15, 57, 1.00)`    |
+| `css_hsl`        | Convert a color to an HSL CSS string                             | `red \| css_hsl` ⇒ `hsl(347, 87%, 44%)`          |
+| `css_hsla`       | Convert a color to an HSLA CSS string                            | `red \| css_hsla` ⇒ `hsla(347, 87%, 44%, 1.00)`  |
 
 > [!NOTE]
 > You also have access to all of Tera's own built-in filters and functions.
@@ -211,22 +209,63 @@ take the form of valid YAML set between triple-dashed lines.
 
 ### Template Version
 
-The most important frontmatter key is the Whiskers version. This key allows
-Whiskers to ensure that it is rendering a template that it can understand.
+The most important frontmatter key is the Whiskers version requirement. This key
+allows Whiskers to ensure it is rendering a template that it can understand.
 
-Example:
+Syntax:
 
 ```yaml
 ---
 whiskers:
-  version: "2.0.0"
+  version: "^2.5.1"
 ---
 ... standard template content goes here ...
 ```
 
+Whiskers supports specifying version requirements in a number of ways:
+
+- `^X.Y.Z`: exactly `X`, with any minor and patch version >= `Y.Z`. **This is the
+  recommended approach unless a more specific constraint is required.**
+- `~X.Y.Z`: exactly `X.Y`, with any patch version >= `Z`.
+- `=X.Y.Z`: only version `X.Y.Z`.
+- `=X.Y` or `=X`: any version matching `X.Y.*` or `X.*.*`.
+- `>ver`: any version newer than `ver`, not including `ver`.
+- `>=ver`: version `ver` or newer.
+- `<ver`: any version older than `ver`, not including `ver`.
+- `<=ver`: version `ver` or older.
+- `X.Y.*`, `X.*`, or `*`: wildcard, any value in the specified position.
+
+Full technical detail of the supported version requirement syntax can be found in [the semver crate documentation](https://docs.rs/semver/1.0.25/semver/enum.Op.html).
+
 If the version key is not present, Whiskers will display a warning and attempt
-to render the template anyway. However, it is recommended to always include the
-version key to ensure compatibility with future versions of Whiskers.
+to render the template anyway. It is recommended to always include the version
+key to ensure compatibility with future versions of Whiskers.
+
+### Hex Format
+
+The format used for rendering colors in hexadecimal can be customised with the `hex_format` frontmatter variable.
+
+This string is rendered as a Tera template with the following context variables:
+
+- `r`, `g`, `b`, `a`: The red, green, blue, and alpha channels of the color as lowercase 2-digit hexadecimal strings.
+- `R`, `G`, `B`, `A`: As above, but uppercase.
+- `z`: The same as `a` if the color is not fully opaque, otherwise an empty string.
+- `Z`: As above, but uppercase.
+
+The default value of `hex_format` is `{{r}}{{g}}{{b}}{{z}}`.
+
+Example:
+
+```
+---
+whiskers:
+  version: "^2.5.1"
+  hex_format: "0x{{B}}{{G}}{{R}}{{A}}"
+---
+{{red.hex}}
+```
+
+Running `whiskers example.tera -f mocha` produces the following output: `0xA88BF3FF`
 
 ### Frontmatter Variables
 
@@ -237,8 +276,8 @@ As a simple example, given the following template (`example.tera`):
 
 ```yaml
 ---
-app: 'Pepperjack'
-author: 'winston'
+app: "Pepperjack"
+author: "winston"
 ---
 # Catppuccin for {{app}}
 # by {{author}}
@@ -275,8 +314,8 @@ Rendering the above template produces the following output:
 bg = "#1e1e2e"
 fg = "#cdd6f4"
 border = "#cba6f7"
-diffaddfg = "#a6e3a1"
-diffaddbg = "#40b436"
+diffAddFg = "#a6e3a1"
+diffAddBg = "#40b436"
 ```
 
 ## Overrides
@@ -312,7 +351,7 @@ flag. This flag takes a JSON string like the following:
   "mocha": {
     "base": "000000",
     "mantle": "010101",
-    "crust": "020202",
+    "crust": "020202"
   }
 }
 ```
@@ -375,7 +414,7 @@ Example:
 ```
 ---
 whiskers:
-  version: 2.0.0
+  version: "^2.5.1"
   matrix:
     - variant: ["normal", "no-italics"]
     - flavor
@@ -405,7 +444,7 @@ for each combination of the matrix iterables.
 
 ## Check Mode
 
-You can use Whiskers as a linter with *check mode*. To do so, set the `--check`
+You can use Whiskers as a linter with _check mode_. To do so, set the `--check`
 option. Whiskers will render your template as per usual, but then instead of
 printing the result it will check it against the expected output and fail with
 exit code 1 if they differ.
@@ -437,22 +476,17 @@ Templating would result in changes.
 
 ## Editor Support
 
-Tera's syntax is not natively supported by most editors. Some editors have
-extensions available that provide syntax highlighting and other features for
-Tera templates. In the case that your editor does not have a viable extension
-available, you can try using a Jinja extension instead. While not an exact
-match, Tera's syntax is similar enough to Jinja's that it can be used quite
-well in most cases.
+Tera support can be installed in Neovim as of v0.11 and with the latest nvim-treesitter. Support in Helix is unreleased but available on the master branch as of 2025-02-02. For Zed users, we recommend the [Tera extension for Zed](https://github.com/uncenter/zed-tera).
 
 For Visual Studio Code users we recommend the [Better Jinja](https://marketplace.visualstudio.com/items?itemName=samuelcolvin.jinjahtml) extension.
 
 ## Further Reading
 
 - See the [examples](examples) directory which further showcase the utilities
-  and power of whiskers.
+  and power of Whiskers.
 - See the RFC,
   [CAT-0003-Whiskers](https://github.com/catppuccin/community/blob/main/rfc/CAT-0003-Whiskers.md),
-  to understand the motivation behind creating whiskers.
+  to understand the motivation behind creating Whiskers.
 
 &nbsp;
 
