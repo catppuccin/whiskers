@@ -168,3 +168,12 @@ pub fn css_hsla(
     let color: css_colors::HSLA = (&color).into();
     Ok(tera::to_value(color.to_string())?)
 }
+
+pub fn rgb_array(
+    value: &tera::Value,
+    _args: &HashMap<String, tera::Value>,
+) -> Result<tera::Value, tera::Error> {
+    let color: Color = tera::from_value(value.clone())?;
+    let colors: [u8; 3] = [color.rgb.r, color.rgb.g, color.rgb.b];
+    Ok(tera::to_value(colors)?)
+}
