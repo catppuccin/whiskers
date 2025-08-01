@@ -476,7 +476,7 @@ Templating would result in changes.
 
 ## Editor Support
 
-Tera support can be installed in Neovim as of v0.11 and with the latest nvim-treesitter. Support in Helix is unreleased but available on the master branch as of 2025-02-02. For Zed users, we recommend the [Tera extension for Zed](https://github.com/uncenter/zed-tera).
+Tera support can be installed in Neovim as of v0.11 and with the latest nvim-treesitter. Helix supports Tera by default as of Helix v25.07. For Zed users, we recommend the [Tera extension for Zed](https://github.com/uncenter/zed-tera).
 
 For Visual Studio Code users we recommend the [Better Jinja](https://marketplace.visualstudio.com/items?itemName=samuelcolvin.jinjahtml) extension.
 
