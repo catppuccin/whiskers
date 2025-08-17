@@ -20,6 +20,9 @@ export default defineConfig({
           href: "https://github.com/catppuccin/whiskers",
         },
       ],
+      editLink: {
+        baseUrl: "https://github.com/catppuccin/whiskers/edit/main/docs",
+      },
       expressiveCode: {
         themes: ["catppuccin-mocha", "catppuccin-latte"],
         // Stop it from auto-correcting colour contrast
