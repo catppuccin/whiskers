@@ -1,3 +1,92 @@
 ---
 title: GitHub Actions
+description: Ways to install Catppuccin Whiskers in GitHub Actions.
 ---
+
+import { Code } from '@astrojs/starlight/components';
+
+Catppuccin Whiskers can be installed in GitHub Actions to generate and/or check
+templates match the generated files.
+
+## Setup Whiskers
+
+The [catppuccin/setup-whiskers](https://github.com/catppuccin/setup-whiskers)
+action installs `whiskers` into the GitHub Actions `$PATH`. 
+
+For code snippets to copy/paste into your workflows, see
+[Usage](https://github.com/catppuccin/setup-whiskers#usage) and
+[Examples](https://github.com/catppuccin/setup-whiskers#examples).
+
+## Whiskers Check
+
+Many repositories using `whiskers` store the generated file(s) in source
+control, allowing the `--check` command to verify that the generated file(s)
+match the template(s) at all times.
+
+### Reusable Workflow (recommended)
+
+A reusable organisation workflow is stored in the
+[catppuccin/actions](https://github.com/catppuccin/actions/blob/main/.github/workflows/whiskers-check.yml)
+repository.
+
+Catppuccin ports generated with `whiskers` should use the reusable workflow, as
+shown below:
+
+export const reusableWorkflow = `
+name: whiskers
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  run:
+    uses: catppuccin/actions/.github/workflows/whiskers-check.yml@v1
+    with:
+      args: <template_file>
+    secrets: inherit
+`
+
+<Code code={reusableWorkflow} lang="yaml" title='.github/workflows/whiskers-check.yml' />
+
+For some "real world" examples, search GitHub with the query 
+"[`org:catppuccin path:*.yml catppuccin/actions/.github/workflows/whiskers-check.yml`](https://github.com/search?q=org%3Acatppuccin%20path%3A*.yml%20catppuccin%2Factions%2F.github%2Fworkflows%2Fwhiskers-check.yml&type=code)".
+
+### Manual Workflow
+
+If the reusable workflow cannot be used, you can use the following template
+below:
+
+export const manualWorkflow = `
+name: whiskers
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Whiskers
+        uses: catppuccin/setup-whiskers@v2
+
+      - name: Check
+        run: |
+          whiskers --check <output_file> <template_file>
+`
+
+<Code code={manualWorkflow} lang="yaml" title='.github/workflows/whiskers-check.yml' />
+
+For some "real world" examples, search GitHub with the query 
+"[`org:catppuccin path:*.yml catppuccin/setup-whiskers`](https://github.com/search?q=org%3Acatppuccin%20path%3A*.yml%20catppuccin%2Fsetup-whiskers%20&type=code)".
+
