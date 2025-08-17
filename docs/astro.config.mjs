@@ -2,10 +2,14 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import catppuccin from "@catppuccin/starlight";
+import { remarkHeadingId } from "remark-custom-heading-id";
 
 // https://astro.build/config
 export default defineConfig({
   site: "https://whiskers.catppuccin.com",
+  markdown: {
+    remarkPlugins: [remarkHeadingId],
+  },
   integrations: [
     starlight({
       title: "Catppuccin Whiskers",
