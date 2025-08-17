@@ -1,0 +1,59 @@
+---
+title: Filters Reference
+description: All of the filters that can be used in template files.
+sidebar:
+  order: 4
+---
+
+These are all of the filters available to use in your templates, alongside all
+of the [existing Tera built-ins](https://keats.github.io/tera/docs/#built-ins).
+
+## `add` {#filters-add}
+
+- **Description**: Add a value to a color
+- **Example**: `red | add(hue=30)` ⇒ `#ff6666`
+
+## `sub` {#filters-sub}
+
+- **Description**: Subtract a value from a color
+- **Example**: `red | sub(hue=30)` ⇒ `#d30f9b`
+
+## `mod` {#filters-mod}
+
+- **Description**: Modify a color
+- **Example**: `red | mod(lightness=80)` ⇒ `#f8a0b3`
+
+## `mix` {#filters-mix}
+
+- **Description**: Mix two colors together
+- **Example**: `red | mix(color=base, amount=0.5)` ⇒ `#e08097`
+
+## `urlencode_lzma` {#filters-urlencode_lzma}
+
+- **Description**: Serialize an object into a URL-safe string with LZMA compression
+- **Example**: `red | urlencode_lzma` ⇒ `#ff6666`
+
+## `trunc` {#filters-trunc}
+
+- **Description**: Truncate a number to a certain number of places
+- **Example**: `1.123456 | trunc(places=3)` ⇒ `1.123`
+
+## `css_rgb` {#filters-css_rgb}
+
+- **Description**: Convert a color to an RGB CSS string
+- **Example**: `red | css_rgb` ⇒ `rgb(210, 15, 57)`
+
+## `css_rgba` {#filters-css_rgba}
+
+- **Description**: Convert a color to an RGBA CSS string
+- **Example**: `red | css_rgba` ⇒ `rgba(210, 15, 57, 1.00)`
+
+## `css_hsl` {#filters-css_hsl}
+
+- **Description**: Convert a color to an HSL CSS string
+- **Example**: `red | css_hsl` ⇒ `hsl(347, 87%, 44%)`
+
+## `css_hsla` {#filters-css_hsla}
+
+- **Description**: Convert a color to an HSLA CSS string
+- **Example**: `red | css_hsla` ⇒ `hsla(347, 87%, 44%, 1.00)`

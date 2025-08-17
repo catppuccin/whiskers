@@ -1,4 +1,174 @@
 ---
-title: Context Variables
-description: List of variables that can be used in templates.
+title: Context Variables Reference
+description: All of the context variables that can be used in template files.
+tableOfContents:
+  minHeadingLevel: 2
+  maxHeadingLevel: 4
+sidebar:
+  order: 2
 ---
+
+These are all of the context variables available to use in your templates,
+alongside all of the [existing Tera built-ins](https://keats.github.io/tera/docs/).
+
+## Single-Flavor Mode
+
+| Variable                                                                                          | Description                                                                                    |
+| ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| **flavor** ([`Flavor`](#flavor))                                                                  | The flavor being templated.                                                                    |
+| **rosewater**, **flamingo**, **pink**, [etc.](https://catppuccin.com/palette) ([`Color`](#color)) | All colors of the flavor being templated.                                                      |
+| Any Frontmatter                                                                                   | All frontmatter variables as described in the [Frontmatter Reference](/reference/frontmatter). |
+
+## Multi-Flavor Mode
+
+| Variable                                                 | Description                                                                                    |
+| -------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| **flavors** <br/> (`Map<String, `[`Flavor`](#flavor)`>`) | An array containing all of the named flavors, with every other context variable.               |
+| Any Frontmatter                                          | All frontmatter variables as described in the [Frontmatter Reference](/reference/frontmatter). |
+
+## Types
+
+These types are designed to closely match the
+[palette.json](https://github.com/catppuccin/palette/blob/main/palette.json).
+
+### Flavor
+
+#### `name` {#flavor-name}
+
+- **Description**: The name of the flavor.
+- **Type**: `String`
+- **Examples**: `"Latte"`, `"Frappé"`, `"Macchiato"`, `"Mocha"`
+
+#### `identifier` {#flavor-identifier}
+
+- **Description**: The identifier of the flavor.
+- **Type**: `String`
+- **Examples**: `"latte"`, `"frappe"`, `"macchiato"`, `"mocha"`
+
+#### `emoji` {#flavor-emoji}
+
+- **Description**: Emoji associated with the flavor.
+- **Type**: `char`
+- **Examples**: `'🌻'`, `'🪴'`, `'🌺'`, `'🌿'`
+
+#### `order` {#flavor-order}
+
+- **Description**: Order of the flavor in the palette spec.
+- **Type**: `u32`
+- **Examples**: `0` to `3`
+
+#### `dark` {#flavor-dark}
+
+- **Description**: Whether the flavor is dark.
+- **Type**: `bool`
+- **Examples**: `false` for Latte, `true` for others
+
+#### `light` {#flavor-light}
+
+- **Description**: Whether the flavor is light.
+- **Type**: `bool`
+- **Examples**: `true` for Latte, `false` for others
+
+#### `colors` {#flavor-colors}
+
+- **Description**: A map of color identifiers to their respective values.
+- **Type**: `Map<String,`[`Color`](#color)`>`
+
+### Color
+
+#### `name` {#color-name}
+
+- **Description**: The name of the color.
+- **Type**: `String`
+- **Examples**: `"Rosewater"`, `"Surface 0"`, `"Base"`
+
+#### `identifier` {#color-identifier}
+
+- **Description**: The identifier of the color.
+- **Type**: `String`
+- **Examples**: `"rosewater"`, `"surface0"`, `"base"`
+
+#### `order` {#color-order}
+
+- **Description**: Order of the color in the palette spec.
+- **Type**: `u32`
+- **Examples**: `0` to `25`
+
+#### `accent` {#color-accent}
+
+- **Description**: Whether the color is an accent color.
+- **Type**: `bool`
+
+#### `hex` {#color-hex}
+
+- **Description**: The color in hexadecimal format.
+- **Type**: `String`
+- **Examples**: `"1e1e2e"`
+
+#### `int24` {#color-int24}
+
+- **Description**: Big-endian 24-bit color in RGB order.
+- **Type**: `u32`
+- **Examples**: `1973806`
+
+#### `uint32` {#color-uint32}
+
+- **Description**: Big-endian unsigned 32-bit color in ARGB order.
+- **Type**: `u32`
+- **Examples**: `4280163886`
+
+#### `sint32` {#color-sint32}
+
+- **Description**: Big-endian signed 32-bit color in ARGB order.
+- **Type**: `i32`
+- **Examples**: `-14803410`
+
+#### `rgb` {#color-rgb}
+
+- **Description**: The color in RGB format.
+- **Type**: [`RGB`](#rgb)
+
+#### `hsl` {#color-hsl}
+
+- **Description**: The color in HSL format.
+- **Type**: [`HSL`](#hsl)
+
+#### `opacity` {#color-opacity}
+
+- **Description**: The opacity of the color.
+- **Type**: `u8`
+- **Examples**: `0` to `255`
+
+### RGB
+
+#### `r` {#rgb-r}
+
+- **Description**: The red channel of the color.
+- **Type**: `u8`
+
+#### `g` {#rgb-g}
+
+- **Description**: The green channel of the color.
+- **Type**: `u8`
+
+#### `b` {#rgb-b}
+
+- **Description**: The blue channel of the color.
+- **Type**: `u8`
+
+### HSL
+
+#### `h` {#hsl-h}
+
+- **Description**: The hue of the color.
+- **Type**: `u16`
+
+#### `s` {#hsl-s}
+
+- **Description**: The saturation of the color.
+- **Type**: `u8`
+
+#### `l` {#hsl-l}
+
+- **Description**: The lightness of the color.
+- **Type**: `u8`

@@ -1,0 +1,47 @@
+---
+title: Functions Reference
+description: All of the functions that can be used in template files.
+tableOfContents:
+  minHeadingLevel: 2
+  maxHeadingLevel: 4
+sidebar:
+  order: 3
+---
+
+These are all of the functions available to use in your templates, alongside all
+of the [existing Tera built-ins](https://keats.github.io/tera/docs/#built-ins).
+
+## `if` {#functions-if}
+
+- **Description**: Return one value if a condition is true, and another if it's false.
+- **Example**: `if(cond=true, t=1, f=0)` ⇒ `1`
+
+## `object` {#functions-object}
+
+- **Description**: Create an object from the input.
+- **Example**: `object(a=1, b=2)` ⇒ `{a: 1, b: 2}`
+
+## `css_rgb` {#functions-css_rgb}
+
+- **Description**: Convert a color to an RGB CSS string.
+- **Example**: `css_rgb(color=red)` ⇒ `rgb(210, 15, 57)`
+
+## `css_rgba` {#functions-css_rgba}
+
+- **Description**: Convert a color to an RGBA CSS string.
+- **Example**: `css_rgba(color=red)` ⇒ `rgba(210, 15, 57, 1.00)`
+
+## `css_hsl` {#functions-css_hsl}
+
+- **Description**: Convert a color to an HSL CSS string.
+- **Example**: `css_hsl(color=red)` ⇒ `hsl(347, 87%, 44%)`
+
+## `css_hsla` {#functions-css_hsla}
+
+- **Description**: Convert a color to an HSLA CSS string.
+- **Example**: `css_hsla(color=red)` ⇒ `hsla(347, 87%, 44%, 1.00)`
+
+## `read_file` {#functions-read_file}
+
+- **Description**: Read and include the contents of a file, path is relative to the template file.
+- **Example**: `read_file(path="abc.txt")` ⇒ `abc`
