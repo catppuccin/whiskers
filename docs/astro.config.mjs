@@ -9,7 +9,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "Catppuccin Whiskers",
-      favicon: "/public/favicon.png",
+      favicon: "/favicon.png",
       logo: {
         src: "/public/favicon.png",
       },
