@@ -17,65 +17,6 @@ Whiskers is a port creation helper tool that is custom-built for Catppuccin,
 allowing developers to define template files which the palette can be injected
 into.
 
-## Usage
-
-```console
-$ whiskers --help
-Soothing port creation tool for the high-spirited!
-
-Usage: whiskers [OPTIONS] [TEMPLATE]
-
-Arguments:
-  [TEMPLATE]
-          Path to the template file, or - for stdin
-
-Options:
-  -f, --flavor <FLAVOR>
-          Render a single flavor instead of all four
-
-          [possible values: latte, frappe, macchiato, mocha]
-
-      --color-overrides <COLOR_OVERRIDES>
-          Set color overrides
-
-      --overrides <OVERRIDES>
-          Set frontmatter overrides
-
-      --check [<EXAMPLE_PATH>]
-          Instead of creating an output, check it against an example
-
-          In single-output mode, a path to the example file must be provided. In multi-output mode, no path is required and, if one is provided, it will be ignored.
-
-      --dry-run
-          Dry run, don't write anything to disk
-
-      --list-functions
-          List all Tera filters and functions
-
-      --list-flavors
-          List the Catppuccin flavors
-
-      --list-accents
-          List the Catppuccin accent colors
-
-  -o, --output-format <OUTPUT_FORMAT>
-          Output format of --list-functions
-
-          [default: json]
-          [possible values: json, yaml, markdown, markdown-table, plain]
-
-  -h, --help
-          Print help (see a summary with '-h')
-
-  -V, --version
-          Print version
-```
-
-## Template
-
-Please familiarize yourself with [Tera](https://keats.github.io/tera/),
-which is the templating engine used in Whiskers.
-
 ## Overrides
 
 Frontmatter overrides can also be specified through the cli via the
