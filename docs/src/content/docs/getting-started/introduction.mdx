@@ -1,6 +1,8 @@
 ---
 title: Introduction
 description: Introduction to Catppuccin Whiskers.
+sidebar:
+  order: 1
 ---
 
 Whiskers is a port creation templating tool custom-built for Catppuccin,
@@ -9,20 +11,25 @@ allowing developers to easily generate ports via template files.
 For example:
 
 - [catppuccin/windows9x](https://github.com/catppuccin/windows9x) generates a
-combined file using all flavours and accents from a **single template**.
-- [catppuccin/fleet](https://github.com/catppuccin/fleet) generates each flavour
-(4 files) from a **single template**.
+  combined file using all flavors and accents from a **single template**.
+- [catppuccin/fleet](https://github.com/catppuccin/fleet) generates each flavor
+  (4 files) from a **single template**.
+- [catppuccin/zed](https://github.com/catppuccin/zed) generates each accent with
+  all flavors, along with italics and no-italics variants (28 files) from a
+  **single template**.
 - [catppuccin/starlight](https://github.com/catppuccin/starlight) generates each
-flavour and accent (56 files) from a **single template**.
-- [catppuccin/zed](https://github.com/catppuccin/zed) generates each flavour and
-accent, along with italics and no-italics variants from a **single template**.
+  flavor and accent (56 files) from a **single template**.
+- [catppuccin/lazygit](https://github.com/catppuccin/lazygit) generates each
+  flavor and accent, along with normal and mergable variants (112 files) from a
+  **single template**.
 
 Simply running `whiskers <template_file>` can regenerate all your files in an
 instant, removing the need to painstakingly review hex codes and copy/paste
 snippets to different files.
 
-To install whiskers and get started writing templates, see the [Quick
-Start](/getting-started/quick-start) section.
+To install whiskers and start writing templates, see the
+[Installation](/getting-started/installation) and [Quick
+Start](/getting-started/quick-start) sections.
 
 For a deeper understanding into why we created whiskers, see the RFC
 "[CAT-0003-Whiskers](https://github.com/catppuccin/community/blob/main/rfc/CAT-0003-Whiskers.md)".

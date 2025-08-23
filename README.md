@@ -17,19 +17,6 @@ Whiskers is a port creation helper tool that is custom-built for Catppuccin,
 allowing developers to define template files which the palette can be injected
 into.
 
-## Installation
-
-You can install Whiskers using one of the methods below:
-
-| Installation Method                   | Instructions                                                                                                |
-| ------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| crates.io                             | `cargo install catppuccin-whiskers`                                                                         |
-| Source                                | `cargo install --git https://github.com/catppuccin/whiskers catppuccin-whiskers`                            |
-| Homebrew                              | `brew install catppuccin/tap/whiskers`                                                                      |
-| Nix                                   | `nix profile install github:catppuccin/nix@whiskers`<br/>`nix run github:catppuccin/nix#whiskers -- <args>` |
-| Binaries<br/>(Windows, MacOS & Linux) | Available from the [latest GitHub release](https://github.com/catppuccin/whiskers/releases).                |
-| AUR                                   | Install [catppuccin-whiskers-bin](https://aur.archlinux.org/packages/catppuccin-whiskers-bin)               |
-
 ## Usage
 
 ```console
