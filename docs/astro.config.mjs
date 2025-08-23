@@ -29,8 +29,6 @@ export default defineConfig({
       },
       expressiveCode: {
         themes: ["catppuccin-mocha", "catppuccin-latte"],
-        // Stop it from auto-correcting colour contrast
-        minSyntaxHighlightingColorContrast: 0,
         styleOverrides: {
           frames: {
             tooltipSuccessBackground: "var(--green)",
