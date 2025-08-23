@@ -4,3 +4,224 @@ description: All of the keys that can be used in the frontmatter section of a te
 sidebar:
   order: 1
 ---
+
+import { Aside, FileTree, Tabs, TabItem } from "@astrojs/starlight/components";
+
+The frontmatter is a YAML block that contains metadata about the template. If
+present, the frontmatter section must be the first thing in the file and must be
+valid YAML between triple-dashed lines.
+
+## `whiskers`
+
+### `version` {#whiskers-version}
+
+The `version` is the most important frontmatter key. This key ensures whiskers
+understands the template it is rendering.
+
+<Aside type="tip" title="Important">
+  If the `version` key is not present, whiskers will display a warning and
+  attempt to render the template anyway. We recommend to always include the
+  `version` key to ensure compatibility with future versions of whiskers.
+</Aside>
+
+#### Specification {#whiskers-version-specification}
+
+Whiskers supports specifying version requirements in a number of ways:
+
+- `^X.Y.Z`: exactly `X`, with any minor and patch version >= `Y.Z`. **This is the
+  recommended approach unless a more specific constraint is required.**
+- `~X.Y.Z`: exactly `X.Y`, with any patch version >= `Z`.
+- `=X.Y.Z`: only version `X.Y.Z`.
+- `=X.Y` or `=X`: any version matching `X.Y.*` or `X.*.*`.
+- `>ver`: any version newer than `ver`, not including `ver`.
+- `>=ver`: version `ver` or newer.
+- `<ver`: any version older than `ver`, not including `ver`.
+- `<=ver`: version `ver` or older.
+- `X.Y.*`, `X.*`, or `*`: wildcard, any value in the specified position.
+
+Full technical detail of the supported version requirement syntax can be found in [the semver crate documentation](https://docs.rs/semver/1.0.25/semver/enum.Op.html).
+
+#### Example {#whiskers-version-example}
+
+```yaml
+---
+whiskers:
+  version: "^2.5.1"
+---
+```
+
+### `matrix`
+
+The `matrix` key allows whiskers to render multiple outputs from a single
+template. For example, this is useful for generating one output per flavor per
+accent color.
+
+The matrix is defined as a list of iterables, whiskers will generate a file for
+each combination of the iterables in the matrix. Two "magic iterables" are
+supported which means whiskers can automatically generate the values before
+rendering the template:
+
+- `flavor`: latte, frappe, macchiato, mocha
+- `accent`: rosewater, flamingo, pink, mauve, red, maroon, peach, yellow, green, teal, sky, sapphire, blue, lavender
+
+#### Example {#whiskers-matrix-example}
+
+<Tabs>
+  <TabItem label="Input">
+  ```markdown title="example.tera"
+  ---
+  whiskers:
+    version: "^2.5.1"
+    matrix:
+      - variant: ["normal", "no-italics"]
+      - flavor
+      - accent
+    filename: "themes/{{flavor.identifier}}/catppuccin-{{flavor.identifier}}-{{accent}}-{{variant}}.ini"
+  ---
+  # Catppuccin {{flavor.name}}{% if variant == "no-italics" %} (no italics){% endif %}
+  [theme]
+  {{accent}}: {{flavor.colors[accent].hex}}
+  ```
+  </TabItem>
+  <TabItem label="Output">
+    Running `whiskers example.tera` will produce the following files:
+
+    <FileTree>
+    - example.tera
+    - themes
+      - frappe
+        - catppuccin-frappe-rosewater-normal.ini
+        - catppuccin-frappe-rosewater-no-italics.ini
+        - ...
+        - catppuccin-frappe-lavender-normal.ini
+        - catppuccin-frappe-lavender-no-italics.ini
+      - latte
+        - catppuccin-latte-rosewater-normal.ini
+        - catppuccin-latte-rosewater-no-italics.ini
+        - ...
+        - catppuccin-latte-lavender-normal.ini
+        - catppuccin-latte-lavender-no-italics.ini
+      - macchiato
+        - catppuccin-macchiato-rosewater-normal.ini
+        - catppuccin-macchiato-rosewater-no-italics.ini
+        - ...
+        - catppuccin-macchiato-lavender-normal.ini
+        - catppuccin-macchiato-lavender-no-italics.ini
+      - mocha
+        - catppuccin-mocha-rosewater-normal.ini
+        - catppuccin-mocha-rosewater-no-italics.ini
+        - ...
+        - catppuccin-mocha-lavender-normal.ini
+        - catppuccin-mocha-lavender-no-italics.ini
+    </FileTree>
+
+    The directories and files are overwritten if they already exist.
+  </TabItem>
+</Tabs>
+
+### `filename`
+
+The `filename` key allows whiskers to automatically write the output to a file.
+
+<Aside type="note">
+  The `filename` key is **required** when used alongside the `matrix` key, to
+  allow whiskers to write to multiple files.
+</Aside>
+
+#### Example {#whiskers-filename-example}
+
+<Tabs>
+  <TabItem label="Input">
+  ```yaml title="example.tera"
+  ---
+  whiskers:
+    version: "^2.5.1"
+    filename: "example.md"
+  ---
+  Catppuccin {{flavor.name}} Red is {{red.hex}}
+  ```
+  </TabItem>
+  <TabItem label="Output">
+  Running `whiskers example.tera -f mocha` outputs:
+  ```markdown title="example.md"
+  Catppuccin Mocha Red is f38ba8
+  ```
+  </TabItem>
+</Tabs>
+
+### `hex_format`
+
+The format used for rendering colors in hexadecimal can be customised with the
+`hex_format` frontmatter variable.
+
+#### Specification {#whiskers-hex-format-specification}
+
+This string is rendered as a Tera template with the following context variables:
+
+- `r`, `g`, `b`, `a`: The red, green, blue, and alpha channels of the color as lowercase 2-digit hexadecimal strings.
+- `R`, `G`, `B`, `A`: As above, but uppercase.
+- `z`: The same as `a` if the color is not fully opaque, otherwise an empty string.
+- `Z`: As above, but uppercase.
+
+The default value of `hex_format` is `{{r}}{{g}}{{b}}{{z}}`.
+
+#### Example {#whiskers-hex-format-example}
+
+<Tabs>
+  <TabItem label="Input">
+  ```yaml title="example.tera"
+  ---
+  whiskers:
+    version: "^2.5.1"
+    hex_format: "0x{{B}}{{G}}{{R}}{{A}}"
+  ---
+  {{red.hex}}
+  ```
+  </TabItem>
+  <TabItem label="Output">
+  Running `whiskers example.tera -f mocha` outputs:
+  ```markdown
+  0xA88BF3FF
+  ```
+  </TabItem>
+</Tabs>
+
+## Custom Variables
+
+You can also include custom context variables in the templating process by
+adding them to your template's frontmatter.
+
+For example, setting additional metadata and an accent color for the theme:
+
+<Tabs>
+  <TabItem label="Input">
+  ```markdown title="example.tera"
+  ---
+  whiskers:
+    version: "^2.5.1"
+    filename: "example.ini"
+  app: "Windows9x"
+  author: "backwardspy"
+  accent: "mauve"
+  ---
+  {% set darkGreen = green | sub(lightness=30) %}
+  # Catppuccin for {{app}} by {{author}}
+  bg = "#{{base.hex}}"
+  fg = "#{{text.hex}}"
+  border = "#{{flavor.colors[accent].hex}}"
+  diffAddFg = "#{{green.hex}}"
+  diffAddBg = "#{{darkGreen.hex}}"
+  ```
+  </TabItem>
+  <TabItem label="Output">
+  Running `whiskers example.tera -f mocha` outputs:
+  ```ini title="example.ini"
+  # Catppuccin for Windows9x by backwardspy
+  bg = "#1e1e2e"
+  fg = "#cdd6f4"
+  border = "#cba6f7"
+  diffAddFg = "#a6e3a1"
+  diffAddBg = "#40b436"
+  ```
+  </TabItem>
+</Tabs>
