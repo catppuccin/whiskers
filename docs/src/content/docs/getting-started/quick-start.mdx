@@ -1,4 +1,75 @@
 ---
 title: Quick Start
-description: Quickly get started installing and using Catppuccin Whiskers.
+description: Quickly get started using Catppuccin Whiskers.
 ---
+
+import { FileTree, Tabs, TabItem, Steps } from "@astrojs/starlight/components";
+
+In this quick start, you will:
+
+- Learn how to use the whiskers CLI.
+- Write your first template file.
+- Render a template to standard output, a single file and multiple files.
+
+## Pre-requisites
+
+- Whiskers ([installation](/getting-started/installation))
+- Your favourite editor/terminal
+
+## Using the CLI
+
+By default, whiskers:
+
+1. Takes in a template via standard input.
+2. Renders the template.
+3. Outputs the template to standard output.
+
+Let's walk through those steps to get a better understanding:
+
+<Steps>
+
+1. Execute the following command in your terminal:
+
+   ```shell
+   $ whiskers -
+   ```
+
+2. The terminal is now waiting for standard input, let's get the value of
+   Catppuccin Mocha Red as a hex code by typing the highlighted text:
+
+   ```shell ins={2}
+   $ whiskers -
+   Catppuccin Mocha Red - {{flavors.mocha.colors.red.hex}}
+   ```
+
+   Whiskers uses the [Tera](https://keats.github.io/tera/docs/) templating
+   engine, hence why the values between the curly braces are interpolated.
+
+   Also, note that we're traversing down an object hierarchy to get access to
+   the color we want: `flavors` -> `mocha` -> `colors` -> `red` -> `hex`.
+
+3. Now press `Ctrl-D` to send an EOF signal, and allow whiskers to render and
+   output. Your terminal should now look like this:
+
+   ```shell
+   $ whiskers -
+   Catppuccin Mocha Red - {{flavors.mocha.colors.red.hex}}
+   Catppuccin Mocha Red - f38ba8
+   ```
+
+4. Well done! You've just used whiskers via standard input/output. In the next
+   section, you'll learn how to write a separate template file.
+
+</Steps>
+
+## Your First Template File
+
+TODO
+
+## Output Single File
+
+TODO
+
+## Output Multiple Files
+
+TODO

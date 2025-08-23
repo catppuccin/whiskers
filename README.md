@@ -76,17 +76,6 @@ Options:
 Please familiarize yourself with [Tera](https://keats.github.io/tera/),
 which is the templating engine used in Whiskers.
 
-### Naming Convention
-
-Whiskers imposes no restrictions on template names. However, we recommend you use one the following options:
-
-- `<port name>.tera` in the repo root for ports that only need one template.
-  - For example the [lazygit](https://github.com/catppuccin/lazygit) port uses [`lazygit.tera`](https://github.com/catppuccin/lazygit/blob/main/lazygit.tera)
-- `templates/<file name>.tera` especially for ports that have multiple templates.
-  - For example, a port that generates files called `ui.cfg` and `palette.cfg` could use `templates/ui.tera` and `templates/palette.tera` respectively.
-
-These conventions exist to make it easier for contributors to find templates and to give code editors a hint about the correct file type.
-
 ## Overrides
 
 Frontmatter overrides can also be specified through the cli via the
