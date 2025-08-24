@@ -2,7 +2,9 @@ name: Deploy Docs to GH Pages
 
 on:
   push:
-    branches: [main, docs/use-starlight]
+    branches: [main]
+    paths:
+      - 'docs/**'
   workflow_dispatch:
 
 permissions:
