@@ -30,14 +30,14 @@ Let's walk through those steps to get a better understanding:
 
 1. Execute the following command in your terminal:
 
-   ```shell
+   ```console
    $ whiskers -
    ```
 
 2. The terminal is now waiting for standard input, let's get the value of
    Catppuccin Mocha Red as a hex code by typing the highlighted text:
 
-   ```shell ins={2}
+   ```console ins={2}
    $ whiskers -
    Catppuccin Mocha Red - {{flavors.mocha.colors.red.hex}}
    ```
@@ -51,7 +51,7 @@ Let's walk through those steps to get a better understanding:
 3. Now press `Ctrl-D` to send an EOF signal, and allow whiskers to render and
    output. Your terminal should now look like this:
 
-   ```shell
+   ```console
    $ whiskers -
    Catppuccin Mocha Red - {{flavors.mocha.colors.red.hex}}
    Catppuccin Mocha Red - f38ba8

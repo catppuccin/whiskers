@@ -39,85 +39,23 @@ Whiskers supports specifying version requirements in a number of ways:
 - `<=ver`: version `ver` or older.
 - `X.Y.*`, `X.*`, or `*`: wildcard, any value in the specified position.
 
-Full technical detail of the supported version requirement syntax can be found in [the semver crate documentation](https://docs.rs/semver/1.0.25/semver/enum.Op.html).
-
-#### Example {#whiskers-version-example}
-
-```yaml
----
-whiskers:
-  version: "^2.5.1"
----
-```
+Full technical detail of the supported version requirement syntax can be found
+in [the semver crate documentation](https://docs.rs/semver/1.0.25/semver/enum.Op.html).
 
 ### `matrix`
 
 The `matrix` key allows whiskers to render multiple outputs from a single
-template. For example, this is useful for generating one output per flavor per
-accent color.
+template.
 
-The matrix is defined as a list of iterables, whiskers will generate a file for
-each combination of the iterables in the matrix. Two "magic iterables" are
-supported which means whiskers can automatically generate the values before
-rendering the template:
+It is defined as a list of iterables, whiskers will generate a file for each
+combination of the iterables in the matrix. Two "magic iterables" are supported
+which means whiskers can automatically generate the values before rendering the
+template:
 
 - `flavor`: latte, frappe, macchiato, mocha
 - `accent`: rosewater, flamingo, pink, mauve, red, maroon, peach, yellow, green, teal, sky, sapphire, blue, lavender
 
-#### Example {#whiskers-matrix-example}
-
-<Tabs>
-  <TabItem label="Input">
-  ```markdown title="example.tera"
-  ---
-  whiskers:
-    version: "^2.5.1"
-    matrix:
-      - variant: ["normal", "no-italics"]
-      - flavor
-      - accent
-    filename: "themes/{{flavor.identifier}}/catppuccin-{{flavor.identifier}}-{{accent}}-{{variant}}.ini"
-  ---
-  # Catppuccin {{flavor.name}}{% if variant == "no-italics" %} (no italics){% endif %}
-  [theme]
-  {{accent}}: {{flavor.colors[accent].hex}}
-  ```
-  </TabItem>
-  <TabItem label="Output">
-    Running `whiskers example.tera` will produce the following files:
-
-    <FileTree>
-    - example.tera
-    - themes
-      - frappe
-        - catppuccin-frappe-rosewater-normal.ini
-        - catppuccin-frappe-rosewater-no-italics.ini
-        - ...
-        - catppuccin-frappe-lavender-normal.ini
-        - catppuccin-frappe-lavender-no-italics.ini
-      - latte
-        - catppuccin-latte-rosewater-normal.ini
-        - catppuccin-latte-rosewater-no-italics.ini
-        - ...
-        - catppuccin-latte-lavender-normal.ini
-        - catppuccin-latte-lavender-no-italics.ini
-      - macchiato
-        - catppuccin-macchiato-rosewater-normal.ini
-        - catppuccin-macchiato-rosewater-no-italics.ini
-        - ...
-        - catppuccin-macchiato-lavender-normal.ini
-        - catppuccin-macchiato-lavender-no-italics.ini
-      - mocha
-        - catppuccin-mocha-rosewater-normal.ini
-        - catppuccin-mocha-rosewater-no-italics.ini
-        - ...
-        - catppuccin-mocha-lavender-normal.ini
-        - catppuccin-mocha-lavender-no-italics.ini
-    </FileTree>
-
-    The directories and files are overwritten if they already exist.
-  </TabItem>
-</Tabs>
+For examples, visit [Matrix Mode](/concepts/matrix-mode) in the concepts section.
 
 ### `filename`
 
@@ -125,29 +63,8 @@ The `filename` key allows whiskers to automatically write the output to a file.
 
 <Aside type="note">
   The `filename` key is **required** when used alongside the `matrix` key, to
-  allow whiskers to write to multiple files.
+  allow whiskers to generate multiple files.
 </Aside>
-
-#### Example {#whiskers-filename-example}
-
-<Tabs>
-  <TabItem label="Input">
-  ```yaml title="example.tera"
-  ---
-  whiskers:
-    version: "^2.5.1"
-    filename: "example.md"
-  ---
-  Catppuccin {{flavor.name}} Red is {{red.hex}}
-  ```
-  </TabItem>
-  <TabItem label="Output">
-  Running `whiskers example.tera -f mocha` outputs:
-  ```markdown title="example.md"
-  Catppuccin Mocha Red is f38ba8
-  ```
-  </TabItem>
-</Tabs>
 
 ### `hex_format`
 
@@ -172,7 +89,7 @@ The default value of `hex_format` is `{{r}}{{g}}{{b}}{{z}}`.
   ```yaml title="example.tera"
   ---
   whiskers:
-    version: "^2.5.1"
+    version: "^X.Y.Z"
     hex_format: "0x{{B}}{{G}}{{R}}{{A}}"
   ---
   {{red.hex}}
@@ -198,7 +115,7 @@ For example, setting additional metadata and an accent color for the theme:
   ```markdown title="example.tera"
   ---
   whiskers:
-    version: "^2.5.1"
+    version: "^X.Y.Z"
     filename: "example.ini"
   app: "Windows9x"
   author: "backwardspy"
