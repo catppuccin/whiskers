@@ -17,23 +17,7 @@ Whiskers is a port creation helper tool that is custom-built for Catppuccin,
 allowing developers to define template files which the palette can be injected
 into.
 
-## Multi-Flavor Mode
-
-Running Whiskers without the `--flavor/-f` flag causes it to run in multi-flavor mode.
-In this mode, all flavors are placed into the template context as a map of flavor identifiers
-to their respective [`Flavor`](#flavor) objects.
-
-This map can be iterated like so:
-
-```
-{% for id, flavor in flavors %}
-{{id}} is one of "latte", "frappe", "macchiato", or "mocha".
-{{flavor}} is an object containing the flavor's properties and colors.
-{% endfor %}
-```
-
-Please see the [examples/single-file](examples/single-file) directory for more
-concrete examples on how it can be used.
+Visit [whiskers.catppuccin.com](https://whiskers.catppuccin.com) to get started.
 
 &nbsp;
 

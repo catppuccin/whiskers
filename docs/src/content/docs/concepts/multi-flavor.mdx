@@ -3,3 +3,88 @@ title: Multi-Flavor Mode
 sidebar:
   order: 4
 ---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+Running whiskers without the `--flavor/-f` flag causes it to run in multi-flavor
+mode. In this mode, all flavors are placed into the template context as a map of
+flavor identifiers to their respective
+[`Flavor`](/reference/context-variables#flavor) objects.
+
+This map can be iterated like so:
+
+```
+{% for id, flavor in flavors %}
+{{id}} is one of "latte", "frappe", "macchiato", or "mocha".
+{{flavor}} is an object containing the flavor's properties and colors.
+{% endfor %}
+```
+
+For example, a template generating a single JSON file with all flavors:
+
+<Tabs>
+  <TabItem label="Input">
+  ```yaml title="example.tera"
+  ---
+  whiskers:
+    version: "^X.Y.Z"
+    filename: "example.json"
+  ---
+  {
+    "themes": [
+      {%- for id, flavor in flavors %}
+      {
+        "id": "catppuccin-{{id}}",
+        "name": "Catppuccin {{flavor.name}}",
+        "fg": "{{css_rgb(color=flavor.colors.text)}}",
+        "bg": "{{css_rgb(color=flavor.colors.base)}}",
+        "invert": {{flavor.dark}},
+        "dark-mode": {{flavor.dark}}
+      }{% if not loop.last %},{% endif %}
+      {%- endfor %}
+    ]
+  }
+  ```
+  </TabItem>
+  <TabItem label="Output">
+  Running `whiskers example.tera` outputs:
+  ```json title="example.json"
+  {
+    "themes": [
+      {
+        "id": "catppuccin-latte",
+        "name": "Catppuccin Latte",
+        "fg": "rgb(76, 79, 105)",
+        "bg": "rgb(239, 241, 245)",
+        "invert": false,
+        "dark-mode": false
+      },
+      {
+        "id": "catppuccin-frappe",
+        "name": "Catppuccin Frappé",
+        "fg": "rgb(198, 208, 245)",
+        "bg": "rgb(48, 52, 70)",
+        "invert": true,
+        "dark-mode": true
+      },
+      {
+        "id": "catppuccin-macchiato",
+        "name": "Catppuccin Macchiato",
+        "fg": "rgb(202, 211, 245)",
+        "bg": "rgb(36, 39, 58)",
+        "invert": true,
+        "dark-mode": true
+      },
+      {
+        "id": "catppuccin-mocha",
+        "name": "Catppuccin Mocha",
+        "fg": "rgb(205, 214, 244)",
+        "bg": "rgb(30, 30, 46)",
+        "invert": true,
+        "dark-mode": true
+      }
+    ]
+  }
+  ```
+  </TabItem>
+</Tabs>
