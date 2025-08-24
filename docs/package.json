@@ -15,6 +15,7 @@
     "@catppuccin/starlight": "^1.0.2",
     "astro": "^5.13.3",
     "remark-custom-heading-id": "^2.0.0",
-    "sharp": "^0.34.3"
+    "sharp": "^0.34.3",
+    "starlight-links-validator": "^0.17.1"
   }
 }

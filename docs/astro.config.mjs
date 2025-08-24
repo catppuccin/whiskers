@@ -3,6 +3,7 @@ import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import catppuccin from "@catppuccin/starlight";
 import { remarkHeadingId } from "remark-custom-heading-id";
+import starlightLinksValidator from 'starlight-links-validator'
 
 // https://astro.build/config
 export default defineConfig({
@@ -67,7 +68,7 @@ export default defineConfig({
           autogenerate: { directory: "resources" },
         },
       ],
-      plugins: [catppuccin()],
+      plugins: [catppuccin(), starlightLinksValidator()],
     }),
   ],
 });
