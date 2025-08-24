@@ -17,48 +17,6 @@ Whiskers is a port creation helper tool that is custom-built for Catppuccin,
 allowing developers to define template files which the palette can be injected
 into.
 
-## Overrides
-
-Frontmatter overrides can also be specified through the cli via the
-`--overrides` flag, taking in a JSON string resembling the frontmatter. This is
-particularly useful with build scripts to automatically generate files for each
-accent:
-
-`example.tera`
-
-```yaml
----
-accent: "mauve"
----
-theme:
-  accent: "{{flavor.colors[accent].hex}}"
-```
-
-When running `whiskers example.tera -f latte --overrides '{"accent": "pink"}'`,
-the `accent` will be overridden to pink.
-
-## Color Overrides
-
-Color overrides can be specified through the cli via the `--color-overrides`
-flag. This flag takes a JSON string like the following:
-
-```json
-{
-  "all": {
-    "text": "ff0000"
-  },
-  "mocha": {
-    "base": "000000",
-    "mantle": "010101",
-    "crust": "020202"
-  }
-}
-```
-
-Passing these overrides would set the `text` color to bright red for all
-flavors, and the `base`, `mantle`, and `crust` colors to black/near-black for
-Mocha.
-
 ## Single-Flavor Mode
 
 Running Whiskers with the `--flavor/-f` flag causes it to run in single-flavor mode.
