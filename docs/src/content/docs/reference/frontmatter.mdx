@@ -15,13 +15,13 @@ valid YAML between triple-dashed lines.
 
 ### `version` {#whiskers-version}
 
-The `version` is the most important frontmatter key. This key ensures whiskers
+The `version` is the most important frontmatter key. This key ensures Whiskers
 understands the template it is rendering.
 
 <Aside type="tip" title="Important">
-  If the `version` key is not present, whiskers will display a warning and
-  attempt to render the template anyway. We recommend to always include the
-  `version` key to ensure compatibility with future versions of whiskers.
+  If the `version` key is not present, Whiskers will display a warning and
+  attempt to render the template anyway. Always include the `version` key to
+  ensure compatibility with future versions of Whiskers.
 </Aside>
 
 #### Specification {#whiskers-version-specification}
@@ -44,12 +44,12 @@ in [the semver crate documentation](https://docs.rs/semver/1.0.25/semver/enum.Op
 
 ### `matrix`
 
-The `matrix` key allows whiskers to render multiple outputs from a single
+The `matrix` key allows Whiskers to render multiple outputs from a single
 template.
 
-It is defined as a list of iterables, whiskers will generate a file for each
+It is defined as a list of iterables, Whiskers will generate a file for each
 combination of the iterables in the matrix. Two "magic iterables" are supported
-which means whiskers can automatically generate the values before rendering the
+which means Whiskers can automatically generate the values before rendering the
 template:
 
 - `flavor`: latte, frappe, macchiato, mocha
@@ -59,11 +59,10 @@ For examples, visit [Matrix Mode](/concepts/matrix-mode) in the concepts section
 
 ### `filename`
 
-The `filename` key allows whiskers to automatically write the output to a file.
+The `filename` key allows Whiskers to automatically write the output to a file.
 
 <Aside type="note">
-  The `filename` key is **required** when used alongside the `matrix` key, to
-  allow whiskers to generate multiple files.
+  The `filename` key is **required** when used alongside the `matrix` key.
 </Aside>
 
 ### `hex_format`

@@ -82,7 +82,7 @@ This template will generate a file containing all the colors of a single flavor.
    whiskers flavor.tera --flavor mocha
    ```
 
-   The [--flavor](/reference/cli-options/#-f---flavor-flavor) option tells
+   The [--flavor](/reference/cli-options/#-f---flavor-flavor) flag tells
    Whiskers what flavor to use, and renders the template using
    [Single-Flavor Mode](/concepts/single-flavor/).
 
@@ -184,8 +184,9 @@ Catppuccin palette.
    whiskers palette.tera
    ```
 
-   When the `--flavor` option isn't being used, Whiskers renders the template
-   using [Multi-Flavor Mode](/concepts/multi-flavor).
+   When the [--flavor](/reference/cli-options/#-f---flavor-flavor) flag isn't
+   being used, Whiskers renders the template using
+   [Multi-Flavor Mode](/concepts/multi-flavor).
 
 1. View the `palette.md` file, and confirm that a markdown table has been
    generated for each flavor.
