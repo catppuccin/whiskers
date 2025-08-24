@@ -1,0 +1,70 @@
+---
+title: Installation
+description: How to install Whiskers.
+sidebar:
+  order: 2
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+You can install Whiskers using any method listed below.
+
+## Binaries (Linux, macOS, Windows)
+
+Available from the
+[latest GitHub release](https://github.com/catppuccin/whiskers/releases).
+
+## Source
+
+```console
+cargo install --git https://github.com/catppuccin/whiskers
+```
+
+## crates.io
+
+```console
+cargo install catppuccin-whiskers
+```
+
+## Homebrew
+
+```console
+brew install catppuccin/tap/whiskers
+```
+
+## Nix/Nixpkgs
+
+Available in
+[nixpkgs](https://search.nixos.org/packages?channel=25.05&show=catppuccin-whiskers&query=catppuccin-whiskers)
+as `catppuccin-whiskers`.
+
+<Tabs>
+<TabItem label="nix shell">
+```console
+nix shell nixpkgs#catppuccin-whiskers --command whiskers
+```
+</TabItem>
+<TabItem label="nix profile">
+```console
+nix profile add nixpkgs#catppuccin-whiskers
+```
+</TabItem>
+</Tabs>
+
+## AUR
+
+Available in [AUR](https://aur.archlinux.org/packages/catppuccin-whiskers-bin)
+as `catppuccin-whiskers-bin`.
+
+<Tabs>
+<TabItem label="yay">
+```console
+yay -S catppuccin-whiskers-bin
+```
+</TabItem>
+<TabItem label="paru">
+```console
+paru -S catppuccin-whiskers-bin
+```
+</TabItem>
+</Tabs>

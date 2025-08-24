@@ -1,0 +1,25 @@
+---
+title: How to remove trailing commas
+description: Learn how to remove trailing commas, specifically in templates generating JSON.
+---
+
+A common problem when generating JSON in a loop is the trailing comma, which is
+invalid JSON.
+
+To avoid the trailing comma in loops, use `if not loop.last` provided by Tera.
+
+```json title="example.tera" ins="{% if not loop.last %},{% endif %}"
+---
+whiskers:
+  version: "^X.Y.Z"
+---
+{
+  "themes": [
+    {%- for id, flavor in flavors %}
+    {
+      "id": "catppuccin-{{id}}",
+    }{% if not loop.last %},{% endif %}
+    {%- endfor %}
+  ]
+}
+```

@@ -1,0 +1,149 @@
+---
+title: Matrix Mode
+sidebar:
+  order: 2
+---
+
+import { FileTree, Tabs, TabItem } from "@astrojs/starlight/components";
+
+Whiskers has the ability to generate many files from a single template, using the
+[`matrix`](/reference/frontmatter#matrix) frontmatter key.
+
+## Default Combinations
+
+By default, the `flavor` and `accent` iterables are included.
+
+### Flavors
+
+If you want to generate a file for each flavor (4 flavors = 4 files), it's as
+simple as defining the frontmatter below:
+
+<Tabs>
+  <TabItem label="Input">
+  ```yaml title="example.tera"
+  ---
+  whiskers:
+    version: "^X.Y.Z"
+    matrix:
+      - flavor
+    filename: "themes/catppuccin-{{flavor.identifier}}.json"
+  ---
+  # ...
+  ```
+  </TabItem>
+  <TabItem label="Output">
+    Running `whiskers example.tera` will produce the following files:
+
+    <FileTree>
+    - themes
+      - catppuccin-frappe.json
+      - catppuccin-latte.json
+      - catppuccin-macchiato.json
+      - catppuccin-mocha.json
+    </FileTree>
+  </TabItem>
+</Tabs>
+
+### Flavors & Accents
+
+If you want to generate a file for each flavor and accent (4 flavors x 14
+accents = 56 files), it's as simple as defining the frontmatter below:
+
+<Tabs>
+  <TabItem label="Input">
+  ```yaml title="example.tera"
+  ---
+  whiskers:
+    version: "^X.Y.Z"
+    matrix:
+      - flavor
+      - accent
+    filename: "themes/{{flavor.identifier}}/catppuccin-{{flavor.identifier}}/{{accent}}.json"
+  ---
+  # ...
+  ```
+  </TabItem>
+  <TabItem label="Output">
+    Running `whiskers example.tera` will produce the following files:
+
+    <FileTree>
+    - themes
+      - frappe
+        - catppuccin-frappe-rosewater.json
+        - ...
+        - catppuccin-frappe-lavender.json
+      - latte
+        - catppuccin-latte-rosewater.json
+        - ...
+        - catppuccin-latte-lavender.json
+      - macchiato
+        - catppuccin-macchiato-rosewater.json
+        - ...
+        - catppuccin-macchiato-lavender.json
+      - mocha
+        - catppuccin-mocha-rosewater.json
+        - ...
+        - catppuccin-mocha-lavender.json
+    </FileTree>
+  </TabItem>
+</Tabs>
+
+## Extra Combinations
+
+The [`matrix`](/reference/frontmatter#matrix) frontmatter key can take any
+arbitrary amount of iterables, meaning that you can generate as many
+combinations as you'd like.
+
+For example, a "normal" and "no-italics" variant for each flavor and accent (4
+flavors x 14 accents x 2 variants = 112 files):
+
+<Tabs>
+  <TabItem label="Input">
+  ```markdown title="example.tera"
+  ---
+  whiskers:
+    version: "^X.Y.Z"
+    matrix:
+      - variant: ["normal", "no-italics"]
+      - flavor
+      - accent
+    filename: "themes/{{flavor.identifier}}/catppuccin-{{flavor.identifier}}-{{accent}}-{{variant}}.ini"
+  ---
+  # Catppuccin {{flavor.name}}{% if variant == "no-italics" %} (no italics){% endif %}
+  [theme]
+  {{accent}}: {{flavor.colors[accent].hex}}
+  ```
+  </TabItem>
+  <TabItem label="Output">
+    Running `whiskers example.tera` will produce the following files:
+
+    <FileTree>
+    - themes
+      - frappe
+        - catppuccin-frappe-rosewater-normal.ini
+        - catppuccin-frappe-rosewater-no-italics.ini
+        - ...
+        - catppuccin-frappe-lavender-normal.ini
+        - catppuccin-frappe-lavender-no-italics.ini
+      - latte
+        - catppuccin-latte-rosewater-normal.ini
+        - catppuccin-latte-rosewater-no-italics.ini
+        - ...
+        - catppuccin-latte-lavender-normal.ini
+        - catppuccin-latte-lavender-no-italics.ini
+      - macchiato
+        - catppuccin-macchiato-rosewater-normal.ini
+        - catppuccin-macchiato-rosewater-no-italics.ini
+        - ...
+        - catppuccin-macchiato-lavender-normal.ini
+        - catppuccin-macchiato-lavender-no-italics.ini
+      - mocha
+        - catppuccin-mocha-rosewater-normal.ini
+        - catppuccin-mocha-rosewater-no-italics.ini
+        - ...
+        - catppuccin-mocha-lavender-normal.ini
+        - catppuccin-mocha-lavender-no-italics.ini
+    </FileTree>
+
+  </TabItem>
+</Tabs>

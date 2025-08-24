@@ -1,0 +1,215 @@
+---
+title: Quick Start
+description: Quickly get started using Whiskers.
+---
+
+import { FileTree, Tabs, TabItem, Steps } from "@astrojs/starlight/components";
+
+In this quick start, you will:
+
+- Understand the structure of Whiskers templates.
+- Render a template for a single flavor to a single file.
+- Render a template with all the flavors to a single file.
+
+Let's get started!
+
+## Prerequisites
+
+- Whiskers ([Installation](/getting-started/installation))
+- Your favourite editor/terminal.
+  - **(Optional)** Download an extension from [Editor Integrations](/resources/editor-integrations)
+    to make writing templates nicer.
+
+{/* x-release-please-start-version */}
+
+## Your First Template (Single Flavor)
+
+This template will generate a file containing all the colors of a single flavor.
+
+<Steps>
+
+1. Create a new directory, and create a `flavor.tera` file:
+
+   ```yaml title="flavor.tera"
+   ---
+   whiskers:
+     version: "^2.5.1"
+   ---
+   ```
+
+   The code in-between the triple dashes (`---`) is referred to as the
+   [frontmatter](/reference/frontmatter). Every template should **at least**
+   have a [whiskers.version](/reference/frontmatter#whiskers-version) key.
+
+1. Add the following content under the frontmatter:
+
+   ```markdown title="flavor.tera" ins={5-23}
+   ---
+   whiskers:
+     version: "^2.5.1"
+   ---
+   <details open>
+   <summary>Catppuccin {{flavor.name}}</summary>
+   <table>
+    <tr>
+      <th></th>
+      <th>Labels</th>
+      <th>Hex</th>
+      <th>RGB</th>
+      <th>HSL</th>
+    </tr>
+    {%- for _, color in flavor.colors %}
+    <tr>
+      <td><img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/palette/circles/{{flavor.identifier}}_{{color.identifier}}.png" height="23" width="23"/></td>
+      <td>{{color.name}}</td>
+      <td><code>#{{color.hex}}</code></td> {#- Direct access on the `color` object #}
+      <td><code>{{css_rgb(color=color)}}</code></td> {#- Using functions #}
+      <td><code>{{color | css_hsl}}</code></td> {#- Using filters #}
+    </tr>
+    {%- endfor %}
+   </table>
+   </details>
+   ```
+
+   Whiskers uses [Tera](https://keats.github.io/tera/docs/) as the templating
+   engine, which uses `{{ }}` for expressions, `{% %}` for expressions and `{# #}`
+   for comments.
+
+1. In your terminal, run the following command to render the template using
+   Catppuccin Mocha:
+
+   ```console
+   whiskers flavor.tera --flavor mocha
+   ```
+
+   The [--flavor](/reference/cli-options/#-f---flavor-flavor) flag tells
+   Whiskers what flavor to use, and renders the template using
+   [Single-Flavor Mode](/concepts/single-flavor/).
+
+1. You should see the rendered markdown output in your terminal. To make
+   Whiskers output to a file, add the
+   [filename](/reference/frontmatter#filename) frontmatter key:
+
+   ```yaml title="flavor.tera" ins={4}
+   ---
+   whiskers:
+     version: "^2.5.1"
+     filename: "flavor.md"
+   ---
+   ```
+
+1. Re-run the command from Step 3. and view the newly created `palette.md` file
+   which should look like:
+
+   ```markdown title="flavor.md"
+   <details open>
+   <summary>Catppuccin Mocha</summary>
+   <table>
+    <tr>
+      <th></th>
+      <th>Labels</th>
+      <th>Hex</th>
+      <th>RGB</th>
+      <th>HSL</th>
+    </tr>
+    <tr>
+      <td><img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/palette/circles/mocha_rosewater.png" height="23" width="23"/></td>
+      <td>Rosewater</td>
+      <td><code>#f5e0dc</code></td>
+      <td><code>rgb(245, 224, 220)</code></td>
+      <td><code>hsl(10, 56%, 91%)</code></td>
+    </tr>
+    <tr>
+      <td><img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/palette/circles/mocha_flamingo.png" height="23" width="23"/></td>
+      <td>Flamingo</td>
+      <td><code>#f2cdcd</code></td>
+      <td><code>rgb(242, 205, 205)</code></td>
+      <td><code>hsl(0, 59%, 88%)</code></td>
+    </tr>
+    ...
+   </table>
+   </details>
+   ```
+
+1. Well done! You've rendered your first Whiskers template. Can you make it
+   output in a different flavor?
+
+</Steps>
+
+## Your Second Template (Multi Flavor)
+
+We're going to extend the first template to generate a table for the entire
+Catppuccin palette.
+
+<Steps>
+
+1. Copy the first template to a new file named `palette.tera`.
+
+1. Make the following edits:
+
+   ```markdown title="palette.tera" "palette.md" ins={6, 28}
+   ---
+   whiskers:
+     version: "^2.5.1"
+     filename: "palette.md"
+   ---
+   {%- for _, flavor in flavors %}
+   <details open>
+   <summary>Catppuccin {{flavor.name}}</summary>
+   <table>
+    <tr>
+      <th></th>
+      <th>Labels</th>
+      <th>Hex</th>
+      <th>RGB</th>
+      <th>HSL</th>
+    </tr>
+    {%- for _, color in flavor.colors %}
+    <tr>
+      <td><img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/palette/circles/{{flavor.identifier}}_{{color.identifier}}.png" height="23" width="23"/></td>
+      <td>{{color.name}}</td>
+      <td><code>#{{color.hex}}</code></td> {#- Direct access on the `color` object #}
+      <td><code>{{css_rgb(color=color)}}</code></td> {#- Using functions #}
+      <td><code>{{color | css_hsl}}</code></td> {#- Using filters #}
+    </tr>
+    {%- endfor %}
+   </table>
+   </details>
+   {% endfor %}
+   ```
+
+1. In your terminal, run the following command to render the template:
+
+   ```console
+   whiskers palette.tera
+   ```
+
+   When the [--flavor](/reference/cli-options/#-f---flavor-flavor) flag isn't
+   being used, Whiskers renders the template using
+   [Multi-Flavor Mode](/concepts/multi-flavor).
+
+1. View the `palette.md` file, and confirm that a markdown table has been
+   generated for each flavor.
+
+</Steps>
+
+{/* x-release-please-end-version */}
+
+## Next Steps
+
+Congrats! You've used Whiskers to generate a single file with one flavor or all
+flavors.
+
+You should now:
+
+1. Visit [Context Variables](/reference/context-variables),
+   [Functions](/reference/functions), and [Filters](/reference/filters) to see
+   everything that's available to you in the templates!
+1. Visit [Matrix Mode](/concepts/matrix-mode) to learn how to define
+   frontmatter to generate files for all flavors, flavors + accents, and more!
+1. Visit [Overrides](/concepts/overrides) to learn how override the
+   frontmatter and even the palette colors themselves!
+1. Visit [GitHub Actions](/resources/github-actions) to learn how to install
+   Whiskers and check templates in CI/CD!
+
+And most importantly, have fun!
