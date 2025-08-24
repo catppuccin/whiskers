@@ -17,13 +17,6 @@ Whiskers is a port creation helper tool that is custom-built for Catppuccin,
 allowing developers to define template files which the palette can be injected
 into.
 
-## Single-Flavor Mode
-
-Running Whiskers with the `--flavor/-f` flag causes it to run in single-flavor mode.
-This means the chosen flavor is placed into the template context as `flavor` and,
-for convenience, all of its colors are also placed into the context as their respective
-identifiers (`red`, `surface0`, et cetera.)
-
 ## Multi-Flavor Mode
 
 Running Whiskers without the `--flavor/-f` flag causes it to run in multi-flavor mode.
