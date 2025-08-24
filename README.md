@@ -42,38 +42,6 @@ This map can be iterated like so:
 Please see the [examples/single-file](examples/single-file) directory for more
 concrete examples on how it can be used.
 
-## Check Mode
-
-You can use Whiskers as a linter with _check mode_. To do so, set the `--check`
-option. Whiskers will render your template as per usual, but then instead of
-printing the result it will check it against the expected output and fail with
-exit code 1 if they differ.
-
-This is especially useful in CI pipelines to ensure that the generated files are
-not changed without a corresponding change to the templates.
-
-In single-flavor mode, you must provide the path to the expected output file as
-an argument to the `--check` option. In multi-flavor mode, the path is
-unnecessary and will be ignored.
-
-Whiskers will diff the output against the check file using the program set in
-the `DIFFTOOL` environment variable, falling back to `diff` if it's not set. The
-command will be invoked as `$DIFFTOOL <actual> <expected>`.
-
-```console
-$ whiskers theme.tera latte --check themes/latte.cfg
-(no output, exit code 0)
-
-$ whiskers theme.tera latte --check themes/latte.cfg
-Templating would result in changes.
-4c4
-< accent is #ea76cb
----
-> accent is #40a02b
-
-(exit code 1)
-```
-
 &nbsp;
 
 <p align="center"><img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/footers/gray0_ctp_on_line.svg?sanitize=true" /></p>
