@@ -65,6 +65,10 @@ export default defineConfig({
           autogenerate: { directory: "reference" },
         },
         {
+          label: "Cookbook",
+          autogenerate: { directory: "cookbook" },
+        },
+        {
           label: "Resources",
           autogenerate: { directory: "resources" },
         },
