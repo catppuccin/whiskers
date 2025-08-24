@@ -38,9 +38,18 @@ Available in
 [nixpkgs](https://search.nixos.org/packages?channel=25.05&show=catppuccin-whiskers&query=catppuccin-whiskers)
 as `catppuccin-whiskers`.
 
+<Tabs>
+<TabItem label="nix shell">
 ```console
-nix-shell -p catppuccin-whiskers
+nix shell nixpkgs#catppuccin-whiskers --command whiskers
 ```
+</TabItem>
+<TabItem label="nix profile">
+```console
+nix profile add nixpkgs#catppuccin-whiskers
+```
+</TabItem>
+</Tabs>
 
 ## AUR
 
