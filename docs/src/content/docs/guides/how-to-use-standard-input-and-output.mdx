@@ -1,0 +1,43 @@
+---
+title: How to use standard input/output
+---
+
+import { Steps } from "@astrojs/starlight/components"
+
+By default, Whiskers:
+
+1. Takes in a template via standard input.
+2. Renders the template.
+3. Outputs the template to standard output.
+
+Let's walk through those steps to get a better understanding:
+
+<Steps>
+
+1. Execute the following command in your terminal:
+
+   ```console
+   $ whiskers -
+   ```
+
+2. The terminal is now waiting for standard input, let's get the value of
+   Catppuccin Mocha Red as a hex code by typing the highlighted text:
+
+   ```console ins={2}
+   $ whiskers -
+   Catppuccin Mocha Red - {{flavors.mocha.colors.red.hex}}
+   ```
+
+3. Now press `Ctrl-D` to send an EOF signal, and allow Whiskers to render and
+   output. Your terminal should now look like this:
+
+   ```console
+   $ whiskers -
+   Catppuccin Mocha Red - {{flavors.mocha.colors.red.hex}}
+   Catppuccin Mocha Red - f38ba8
+   ```
+
+4. Well done! You've just used Whiskers via standard input/output.
+
+</Steps>
+
