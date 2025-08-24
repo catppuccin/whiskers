@@ -16,7 +16,8 @@ export default defineConfig({
       title: "Catppuccin Whiskers",
       favicon: "/favicon.png",
       logo: {
-        src: "/public/favicon.png",
+        dark: "/public/pepperjack-dark.png",
+        light: "/public/pepperjack-light.png"
       },
       social: [
         {
