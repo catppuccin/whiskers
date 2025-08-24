@@ -55,12 +55,16 @@ This template will generate a file containing all the colors of a single flavor.
       <th></th>
       <th>Labels</th>
       <th>Hex</th>
+      <th>RGB</th>
+      <th>HSL</th>
     </tr>
     {%- for _, color in flavor.colors %}
     <tr>
       <td><img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/palette/circles/{{flavor.identifier}}_{{color.identifier}}.png" height="23" width="23"/></td>
       <td>{{color.name}}</td>
-      <td><code>#{{color.hex}}</code></td>
+      <td><code>#{{color.hex}}</code></td> {#- Direct access on the `color` object #}
+      <td><code>{{css_rgb(color=color)}}</code></td> {#- Using functions #}
+      <td><code>{{color | css_hsl}}</code></td> {#- Using filters #}
     </tr>
     {%- endfor %}
    </table>
@@ -105,23 +109,29 @@ This template will generate a file containing all the colors of a single flavor.
       <th></th>
       <th>Labels</th>
       <th>Hex</th>
+      <th>RGB</th>
+      <th>HSL</th>
     </tr>
     <tr>
       <td><img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/palette/circles/mocha_rosewater.png" height="23" width="23"/></td>
       <td>Rosewater</td>
       <td><code>#f5e0dc</code></td>
+      <td><code>rgb(245, 224, 220)</code></td>
+      <td><code>hsl(10, 56%, 91%)</code></td>
     </tr>
     <tr>
       <td><img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/palette/circles/mocha_flamingo.png" height="23" width="23"/></td>
       <td>Flamingo</td>
       <td><code>#f2cdcd</code></td>
+      <td><code>rgb(242, 205, 205)</code></td>
+      <td><code>hsl(0, 59%, 88%)</code></td>
     </tr>
     ...
    </table>
    </details>
    ```
 
-1. Well done! You've just wrote your first Whiskers template. Can you make it
+1. Well done! You've rendered your first Whiskers template. Can you make it
    output in a different flavor?
 
 </Steps>
@@ -137,7 +147,7 @@ Catppuccin palette.
 
 1. Make the following edits:
 
-   ```markdown title="palette.tera" "palette.md" ins={6, 24}
+   ```markdown title="palette.tera" "palette.md" ins={6, 28}
    ---
    whiskers:
      version: "^2.5.1"
@@ -151,12 +161,16 @@ Catppuccin palette.
       <th></th>
       <th>Labels</th>
       <th>Hex</th>
+      <th>RGB</th>
+      <th>HSL</th>
     </tr>
     {%- for _, color in flavor.colors %}
     <tr>
       <td><img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/palette/circles/{{flavor.identifier}}_{{color.identifier}}.png" height="23" width="23"/></td>
       <td>{{color.name}}</td>
-      <td><code>#{{color.hex}}</code></td>
+      <td><code>#{{color.hex}}</code></td> {#- Direct access on the `color` object #}
+      <td><code>{{css_rgb(color=color)}}</code></td> {#- Using functions #}
+      <td><code>{{color | css_hsl}}</code></td> {#- Using filters #}
     </tr>
     {%- endfor %}
    </table>
