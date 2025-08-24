@@ -4,7 +4,13 @@
   "packages": {
     ".": {
       "package-name": "",
-      "release-type": "rust"
+      "release-type": "rust",
+      "extra-files": [
+        {
+          "type": "generic",
+          "path": "docs/src/content/docs/getting-started/quick-start.mdx"
+        }
+      ]
     }
   }
 }
