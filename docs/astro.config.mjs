@@ -51,12 +51,12 @@ export default defineConfig({
           autogenerate: { directory: "getting-started" },
         },
         {
-          label: "Guides",
-          autogenerate: { directory: "guides" },
-        },
-        {
           label: "Concepts",
           autogenerate: { directory: "concepts" },
+        },
+        {
+          label: "Guides",
+          autogenerate: { directory: "guides" },
         },
         {
           label: "Reference",
