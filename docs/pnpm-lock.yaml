@@ -23,11 +23,19 @@ importers:
       sharp:
         specifier: ^0.34.3
         version: 0.34.3
+      starlight-changelogs:
+        specifier: ^0.2.0
+        version: 0.2.0(@astrojs/starlight@0.35.2(astro@5.13.3(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2)))(astro@5.13.3(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2))
       starlight-links-validator:
         specifier: ^0.17.1
         version: 0.17.1(@astrojs/starlight@0.35.2(astro@5.13.3(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2)))
 
 packages:
+
+  '@ascorbic/loader-utils@1.0.2':
+    resolution: {integrity: sha512-pg43g83gojVtEsAkXfjWuzJhuXneJp4wM/leBftGkCPV3yxKgB92EWA+nWu735BgbBMph3P7DrVqVc3ikt+dJA==}
+    peerDependencies:
+      astro: ^4.14.0 || ^5.0.0-beta.0
 
   '@astrojs/compiler@2.12.2':
     resolution: {integrity: sha512-w2zfvhjNCkNMmMMOn5b0J8+OmUaBL1o40ipMvqcG6NRpdC+lKxmTi48DT8Xw0SzJ3AfmeFLB45zXZXtmbsjcgw==}
@@ -1639,6 +1647,12 @@ packages:
   space-separated-tokens@2.0.2:
     resolution: {integrity: sha512-PEGlAwrG8yXGXRjW32fGbg66JAlOAwbObuqVoJpv/mRgoWDQfgH1wDPvtzWyUSNAXBGSk8h755YDbbcEy3SH2Q==}
 
+  starlight-changelogs@0.2.0:
+    resolution: {integrity: sha512-aMqPaGbFLQz+iTKLqwdHrLqrvvyf/yzffUSUb4+IxAaYFCFwS463h90gBoWpKP6e3fCyF6uLBw5NX71OstS62Q==}
+    engines: {node: '>=18.17.1'}
+    peerDependencies:
+      '@astrojs/starlight': '>=0.35.0'
+
   starlight-links-validator@0.17.1:
     resolution: {integrity: sha512-d2QoBO3mQPWYq/TO4I0kT/3Z9hFulnMzMPaG2dW0H14hPq4N7ZwiBl2FMrLK8I4UE34sztcBatvWCZc62S0BMQ==}
     engines: {node: '>=18.17.1'}
@@ -1948,6 +1962,10 @@ packages:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
 snapshots:
+
+  '@ascorbic/loader-utils@1.0.2(astro@5.13.3(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2))':
+    dependencies:
+      astro: 5.13.3(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2)
 
   '@astrojs/compiler@2.12.2': {}
 
@@ -4123,6 +4141,19 @@ snapshots:
   source-map@0.7.6: {}
 
   space-separated-tokens@2.0.2: {}
+
+  starlight-changelogs@0.2.0(@astrojs/starlight@0.35.2(astro@5.13.3(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2)))(astro@5.13.3(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2)):
+    dependencies:
+      '@ascorbic/loader-utils': 1.0.2(astro@5.13.3(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2))
+      '@astrojs/starlight': 0.35.2(astro@5.13.3(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2))
+      github-slugger: 2.0.0
+      mdast-util-from-markdown: 2.0.2
+      mdast-util-to-markdown: 2.1.2
+      mdast-util-to-string: 4.0.0
+      unist-util-visit: 5.0.0
+    transitivePeerDependencies:
+      - astro
+      - supports-color
 
   starlight-links-validator@0.17.1(@astrojs/starlight@0.35.2(astro@5.13.3(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2))):
     dependencies:

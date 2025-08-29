@@ -3,7 +3,8 @@ import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import catppuccin from "@catppuccin/starlight";
 import { remarkHeadingId } from "remark-custom-heading-id";
-import starlightLinksValidator from 'starlight-links-validator'
+import starlightLinksValidator from "starlight-links-validator";
+import starlightChangelogs from "starlight-changelogs";
 
 // https://astro.build/config
 export default defineConfig({
@@ -17,7 +18,7 @@ export default defineConfig({
       favicon: "/favicon.png",
       logo: {
         dark: "/public/pepperjack-dark.png",
-        light: "/public/pepperjack-light.png"
+        light: "/public/pepperjack-light.png",
       },
       social: [
         {
@@ -72,8 +73,12 @@ export default defineConfig({
           label: "Resources",
           autogenerate: { directory: "resources" },
         },
+        {
+          link: "/changelog/",
+          label: "Changelog",
+        },
       ],
-      plugins: [catppuccin(), starlightLinksValidator()],
+      plugins: [catppuccin(), starlightLinksValidator(), starlightChangelogs()],
     }),
   ],
 });
