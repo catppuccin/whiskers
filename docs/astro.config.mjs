@@ -4,9 +4,7 @@ import starlight from "@astrojs/starlight";
 import catppuccin from "@catppuccin/starlight";
 import { remarkHeadingId } from "remark-custom-heading-id";
 import starlightLinksValidator from "starlight-links-validator";
-import starlightChangelogs, {
-  makeChangelogsSidebarLinks,
-} from "starlight-changelogs";
+import starlightChangelogs from "starlight-changelogs";
 
 // https://astro.build/config
 export default defineConfig({
@@ -76,16 +74,8 @@ export default defineConfig({
           autogenerate: { directory: "resources" },
         },
         {
-          label: "Recent versions",
-          items: [
-            ...makeChangelogsSidebarLinks([
-              {
-                type: "recent",
-                base: "changelog",
-                count: 10,
-              },
-            ]),
-          ],
+          link: "/changelog/",
+          label: "Changelog",
         },
       ],
       plugins: [catppuccin(), starlightLinksValidator(), starlightChangelogs()],
