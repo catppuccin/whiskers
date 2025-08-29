@@ -11,7 +11,7 @@ export const collections = {
         provider: "changeset",
         base: "changelog",
         changelog: "../CHANGELOG.md",
-        title: "Releases",
+        title: "Changelog",
         pageSize: 100 // We'll worry about this when/if Whiskers reaches 100 releases
       },
     ]),
