@@ -39,7 +39,7 @@ cast_sign_loss = "allow"
 [dependencies]
 anyhow = "1.0.95"
 base64 = "0.22.1"
-catppuccin = { version = "2.4.0", features = ["serde", "css-colors"] }
+catppuccin = { version = "2.5.1", features = ["serde", "css-colors"] }
 clap = { version = "4.5.30", features = ["derive"] }
 clap-stdin = "0.6.0"
 css-colors = "1.0.1"
