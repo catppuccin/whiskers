@@ -1,4 +1,5 @@
 use std::fmt::Display;
+use std::fmt::Write as _;
 
 use itertools::Itertools as _;
 
@@ -12,7 +13,7 @@ pub fn display_as_list<T: Display>(items: &[T], heading: &str) -> String {
     format!("### {heading}\n\n{items}")
 }
 
-pub fn display_as_table<T: TableDisplay>(items: &[T], heading: &str) -> String {
+pub fn display_as_table<T: TableDisplay>(items: &[T], heading: &str) -> anyhow::Result<String> {
     let mut result = String::new();
     let rows = items.iter().map(T::table_row).collect::<Vec<_>>();
 
@@ -33,30 +34,33 @@ pub fn display_as_table<T: TableDisplay>(items: &[T], heading: &str) -> String {
         .collect::<Vec<_>>();
 
     // add the section heading
-    result.push_str(&format!("### {heading}\n\n"));
+    write!(result, "### {heading}\n\n")?;
 
     // add the table headings
-    result.push_str(&format!(
-        "| {} |\n",
+    writeln!(
+        result,
+        "| {} |",
         headings
             .iter()
             .map(|(heading, max_width)| format!("{heading:<max_width$}"))
             .join(" | ")
-    ));
+    )?;
 
     // add the separator
-    result.push_str(&format!(
-        "| {} |\n",
+    writeln!(
+        result,
+        "| {} |",
         headings
             .iter()
             .map(|(_, max_width)| "-".repeat(*max_width))
             .join(" | ")
-    ));
+    )?;
 
     // add the rows
     for row in rows {
-        result.push_str(&format!(
-            "| {} |\n",
+        writeln!(
+            result,
+            "| {} |",
             row.iter()
                 .enumerate()
                 .map(|(i, cell)| {
@@ -64,8 +68,8 @@ pub fn display_as_table<T: TableDisplay>(items: &[T], heading: &str) -> String {
                     format!("{cell:<max_width$}")
                 })
                 .join(" | ")
-        ));
+        )?;
     }
 
-    result.trim().to_string()
+    Ok(result.trim().to_string())
 }

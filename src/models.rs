@@ -231,7 +231,7 @@ pub fn build_palette(color_overrides: Option<&ColorOverrides>) -> Result<Palette
 
 impl Palette {
     #[must_use]
-    pub fn iter(&self) -> indexmap::map::Iter<String, Flavor> {
+    pub fn iter(&self) -> indexmap::map::Iter<'_, String, Flavor> {
         self.flavors.iter()
     }
 }
@@ -247,7 +247,7 @@ impl<'a> IntoIterator for &'a Palette {
 
 impl Flavor {
     #[must_use]
-    pub fn iter(&self) -> indexmap::map::Iter<String, Color> {
+    pub fn iter(&self) -> indexmap::map::Iter<'_, String, Color> {
         self.colors.iter()
     }
 }

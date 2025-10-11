@@ -109,7 +109,7 @@ impl TemplateOptions {
 fn main() -> anyhow::Result<()> {
     // parse command-line arguments & template frontmatter
     let args = Args::parse();
-    handle_list_flags(&args);
+    handle_list_flags(&args)?;
 
     let template_arg = args
         .template
@@ -225,14 +225,14 @@ fn main() -> anyhow::Result<()> {
     Ok(())
 }
 
-fn handle_list_flags(args: &Args) {
+fn handle_list_flags(args: &Args) -> anyhow::Result<()> {
     if args.list_functions {
-        list_functions(args.output_format);
+        list_functions(args.output_format)?;
         exit(0);
     }
 
     if args.list_flavors {
-        list_flavors(args.output_format);
+        list_flavors(args.output_format)?;
         exit(0);
     }
 
@@ -240,6 +240,8 @@ fn handle_list_flags(args: &Args) {
         list_accents(args.output_format);
         exit(0);
     }
+
+    Ok(())
 }
 
 fn override_matrix(
@@ -269,7 +271,7 @@ fn override_matrix(
     Ok(())
 }
 
-fn list_functions(format: OutputFormat) {
+fn list_functions(format: OutputFormat) -> anyhow::Result<()> {
     let functions = templating::all_functions();
     let filters = templating::all_filters();
     println!(
@@ -290,8 +292,8 @@ fn list_functions(format: OutputFormat) {
             OutputFormat::Markdown | OutputFormat::MarkdownTable => {
                 format!(
                     "{}\n\n{}",
-                    markdown::display_as_table(&functions, "Functions"),
-                    markdown::display_as_table(&filters, "Filters")
+                    markdown::display_as_table(&functions, "Functions")?,
+                    markdown::display_as_table(&filters, "Filters")?
                 )
             }
             OutputFormat::Plain => {
@@ -306,9 +308,10 @@ fn list_functions(format: OutputFormat) {
             }
         }
     );
+    Ok(())
 }
 
-fn list_flavors(format: OutputFormat) {
+fn list_flavors(format: OutputFormat) -> anyhow::Result<()> {
     // we want all the flavor info minus the colors
     #[derive(serde::Serialize)]
     struct FlavorInfo {
@@ -372,10 +375,12 @@ fn list_flavors(format: OutputFormat) {
             }
             // and finally for human-readable markdown, we list the flavor names
             OutputFormat::Markdown | OutputFormat::MarkdownTable => {
-                markdown::display_as_table(&flavors, "Flavors")
+                markdown::display_as_table(&flavors, "Flavors")?
             }
         }
     );
+
+    Ok(())
 }
 
 fn list_accents(format: OutputFormat) {
@@ -482,7 +487,7 @@ fn template_is_compatible(template_opts: &TemplateOptions) -> bool {
         eprintln!("    version: \"^{whiskers_version}\"");
         eprintln!("---");
         eprintln!();
-    };
+    }
 
     true
 }
@@ -597,7 +602,7 @@ fn maybe_create_parents(filename: &Path) -> anyhow::Result<()> {
                 filename.display()
             )
         })?;
-    };
+    }
     Ok(())
 }
 
