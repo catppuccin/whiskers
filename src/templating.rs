@@ -57,14 +57,12 @@ pub fn make_engine(template_directory: &Path) -> tera::Tera {
     tera.register_filter("css_rgba", filters::css_rgba);
     tera.register_filter("css_hsl", filters::css_hsl);
     tera.register_filter("css_hsla", filters::css_hsla);
-    tera.register_filter("rgb_array", filters::rgb_array);
     tera.register_function("if", functions::if_fn);
     tera.register_function("object", functions::object);
     tera.register_function("css_rgb", functions::css_rgb);
     tera.register_function("css_rgba", functions::css_rgba);
     tera.register_function("css_hsl", functions::css_hsl);
     tera.register_function("css_hsla", functions::css_hsla);
-    tera.register_function("rgb_array", functions::rgb_array);
     tera.register_function(
         "read_file",
         functions::read_file_handler(template_directory.to_owned()),

@@ -87,14 +87,3 @@ pub fn read_file_handler(
         Ok(tera::to_value(contents)?)
     }
 }
-
-pub fn rgb_array(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera::Error> {
-    let color: Color = tera::from_value(
-        args.get("color")
-            .ok_or_else(|| tera::Error::msg("color is required"))?
-            .clone(),
-    )?;
-
-    let colors: [u8; 3] = [color.rgb.r, color.rgb.g, color.rgb.b];
-    Ok(tera::to_value(colors)?)
-}
