@@ -26,6 +26,8 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    # don't run on forks
+    if: ${{ github.repository == 'catppuccin/whiskers' }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
