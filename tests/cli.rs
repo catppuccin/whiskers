@@ -59,7 +59,8 @@ mod happy_path {
         assert.success().stdout(
             predicate::str::contains("24-bit red: 13766457")
                 .and(predicate::str::contains("unsigned 32-bit red: 4291956537"))
-                .and(predicate::str::contains("signed 32-bit red: -3010759")),
+                .and(predicate::str::contains("signed 32-bit red: -3010759"))
+                .and(predicate::str::contains("channels: 210 15 57")),
         );
     }
 

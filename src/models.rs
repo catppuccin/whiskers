@@ -45,6 +45,7 @@ pub struct RGB {
     pub r: u8,
     pub g: u8,
     pub b: u8,
+    pub channels: [u8; 3],
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
@@ -120,11 +121,11 @@ fn rgb_to_ints(rgb: &RGB, opacity: Option<u8>) -> (u32, u32, i32) {
 
 fn color_from_hex_override(hex: &str, blueprint: &catppuccin::Color) -> Result<Color, Error> {
     let i = u32::from_str_radix(hex, 16)?;
-    let rgb = RGB {
-        r: ((i >> 16) & 0xFF) as u8,
-        g: ((i >> 8) & 0xFF) as u8,
-        b: (i & 0xFF) as u8,
-    };
+    let rgb = RGB::new(
+        ((i >> 16) & 0xFF) as u8,
+        ((i >> 8) & 0xFF) as u8,
+        (i & 0xFF) as u8,
+    );
     let hsl = css_colors::rgb(rgb.r, rgb.g, rgb.b).to_hsl();
     let hex = format_hex!(rgb.r, rgb.g, rgb.b, 0xFF)?;
     let (int24, uint32, sint32) = rgb_to_ints(&rgb, None);
@@ -160,11 +161,7 @@ fn color_from_catppuccin(color: &catppuccin::Color) -> tera::Result<Color> {
         int24,
         uint32,
         sint32,
-        rgb: RGB {
-            r: color.rgb.r,
-            g: color.rgb.g,
-            b: color.rgb.b,
-        },
+        rgb: RGB::new(color.rgb.r, color.rgb.g, color.rgb.b),
         hsl: HSL {
             h: color.hsl.h.round() as u16,
             s: color.hsl.s as f32,
@@ -268,11 +265,7 @@ fn rgb_to_hex(rgb: &RGB, opacity: u8) -> tera::Result<String> {
 impl Color {
     fn from_hsla(hsla: css_colors::HSLA, blueprint: &Self) -> tera::Result<Self> {
         let rgb = hsla.to_rgb();
-        let rgb = RGB {
-            r: rgb.r.as_u8(),
-            g: rgb.g.as_u8(),
-            b: rgb.b.as_u8(),
-        };
+        let rgb = RGB::new(rgb.r.as_u8(), rgb.g.as_u8(), rgb.b.as_u8());
         let hsl = HSL {
             h: hsla.h.degrees(),
             s: hsla.s.as_f32(),
@@ -297,11 +290,7 @@ impl Color {
 
     fn from_rgba(rgba: css_colors::RGBA, blueprint: &Self) -> tera::Result<Self> {
         let hsl = rgba.to_hsl();
-        let rgb = RGB {
-            r: rgba.r.as_u8(),
-            g: rgba.g.as_u8(),
-            b: rgba.b.as_u8(),
-        };
+        let rgb = RGB::new(rgba.r.as_u8(), rgba.g.as_u8(), rgba.b.as_u8());
         let hsl = HSL {
             h: hsl.h.degrees(),
             s: hsl.s.as_f32(),
@@ -472,12 +461,19 @@ impl From<&Color> for css_colors::HSLA {
     }
 }
 
+impl RGB {
+    const fn new(r: u8, g: u8, b: u8) -> Self {
+        Self {
+            r,
+            g,
+            b,
+            channels: [r, g, b],
+        }
+    }
+}
+
 impl From<catppuccin::Rgb> for RGB {
     fn from(rgb: catppuccin::Rgb) -> Self {
-        Self {
-            r: rgb.r,
-            g: rgb.g,
-            b: rgb.b,
-        }
+        Self::new(rgb.r, rgb.g, rgb.b)
     }
 }

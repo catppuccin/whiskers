@@ -5,3 +5,4 @@ whiskers:
 24-bit red: {{red.int24}}
 unsigned 32-bit red: {{red.uint32}}
 signed 32-bit red: {{red.sint32}}
+channels: {% for channel in red.rgb.channels %}{{ channel }} {% endfor %}
