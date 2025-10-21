@@ -12,7 +12,8 @@ mod happy_path {
             .assert();
         assert
             .success()
-            .stdout(include_str!("fixtures/single/single.md"));
+            .stdout(include_str!("fixtures/single/single.md"))
+            .stderr(predicate::str::is_empty());
     }
 
     /// Test that the CLI can render a multi-flavor template file
@@ -22,7 +23,8 @@ mod happy_path {
         let assert = cmd.args(["tests/fixtures/multi/multi.tera"]).assert();
         assert
             .success()
-            .stdout(include_str!("fixtures/multi/multi.md"));
+            .stdout(include_str!("fixtures/multi/multi.md"))
+            .stderr(predicate::str::is_empty());
     }
 
     /// Test that the CLI can render a multi-flavor matrix template
@@ -34,7 +36,8 @@ mod happy_path {
             .assert();
         assert.success().stdout(predicate::str::contains(
             "catppuccin-macchiato-yellow-no-italics.ini",
-        ));
+        ))
+            .stderr(predicate::str::is_empty());
     }
 
     /// Test that the CLI can render a template which uses `read_file`
@@ -46,7 +49,8 @@ mod happy_path {
             .assert();
         assert
             .success()
-            .stdout(include_str!("fixtures/read_file/read_file.md"));
+            .stdout(include_str!("fixtures/read_file/read_file.md"))
+            .stderr(predicate::str::is_empty());
     }
 
     /// Test that the CLI can render colours in specific formats
@@ -61,7 +65,8 @@ mod happy_path {
                 .and(predicate::str::contains("unsigned 32-bit red: 4291956537"))
                 .and(predicate::str::contains("signed 32-bit red: -3010759"))
                 .and(predicate::str::contains("channels: 210 15 57")),
-        );
+        )
+            .stderr(predicate::str::is_empty());
     }
 
     /// Test that the CLI can render a UTF-8 template file
@@ -71,7 +76,8 @@ mod happy_path {
         let assert = cmd.args(["tests/fixtures/encodings/utf8.tera"]).assert();
         assert
             .success()
-            .stdout(predicate::str::contains("it worked!"));
+            .stdout(predicate::str::contains("it worked!"))
+            .stderr(predicate::str::is_empty());
     }
 
     /// Test that the CLI can render a UTF-8 with BOM template file
@@ -81,7 +87,8 @@ mod happy_path {
         let assert = cmd.args(["tests/fixtures/encodings/utf8bom.tera"]).assert();
         assert
             .success()
-            .stdout(predicate::str::contains("it worked!"));
+            .stdout(predicate::str::contains("it worked!"))
+            .stderr(predicate::str::is_empty());
     }
 
     /// Test that the CLI can render a UTF-16 BE template file
@@ -91,7 +98,8 @@ mod happy_path {
         let assert = cmd.args(["tests/fixtures/encodings/utf16be.tera"]).assert();
         assert
             .success()
-            .stdout(predicate::str::contains("it worked!"));
+            .stdout(predicate::str::contains("it worked!"))
+            .stderr(predicate::str::is_empty());
     }
 
     /// Test that the CLI can render a UTF-16 LE template file
@@ -101,7 +109,8 @@ mod happy_path {
         let assert = cmd.args(["tests/fixtures/encodings/utf16le.tera"]).assert();
         assert
             .success()
-            .stdout(predicate::str::contains("it worked!"));
+            .stdout(predicate::str::contains("it worked!"))
+            .stderr(predicate::str::is_empty());
     }
 
     /// Test that the default hex format is rrggbb and full alpha is hidden
@@ -111,7 +120,8 @@ mod happy_path {
         let assert = cmd.args(["tests/fixtures/hexformat/default.tera"]).assert();
         assert
             .success()
-            .stdout(include_str!("fixtures/hexformat/default.txt"));
+            .stdout(include_str!("fixtures/hexformat/default.txt"))
+            .stderr(predicate::str::is_empty());
     }
 
     /// Test that the CLI can render a template with a custom hex format
@@ -123,7 +133,8 @@ mod happy_path {
             .assert();
         assert
             .success()
-            .stdout(include_str!("fixtures/hexformat/custom.txt"));
+            .stdout(include_str!("fixtures/hexformat/custom.txt"))
+            .stderr(predicate::str::is_empty());
     }
 }
 
