@@ -1,6 +1,6 @@
 ---
 whiskers:
-  version: 2.0.0
+  version: ^2.0.0
 ---
 {%- macro css_rgb(v) -%}
 rgb({{ v.r }}, {{ v.g }}, {{ v.b }})
