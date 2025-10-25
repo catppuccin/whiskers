@@ -34,9 +34,11 @@ mod happy_path {
         let assert = cmd
             .args(["--dry-run", "tests/fixtures/multifile.tera"])
             .assert();
-        assert.success().stdout(predicate::str::contains(
-            "catppuccin-macchiato-yellow-no-italics.ini",
-        ))
+        assert
+            .success()
+            .stdout(predicate::str::contains(
+                "catppuccin-macchiato-yellow-no-italics.ini",
+            ))
             .stderr(predicate::str::is_empty());
     }
 
@@ -60,12 +62,14 @@ mod happy_path {
         let assert = cmd
             .args(["tests/fixtures/formats.tera", "-f", "latte"])
             .assert();
-        assert.success().stdout(
-            predicate::str::contains("24-bit red: 13766457")
-                .and(predicate::str::contains("unsigned 32-bit red: 4291956537"))
-                .and(predicate::str::contains("signed 32-bit red: -3010759"))
-                .and(predicate::str::contains("channels: 210 15 57")),
-        )
+        assert
+            .success()
+            .stdout(
+                predicate::str::contains("24-bit red: 13766457")
+                    .and(predicate::str::contains("unsigned 32-bit red: 4291956537"))
+                    .and(predicate::str::contains("signed 32-bit red: -3010759"))
+                    .and(predicate::str::contains("channels: 210 15 57")),
+            )
             .stderr(predicate::str::is_empty());
     }
 
