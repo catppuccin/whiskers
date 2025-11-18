@@ -27,8 +27,8 @@ importers:
         specifier: ^0.2.1
         version: 0.2.1(@astrojs/starlight@0.36.0(astro@5.14.4(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2)))(astro@5.14.4(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2))
       starlight-links-validator:
-        specifier: ^0.18.0
-        version: 0.18.0(@astrojs/starlight@0.36.0(astro@5.14.4(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2)))
+        specifier: ^0.19.0
+        version: 0.19.1(@astrojs/starlight@0.36.0(astro@5.14.4(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2)))
 
 packages:
 
@@ -1509,6 +1509,7 @@ packages:
   sitemap@8.0.0:
     resolution: {integrity: sha512-+AbdxhM9kJsHtruUF39bwS/B0Fytw6Fr1o4ZAIAEqA6cke2xcoO2GleBw9Zw7nRzILVEgz7zBM5GiTJjie1G9A==}
     engines: {node: '>=14.0.0', npm: '>=6.0.0'}
+    deprecated: 'SECURITY: Multiple vulnerabilities fixed in 8.0.1 (XML injection, path traversal, command injection, protocol injection). Upgrade immediately: npm install sitemap@8.0.1'
     hasBin: true
 
   smol-toml@1.4.2:
@@ -1532,8 +1533,8 @@ packages:
     peerDependencies:
       '@astrojs/starlight': '>=0.35.0'
 
-  starlight-links-validator@0.18.0:
-    resolution: {integrity: sha512-R0gLdrKWdpAEqux3DL2B3QvNJM8Zpys8CQu1BGLD9hc+66nt/Q6aJDkvvkvoCVky9JKmBEnmL4PhFkyz13lK5g==}
+  starlight-links-validator@0.19.1:
+    resolution: {integrity: sha512-Ermpe7zJG5uRJUqIWflX4VNLozOBX2/N4XvHvyaPQcHsfdN7y81qEd3n56PYdVb3Tj4/6ZFFSfAtiCe78XtBVw==}
     engines: {node: '>=18.17.1'}
     peerDependencies:
       '@astrojs/starlight': '>=0.32.0'
@@ -3934,7 +3935,7 @@ snapshots:
       - astro
       - supports-color
 
-  starlight-links-validator@0.18.0(@astrojs/starlight@0.36.0(astro@5.14.4(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2))):
+  starlight-links-validator@0.19.1(@astrojs/starlight@0.36.0(astro@5.14.4(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2))):
     dependencies:
       '@astrojs/starlight': 0.36.0(astro@5.14.4(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2))
       '@types/picomatch': 3.0.2
