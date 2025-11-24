@@ -181,6 +181,7 @@ dependencies = [
  "itertools",
  "lzma-rust",
  "predicates",
+ "rand",
  "rmp-serde",
  "semver",
  "serde",

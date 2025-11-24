@@ -1,5 +1,6 @@
 pub mod cli;
 pub mod context;
+pub mod css_filter;
 pub mod filters;
 pub mod frontmatter;
 pub mod functions;

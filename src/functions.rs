@@ -87,3 +87,14 @@ pub fn read_file_handler(
         Ok(tera::to_value(contents)?)
     }
 }
+
+pub fn css_filter(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera::Error> {
+    let color: Color = tera::from_value(
+        args.get("color")
+            .ok_or_else(|| tera::Error::msg("color is required"))?
+            .clone(),
+    )?;
+
+    let filter = crate::css_filter::css_filter(&color);
+    Ok(tera::to_value(filter)?)
+}
