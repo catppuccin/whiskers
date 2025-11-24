@@ -212,21 +212,17 @@ impl Solver {
     fn solve(&mut self) -> FilterResult {
         let mut res = self.solve_narrow(&self.solve_wide());
 
-        // If loss is still high, run extra iterations to refine
-        if res.loss >= 0.1 {
-            res = self.solve_narrow(&res);
-        }
-
-        // If still not fixed, try with a different seed
-        if res.loss >= 0.1 {
+        // If loss is still high, try with different seeds up to 10 times
+        for _ in 0..10 {
+            if res.loss <= 0.01 {
+                break;
+            }
             self.rng_seed = self.rng_seed.wrapping_add(1);
             let new_res = self.solve_narrow(&self.solve_wide());
             if new_res.loss < res.loss {
                 res = new_res;
             }
         }
-
-        eprintln!("loss: {}", res.loss);
         res
     }
 
@@ -241,12 +237,11 @@ impl Solver {
         };
 
         for _ in 0..10 {
-            if best.loss <= 0.001 {
-                // acceptable range
+            if best.loss <= 0.01 {
                 break;
             }
             let initial = [50.0, 20.0, 3750.0, 50.0, 100.0, 100.0];
-            let result = self.spsa(a_val, &a, c, &initial, 3000);
+            let result = self.spsa(a_val, &a, c, &initial, 1000);
             if result.loss < best.loss {
                 best = result;
             }
