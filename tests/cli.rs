@@ -73,6 +73,19 @@ mod happy_path {
             .stderr(predicate::str::is_empty());
     }
 
+    /// Test that the CLI can generate CSS filters using SPSA algorithm
+    #[test]
+    fn test_css_filter() {
+        let mut cmd = Command::cargo_bin("whiskers").expect("binary exists");
+        let assert = cmd
+            .args(["tests/fixtures/css_filter/css_filter.tera", "-f", "mocha"])
+            .assert();
+        assert
+            .success()
+            .stdout(include_str!("fixtures/css_filter/css_filter.md"))
+            .stderr(predicate::str::is_empty());
+    }
+
     /// Test that the CLI can render a UTF-8 template file
     #[test]
     fn test_utf8() {
