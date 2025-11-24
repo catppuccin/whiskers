@@ -94,7 +94,14 @@ pub fn css_filter(args: &HashMap<String, tera::Value>) -> Result<tera::Value, te
             .ok_or_else(|| tera::Error::msg("color is required"))?
             .clone(),
     )?;
+    let seed = args
+        .get("seed")
+        .map(|v| {
+            v.as_u64()
+                .ok_or_else(|| tera::Error::msg("seed must be a positive integer"))
+        })
+        .transpose()?;
 
-    let filter = crate::css_filter::css_filter(&color);
+    let filter = crate::css_filter::css_filter(&color, seed);
     Ok(tera::to_value(filter)?)
 }

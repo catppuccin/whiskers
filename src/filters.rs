@@ -171,9 +171,16 @@ pub fn css_hsla(
 
 pub fn css_filter(
     value: &tera::Value,
-    _args: &HashMap<String, tera::Value>,
+    args: &HashMap<String, tera::Value>,
 ) -> Result<tera::Value, tera::Error> {
     let color: Color = tera::from_value(value.clone())?;
-    let filter = crate::css_filter::css_filter(&color);
+    let seed = args
+        .get("seed")
+        .map(|v| {
+            v.as_u64()
+                .ok_or_else(|| tera::Error::msg("seed must be a positive integer"))
+        })
+        .transpose()?;
+    let filter = crate::css_filter::css_filter(&color, seed);
     Ok(tera::to_value(filter)?)
 }

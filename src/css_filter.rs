@@ -21,8 +21,8 @@ use rand::Rng;
 use rand::SeedableRng;
 use rand_chacha::ChaCha8Rng;
 
-/// Type alias for the filter cache
-type FilterCache = Mutex<HashMap<(u8, u8, u8), String>>;
+/// Type alias for the filter cache (RGB + optional seed)
+type FilterCache = Mutex<HashMap<(u8, u8, u8, Option<u64>), String>>;
 
 /// In-memory cache for filter results
 static FILTER_CACHE: OnceLock<FilterCache> = OnceLock::new();
@@ -196,13 +196,15 @@ struct Solver {
 }
 
 impl Solver {
-    fn new(target: FilterColor) -> Self {
+    fn new(target: FilterColor, seed: Option<u64>) -> Self {
         let target_oklab = target.oklab();
-        // Deterministic seed based on RGB values for reproducible builds
-        let r = (target.r() * 255.0).round() as u32;
-        let g = (target.g() * 255.0).round() as u32;
-        let b = (target.b() * 255.0).round() as u32;
-        let rng_seed = u64::from(r) | (u64::from(g) << 16) | (u64::from(b) << 32);
+        // Use provided seed or derive a deterministic seed from RGB values for reproducible builds
+        let rng_seed = seed.unwrap_or_else(|| {
+            let r = (target.r() * 255.0).round() as u32;
+            let g = (target.g() * 255.0).round() as u32;
+            let b = (target.b() * 255.0).round() as u32;
+            u64::from(r) | (u64::from(g) << 16) | (u64::from(b) << 32)
+        });
         Self {
             target_oklab,
             rng_seed,
@@ -353,29 +355,31 @@ fn fix(value: f64, idx: usize) -> f64 {
 /// Generate a CSS filter string that transforms black to the given color
 ///
 /// Results are cached in memory to avoid redundant expensive computations.
+/// The cache key includes both the color and the seed.
 ///
 /// # Arguments
 /// * `color` - A Color object containing RGB values
+/// * `seed` - Optional seed for the RNG. If not provided, a deterministic seed based on RGB values is used.
 ///
 /// # Returns
 /// A CSS filter string
 ///
 /// # Panics
 /// Panics if the cache mutex is poisoned (i.e., a thread panicked while holding the lock)
-pub fn css_filter(color: &crate::models::Color) -> String {
-    let rgb_key = (color.rgb.r, color.rgb.g, color.rgb.b);
+pub fn css_filter(color: &crate::models::Color, seed: Option<u64>) -> String {
+    let cache_key = (color.rgb.r, color.rgb.g, color.rgb.b, seed);
 
     // Initialize cache if needed
     let cache = FILTER_CACHE.get_or_init(|| Mutex::new(HashMap::new()));
 
-    // Check cache for color
-    if let Some(cached) = cache.lock().expect("lock good").get(&rgb_key) {
+    // Check cache for color + seed combination
+    if let Some(cached) = cache.lock().expect("lock good").get(&cache_key) {
         return cached.clone();
     }
 
     // Compute if not cached
     let target = FilterColor::new(color.rgb.r, color.rgb.g, color.rgb.b);
-    let mut solver = Solver::new(target);
+    let mut solver = Solver::new(target, seed);
     let result = solver.solve();
     let filter_string = result.css();
 
@@ -383,7 +387,7 @@ pub fn css_filter(color: &crate::models::Color) -> String {
     cache
         .lock()
         .expect("lock good")
-        .insert(rgb_key, filter_string.clone());
+        .insert(cache_key, filter_string.clone());
 
     filter_string
 }
@@ -420,14 +424,37 @@ mod tests {
     fn test_repeated_output() {
         // Same color should produce identical results across multiple runs
         let color1 = FilterColor::new(210, 15, 57);
-        let mut solver1 = Solver::new(color1);
+        let mut solver1 = Solver::new(color1, None);
         let result1 = solver1.solve();
 
         let color2 = FilterColor::new(210, 15, 57);
-        let mut solver2 = Solver::new(color2);
+        let mut solver2 = Solver::new(color2, None);
         let result2 = solver2.solve();
 
         assert_eq!(result1.css(), result2.css());
         assert_eq!(result1.values, result2.values);
+    }
+
+    #[test]
+    fn test_custom_seed() {
+        // Same color with different seeds should produce different results
+        let color1 = FilterColor::new(210, 15, 57);
+        let mut solver1 = Solver::new(color1, Some(12345));
+        let result1 = solver1.solve();
+
+        let color2 = FilterColor::new(210, 15, 57);
+        let mut solver2 = Solver::new(color2, Some(67890));
+        let result2 = solver2.solve();
+
+        // Results should differ (different seeds)
+        assert_ne!(result1.values, result2.values);
+
+        // Same seed should produce same result
+        let color3 = FilterColor::new(210, 15, 57);
+        let mut solver3 = Solver::new(color3, Some(12345));
+        let result3 = solver3.solve();
+
+        assert_eq!(result1.css(), result3.css());
+        assert_eq!(result1.values, result3.values);
     }
 }
