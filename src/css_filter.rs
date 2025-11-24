@@ -26,7 +26,7 @@ type FilterCache = Mutex<HashMap<(u8, u8, u8), String>>;
 static FILTER_CACHE: OnceLock<FilterCache> = OnceLock::new();
 
 /// Internal color representation for filter computation
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 struct FilterColor(f32, f32, f32);
 
 impl FilterColor {
