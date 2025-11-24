@@ -17,7 +17,9 @@
 use std::collections::HashMap;
 use std::sync::{Mutex, OnceLock};
 
-use rand::{Rng, SeedableRng};
+use rand::Rng;
+use rand_chacha::ChaCha8Rng;
+use rand::SeedableRng;
 
 /// Type alias for the filter cache
 type FilterCache = Mutex<HashMap<(u8, u8, u8), String>>;
@@ -256,8 +258,8 @@ impl Solver {
         let mut best: Option<FilterResult> = None;
         let mut best_loss = f64::INFINITY;
         let mut values = *initial_values;
-        // Use deterministic RNG seeded by target color for reproducible builds
-        let mut rng = rand::rngs::StdRng::seed_from_u64(self.rng_seed);
+        // Use ChaCha8Rng for deterministic, cross-platform reproducible results
+        let mut rng = ChaCha8Rng::seed_from_u64(self.rng_seed);
 
         for k in 0..iters {
             let ck = c / f64::from(k as u32 + 1).powf(gamma);

@@ -183,6 +183,7 @@ dependencies = [
  "oklab",
  "predicates",
  "rand",
+ "rand_chacha",
  "rmp-serde",
  "semver",
  "serde",
