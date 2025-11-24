@@ -130,7 +130,7 @@ pub fn all_functions() -> Vec<Function> {
                 "Generate a CSS filter that transforms black to the given color using SPSA"
                     .to_string(),
             examples: vec![
-                function_example!(css_filter(color=red) => "invert(42%) sepia(98%) saturate(4636%) hue-rotate(346deg) brightness(91%) contrast(94%)"),
+                function_example!(css_filter(color=red) => "invert(71%) sepia(9%) saturate(2897%) hue-rotate(300deg) brightness(101%) contrast(91%)"),
             ],
         },
     ]
@@ -213,7 +213,7 @@ pub fn all_filters() -> Vec<Filter> {
                 "Generate a CSS filter that transforms black to the given color using SPSA"
                     .to_string(),
             examples: vec![
-                filter_example!(red | css_filter => "invert(42%) sepia(98%) saturate(4636%) hue-rotate(346deg) brightness(91%) contrast(94%)"),
+                filter_example!(red | css_filter => "invert(71%) sepia(9%) saturate(2897%) hue-rotate(300deg) brightness(101%) contrast(91%)"),
             ],
         },
     ]
