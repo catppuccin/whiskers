@@ -6,6 +6,9 @@
 //! black (#000000) into a target color. This is useful for applying color transformations
 //! to SVG icons and other elements that cannot be colored with fill, using CSS filters instead.
 //!
+//! The loss function uses the Oklab perceptually uniform color space for more accurate
+//! color matching.
+//!
 //! Reference implementations:
 //! - <https://stackoverflow.com/questions/42966641>
 //! - <https://codepen.io/sosuke/pen/Pjoqqp>
@@ -14,7 +17,6 @@
 use std::collections::HashMap;
 use std::sync::{Mutex, OnceLock};
 
-use css_colors::Color as _;
 use rand::{Rng, SeedableRng};
 
 /// Type alias for the filter cache
@@ -154,48 +156,12 @@ impl FilterColor {
         self.set_rgb(new_r, new_g, new_b);
     }
 
-    fn hsl(&self) -> css_colors::HSL {
-        css_colors::RGB {
-            r: css_colors::Ratio::from_f32(self.0),
-            g: css_colors::Ratio::from_f32(self.1),
-            b: css_colors::Ratio::from_f32(self.2),
-        }
-        .to_hsl()
-    }
-
-    // Fallback HSL conversion for intermediate filter calculations
-    // css_colors can panic on edge case RGB values during SPSA optimization
-    fn hsl_lossy(&self) -> (f32, f32, f32) {
-        let r = self.r();
-        let g = self.g();
-        let b = self.b();
-        let max = r.max(g).max(b);
-        let min = r.min(g).min(b);
-        let h;
-        let s;
-        let l = f32::midpoint(max, min);
-
-        if (max - min).abs() < f32::EPSILON {
-            h = 0.0;
-            s = 0.0;
-        } else {
-            let d = max - min;
-            s = if l > 0.5 {
-                d / (2.0 - max - min)
-            } else {
-                d / (max + min)
-            };
-
-            h = if (max - r).abs() < f32::EPSILON {
-                (g - b) / d + if g < b { 6.0 } else { 0.0 }
-            } else if (max - g).abs() < f32::EPSILON {
-                (b - r) / d + 2.0
-            } else {
-                (r - g) / d + 4.0
-            } / 6.0;
-        }
-
-        (h * 360.0, s, l)
+    fn oklab(&self) -> oklab::Oklab {
+        oklab::srgb_f32_to_oklab(oklab::Rgb {
+            r: self.0,
+            g: self.1,
+            b: self.2,
+        })
     }
 }
 
@@ -223,22 +189,20 @@ impl FilterResult {
 }
 
 struct Solver {
-    target: FilterColor,
-    target_hsl: css_colors::HSL,
+    target_oklab: oklab::Oklab,
     rng_seed: u64,
 }
 
 impl Solver {
     fn new(target: FilterColor) -> Self {
-        let target_hsl = target.hsl();
+        let target_oklab = target.oklab();
         // Deterministic seed based on RGB values for reproducible builds
         let r = (target.r() * 255.0).round() as u32;
         let g = (target.g() * 255.0).round() as u32;
         let b = (target.b() * 255.0).round() as u32;
         let rng_seed = u64::from(r) | (u64::from(g) << 16) | (u64::from(b) << 32);
         Self {
-            target,
-            target_hsl,
+            target_oklab,
             rng_seed,
         }
     }
@@ -337,18 +301,14 @@ impl Solver {
         color.brightness((filters[4] / 100.0) as f32);
         color.contrast((filters[5] / 100.0) as f32);
 
-        // Use lossy HSL for intermediate calculations to avoid css_colors panics
-        let (h, s, l) = color.hsl_lossy();
-        let target_h = f32::from(self.target_hsl.h.degrees());
-        let target_s = self.target_hsl.s.as_f32();
-        let target_l = self.target_hsl.l.as_f32();
+        // Compute Euclidean distance in Oklab color space (perceptually uniform)
+        let current_oklab = color.oklab();
+        let dl = current_oklab.l - self.target_oklab.l;
+        let da = current_oklab.a - self.target_oklab.a;
+        let db = current_oklab.b - self.target_oklab.b;
 
-        f64::from((color.r() - self.target.r()).abs() * 255.0)
-            + f64::from((color.g() - self.target.g()).abs() * 255.0)
-            + f64::from((color.b() - self.target.b()).abs() * 255.0)
-            + f64::from((h - target_h).abs())
-            + f64::from((s - target_s).abs() * 100.0)
-            + f64::from((l - target_l).abs() * 100.0)
+        // Scale to make the loss comparable to the original (roughly 0-300 range)
+        f64::from(dl * dl + da * da + db * db).sqrt() * 300.0
     }
 }
 
@@ -434,12 +394,13 @@ mod tests {
     }
 
     #[test]
-    fn test_hsl_conversion() {
+    fn test_oklab_conversion() {
         let color = FilterColor::new(255, 0, 0);
-        let hsl = color.hsl();
-        assert!(hsl.h.degrees() < 1); // Red should be near 0 degrees
-        assert!(hsl.s.as_f32() > 0.9); // Should be highly saturated
-        assert!((hsl.l.as_f32() - 0.5).abs() < 0.05); // Should be around 50% lightness
+        let oklab = color.oklab();
+        // Red in Oklab should have positive a (towards red) and positive b (towards yellow)
+        assert!(oklab.l > 0.5); // Should have decent lightness
+        assert!(oklab.a > 0.1); // Should be strongly towards red
+        assert!(oklab.b > 0.0); // Red has positive b
     }
 
     #[test]
