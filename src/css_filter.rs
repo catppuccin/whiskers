@@ -18,8 +18,8 @@ use std::collections::HashMap;
 use std::sync::{Mutex, OnceLock};
 
 use rand::Rng;
-use rand_chacha::ChaCha8Rng;
 use rand::SeedableRng;
+use rand_chacha::ChaCha8Rng;
 
 /// Type alias for the filter cache
 type FilterCache = Mutex<HashMap<(u8, u8, u8), String>>;
@@ -209,8 +209,25 @@ impl Solver {
         }
     }
 
-    fn solve(&self) -> FilterResult {
-        self.solve_narrow(&self.solve_wide())
+    fn solve(&mut self) -> FilterResult {
+        let mut res = self.solve_narrow(&self.solve_wide());
+
+        // If loss is still high, run extra iterations to refine
+        if res.loss >= 0.1 {
+            res = self.solve_narrow(&res);
+        }
+
+        // If still not fixed, try with a different seed
+        if res.loss >= 0.1 {
+            self.rng_seed = self.rng_seed.wrapping_add(1);
+            let new_res = self.solve_narrow(&self.solve_wide());
+            if new_res.loss < res.loss {
+                res = new_res;
+            }
+        }
+
+        eprintln!("loss: {}", res.loss);
+        res
     }
 
     fn solve_wide(&self) -> FilterResult {
@@ -224,7 +241,8 @@ impl Solver {
         };
 
         for _ in 0..10 {
-            if best.loss <= 5.0 {
+            if best.loss <= 0.001 {
+                // acceptable range
                 break;
             }
             let initial = [50.0, 20.0, 3750.0, 50.0, 100.0, 100.0];
@@ -308,9 +326,7 @@ impl Solver {
         let dl = current_oklab.l - self.target_oklab.l;
         let da = current_oklab.a - self.target_oklab.a;
         let db = current_oklab.b - self.target_oklab.b;
-
-        // Scale to make the loss comparable to the original (roughly 0-300 range)
-        f64::from(dl * dl + da * da + db * db).sqrt() * 300.0
+        f64::from(dl * dl + da * da + db * db) * 5000.0
     }
 }
 
@@ -364,7 +380,7 @@ pub fn css_filter(color: &crate::models::Color) -> String {
 
     // Compute if not cached
     let target = FilterColor::new(color.rgb.r, color.rgb.g, color.rgb.b);
-    let solver = Solver::new(target);
+    let mut solver = Solver::new(target);
     let result = solver.solve();
     let filter_string = result.css();
 
@@ -409,11 +425,11 @@ mod tests {
     fn test_repeated_output() {
         // Same color should produce identical results across multiple runs
         let color1 = FilterColor::new(210, 15, 57);
-        let solver1 = Solver::new(color1);
+        let mut solver1 = Solver::new(color1);
         let result1 = solver1.solve();
 
         let color2 = FilterColor::new(210, 15, 57);
-        let solver2 = Solver::new(color2);
+        let mut solver2 = Solver::new(color2);
         let result2 = solver2.solve();
 
         assert_eq!(result1.css(), result2.css());
