@@ -59,3 +59,7 @@ Mauve:
 ```css
 {{ mauve | css_filter }}
 ```
+
+## SVG Output
+
+![CSS Filter Preview](css_filter.svg)

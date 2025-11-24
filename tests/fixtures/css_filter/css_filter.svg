@@ -1,0 +1,193 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="250" height="1580">
+  <style>
+    text { font-family: monospace; font-size: 10px; fill: #cdd6f4; }
+    .filter-rosewater {
+      filter: invert(100%) sepia(97%) saturate(410%) hue-rotate(20deg) brightness(108%) contrast(108%);
+    }
+    .filter-flamingo {
+      filter: invert(100%) sepia(83%) saturate(6887%) hue-rotate(304deg) brightness(92%) contrast(104%);
+    }
+    .filter-pink {
+      filter: invert(95%) sepia(99%) saturate(4139%) hue-rotate(200deg) brightness(102%) contrast(92%);
+    }
+    .filter-mauve {
+      filter: invert(73%) sepia(9%) saturate(1597%) hue-rotate(222deg) brightness(94%) contrast(106%);
+    }
+    .filter-red {
+      filter: invert(76%) sepia(5%) saturate(5510%) hue-rotate(299deg) brightness(91%) contrast(110%);
+    }
+    .filter-maroon {
+      filter: invert(77%) sepia(93%) saturate(4166%) hue-rotate(236deg) brightness(116%) contrast(84%);
+    }
+    .filter-peach {
+      filter: invert(72%) sepia(45%) saturate(716%) hue-rotate(317deg) brightness(114%) contrast(96%);
+    }
+    .filter-yellow {
+      filter: invert(84%) sepia(37%) saturate(535%) hue-rotate(321deg) brightness(113%) contrast(95%);
+    }
+    .filter-green {
+      filter: invert(91%) sepia(17%) saturate(720%) hue-rotate(57deg) brightness(90%) contrast(97%);
+    }
+    .filter-teal {
+      filter: invert(92%) sepia(11%) saturate(1012%) hue-rotate(110deg) brightness(92%) contrast(93%);
+    }
+    .filter-sky {
+      filter: invert(91%) sepia(9%) saturate(2872%) hue-rotate(158deg) brightness(100%) contrast(84%);
+    }
+    .filter-sapphire {
+      filter: invert(77%) sepia(4%) saturate(5467%) hue-rotate(165deg) brightness(99%) contrast(87%);
+    }
+    .filter-blue {
+      filter: invert(76%) sepia(19%) saturate(4666%) hue-rotate(187deg) brightness(102%) contrast(96%);
+    }
+    .filter-lavender {
+      filter: invert(72%) sepia(71%) saturate(1183%) hue-rotate(192deg) brightness(106%) contrast(99%);
+    }
+    .filter-text {
+      filter: invert(86%) sepia(11%) saturate(495%) hue-rotate(190deg) brightness(94%) contrast(104%);
+    }
+    .filter-subtext1 {
+      filter: invert(85%) sepia(7%) saturate(907%) hue-rotate(192deg) brightness(93%) contrast(86%);
+    }
+    .filter-subtext0 {
+      filter: invert(82%) sepia(13%) saturate(441%) hue-rotate(191deg) brightness(84%) contrast(88%);
+    }
+    .filter-overlay2 {
+      filter: invert(76%) sepia(43%) saturate(149%) hue-rotate(191deg) brightness(74%) contrast(90%);
+    }
+    .filter-overlay1 {
+      filter: invert(56%) sepia(38%) saturate(210%) hue-rotate(193deg) brightness(87%) contrast(80%);
+    }
+    .filter-overlay0 {
+      filter: invert(53%) sepia(13%) saturate(606%) hue-rotate(194deg) brightness(79%) contrast(83%);
+    }
+    .filter-surface2 {
+      filter: invert(76%) sepia(20%) saturate(4201%) hue-rotate(195deg) brightness(47%) contrast(83%);
+    }
+    .filter-surface1 {
+      filter: invert(24%) sepia(9%) saturate(1208%) hue-rotate(196deg) brightness(100%) contrast(86%);
+    }
+    .filter-surface0 {
+      filter: invert(16%) sepia(16%) saturate(1087%) hue-rotate(199deg) brightness(93%) contrast(85%);
+    }
+    .filter-base {
+      filter: invert(8%) sepia(18%) saturate(1586%) hue-rotate(201deg) brightness(94%) contrast(89%);
+    }
+    .filter-mantle {
+      filter: invert(5%) sepia(11%) saturate(3589%) hue-rotate(202deg) brightness(92%) contrast(88%);
+    }
+    .filter-crust {
+      filter: invert(4%) sepia(16%) saturate(4646%) hue-rotate(216deg) brightness(69%) contrast(92%);
+    }
+  </style>
+
+  <!-- Original colors -->
+  <text y="10" x="15">Original Colors:</text>
+  <rect y="10" x="25" width="50" height="50" fill="#f5e0dc" />
+  <text y="10" x="90">rosewater</text>
+  <rect y="70" x="25" width="50" height="50" fill="#f2cdcd" />
+  <text y="70" x="90">flamingo</text>
+  <rect y="130" x="25" width="50" height="50" fill="#f5c2e7" />
+  <text y="130" x="90">pink</text>
+  <rect y="190" x="25" width="50" height="50" fill="#cba6f7" />
+  <text y="190" x="90">mauve</text>
+  <rect y="250" x="25" width="50" height="50" fill="#f38ba8" />
+  <text y="250" x="90">red</text>
+  <rect y="310" x="25" width="50" height="50" fill="#eba0ac" />
+  <text y="310" x="90">maroon</text>
+  <rect y="370" x="25" width="50" height="50" fill="#fab387" />
+  <text y="370" x="90">peach</text>
+  <rect y="430" x="25" width="50" height="50" fill="#f9e2af" />
+  <text y="430" x="90">yellow</text>
+  <rect y="490" x="25" width="50" height="50" fill="#a6e3a1" />
+  <text y="490" x="90">green</text>
+  <rect y="550" x="25" width="50" height="50" fill="#94e2d5" />
+  <text y="550" x="90">teal</text>
+  <rect y="610" x="25" width="50" height="50" fill="#89dceb" />
+  <text y="610" x="90">sky</text>
+  <rect y="670" x="25" width="50" height="50" fill="#74c7ec" />
+  <text y="670" x="90">sapphire</text>
+  <rect y="730" x="25" width="50" height="50" fill="#89b4fa" />
+  <text y="730" x="90">blue</text>
+  <rect y="790" x="25" width="50" height="50" fill="#b4befe" />
+  <text y="790" x="90">lavender</text>
+  <rect y="850" x="25" width="50" height="50" fill="#cdd6f4" />
+  <text y="850" x="90">text</text>
+  <rect y="910" x="25" width="50" height="50" fill="#bac2de" />
+  <text y="910" x="90">subtext1</text>
+  <rect y="970" x="25" width="50" height="50" fill="#a6adc8" />
+  <text y="970" x="90">subtext0</text>
+  <rect y="1030" x="25" width="50" height="50" fill="#9399b2" />
+  <text y="1030" x="90">overlay2</text>
+  <rect y="1090" x="25" width="50" height="50" fill="#7f849c" />
+  <text y="1090" x="90">overlay1</text>
+  <rect y="1150" x="25" width="50" height="50" fill="#6c7086" />
+  <text y="1150" x="90">overlay0</text>
+  <rect y="1210" x="25" width="50" height="50" fill="#585b70" />
+  <text y="1210" x="90">surface2</text>
+  <rect y="1270" x="25" width="50" height="50" fill="#45475a" />
+  <text y="1270" x="90">surface1</text>
+  <rect y="1330" x="25" width="50" height="50" fill="#313244" />
+  <text y="1330" x="90">surface0</text>
+  <rect y="1390" x="25" width="50" height="50" fill="#1e1e2e" />
+  <text y="1390" x="90">base</text>
+  <rect y="1450" x="25" width="50" height="50" fill="#181825" />
+  <text y="1450" x="90">mantle</text>
+  <rect y="1510" x="25" width="50" height="50" fill="#11111b" />
+  <text y="1510" x="90">crust</text>
+
+  <!-- Black squares with CSS filters applied -->
+  <text y="10" x="115">Black + CSS Filter:</text>
+  <rect y="10" x="125" width="50" height="50" fill="#000000" class="filter-rosewater" />
+  <text y="10" x="190">rosewater</text>
+  <rect y="70" x="125" width="50" height="50" fill="#000000" class="filter-flamingo" />
+  <text y="70" x="190">flamingo</text>
+  <rect y="130" x="125" width="50" height="50" fill="#000000" class="filter-pink" />
+  <text y="130" x="190">pink</text>
+  <rect y="190" x="125" width="50" height="50" fill="#000000" class="filter-mauve" />
+  <text y="190" x="190">mauve</text>
+  <rect y="250" x="125" width="50" height="50" fill="#000000" class="filter-red" />
+  <text y="250" x="190">red</text>
+  <rect y="310" x="125" width="50" height="50" fill="#000000" class="filter-maroon" />
+  <text y="310" x="190">maroon</text>
+  <rect y="370" x="125" width="50" height="50" fill="#000000" class="filter-peach" />
+  <text y="370" x="190">peach</text>
+  <rect y="430" x="125" width="50" height="50" fill="#000000" class="filter-yellow" />
+  <text y="430" x="190">yellow</text>
+  <rect y="490" x="125" width="50" height="50" fill="#000000" class="filter-green" />
+  <text y="490" x="190">green</text>
+  <rect y="550" x="125" width="50" height="50" fill="#000000" class="filter-teal" />
+  <text y="550" x="190">teal</text>
+  <rect y="610" x="125" width="50" height="50" fill="#000000" class="filter-sky" />
+  <text y="610" x="190">sky</text>
+  <rect y="670" x="125" width="50" height="50" fill="#000000" class="filter-sapphire" />
+  <text y="670" x="190">sapphire</text>
+  <rect y="730" x="125" width="50" height="50" fill="#000000" class="filter-blue" />
+  <text y="730" x="190">blue</text>
+  <rect y="790" x="125" width="50" height="50" fill="#000000" class="filter-lavender" />
+  <text y="790" x="190">lavender</text>
+  <rect y="850" x="125" width="50" height="50" fill="#000000" class="filter-text" />
+  <text y="850" x="190">text</text>
+  <rect y="910" x="125" width="50" height="50" fill="#000000" class="filter-subtext1" />
+  <text y="910" x="190">subtext1</text>
+  <rect y="970" x="125" width="50" height="50" fill="#000000" class="filter-subtext0" />
+  <text y="970" x="190">subtext0</text>
+  <rect y="1030" x="125" width="50" height="50" fill="#000000" class="filter-overlay2" />
+  <text y="1030" x="190">overlay2</text>
+  <rect y="1090" x="125" width="50" height="50" fill="#000000" class="filter-overlay1" />
+  <text y="1090" x="190">overlay1</text>
+  <rect y="1150" x="125" width="50" height="50" fill="#000000" class="filter-overlay0" />
+  <text y="1150" x="190">overlay0</text>
+  <rect y="1210" x="125" width="50" height="50" fill="#000000" class="filter-surface2" />
+  <text y="1210" x="190">surface2</text>
+  <rect y="1270" x="125" width="50" height="50" fill="#000000" class="filter-surface1" />
+  <text y="1270" x="190">surface1</text>
+  <rect y="1330" x="125" width="50" height="50" fill="#000000" class="filter-surface0" />
+  <text y="1330" x="190">surface0</text>
+  <rect y="1390" x="125" width="50" height="50" fill="#000000" class="filter-base" />
+  <text y="1390" x="190">base</text>
+  <rect y="1450" x="125" width="50" height="50" fill="#000000" class="filter-mantle" />
+  <text y="1450" x="190">mantle</text>
+  <rect y="1510" x="125" width="50" height="50" fill="#000000" class="filter-crust" />
+  <text y="1510" x="190">crust</text>
+</svg>

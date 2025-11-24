@@ -1,0 +1,28 @@
+---
+whiskers:
+  version: ^2.0.0
+---
+<svg xmlns="http://www.w3.org/2000/svg" width="250" height="1580">
+  <style>
+    text { font-family: monospace; font-size: 10px; fill: #{{ text.hex }}; }
+    {%- for color_key, color in flavor.colors %}
+    .filter-{{ color.identifier }} {
+      filter: {{ color | css_filter }};
+    }
+    {%- endfor %}
+  </style>
+
+  <!-- Original colors -->
+  <text y="10" x="15">Original Colors:</text>
+  {%- for color_key, color in flavor.colors %}
+  <rect y="{{ loop.index0 * 60 + 10 }}" x="25" width="50" height="50" fill="#{{ color.hex }}" />
+  <text y="{{ loop.index0 * 60 + 10 }}" x="90">{{ color.identifier }}</text>
+  {%- endfor %}
+
+  <!-- Black squares with CSS filters applied -->
+  <text y="10" x="115">Black + CSS Filter:</text>
+  {%- for color_key, color in flavor.colors %}
+  <rect y="{{ loop.index0 * 60 + 10 }}" x="125" width="50" height="50" fill="#000000" class="filter-{{ color.identifier }}" />
+  <text y="{{ loop.index0 * 60 + 10 }}" x="190">{{ color.identifier }}</text>
+  {%- endfor %}
+</svg>
