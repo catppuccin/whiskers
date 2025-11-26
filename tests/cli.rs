@@ -73,9 +73,8 @@ mod happy_path {
             .stderr(predicate::str::is_empty());
     }
 
-    /// Test that the CLI can generate CSS filters using SPSA algorithm
+    /// Test that the CLI can generate CSS filters using COBYLA algorithm
     #[test]
-    #[cfg(all(target_arch = "x86_64", target_os = "linux"))]
     fn test_css_filter() {
         let mut cmd = Command::cargo_bin("whiskers").expect("binary exists");
         let assert = cmd

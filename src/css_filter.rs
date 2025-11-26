@@ -1,6 +1,4 @@
-#![allow(clippy::many_single_char_names)]
-
-//! CSS Filter generation using SPSA (Simultaneous Perturbation Stochastic Approximation)
+//! CSS Filter generation using COBYLA (Constrained Optimization BY Linear Approximation)
 //!
 //! This module implements an algorithm to derive CSS filter properties that transform
 //! black (#000000) into a target color. This is useful for applying color transformations
@@ -17,12 +15,10 @@
 use std::collections::HashMap;
 use std::sync::{Mutex, OnceLock};
 
-use rand::Rng;
-use rand::SeedableRng;
-use rand_chacha::ChaCha8Rng;
+use cobyla::{minimize, RhoBeg, StopTols};
 
-/// Type alias for the filter cache (RGB + optional seed)
-type FilterCache = Mutex<HashMap<(u8, u8, u8, Option<u64>), String>>;
+/// Type alias for the filter cache (RGB)
+type FilterCache = Mutex<HashMap<(u8, u8, u8), String>>;
 
 /// In-memory cache for filter results
 static FILTER_CACHE: OnceLock<FilterCache> = OnceLock::new();
@@ -190,197 +186,149 @@ impl FilterResult {
     }
 }
 
-struct Solver {
-    target_oklab: oklab::Oklab,
-    rng_seed: u64,
+/// Compute the loss (distance in Oklab color space) for given filter values
+fn compute_loss(filters: &[f64], target_oklab: oklab::Oklab) -> f64 {
+    let mut color = FilterColor::new(0, 0, 0);
+
+    color.invert((filters[0] / 100.0) as f32);
+    color.sepia((filters[1] / 100.0) as f32);
+    color.saturate((filters[2] / 100.0) as f32);
+    color.hue_rotate((filters[3] * 3.6) as f32);
+    color.brightness((filters[4] / 100.0) as f32);
+    color.contrast((filters[5] / 100.0) as f32);
+
+    // Compute Euclidean distance in Oklab color space (perceptually uniform)
+    let current_oklab = color.oklab();
+    let dl = current_oklab.l - target_oklab.l;
+    let da = current_oklab.a - target_oklab.a;
+    let db = current_oklab.b - target_oklab.b;
+    f64::from(dl * dl + da * da + db * db) * 5000.0
 }
 
-impl Solver {
-    fn new(target: FilterColor, seed: Option<u64>) -> Self {
-        let target_oklab = target.oklab();
-        // Use provided seed or derive a deterministic seed from RGB values for reproducible builds
-        let rng_seed = seed.unwrap_or_else(|| {
-            let r = (target.r() * 255.0).round() as u32;
-            let g = (target.g() * 255.0).round() as u32;
-            let b = (target.b() * 255.0).round() as u32;
-            u64::from(r) | (u64::from(g) << 16) | (u64::from(b) << 32)
-        });
-        Self {
-            target_oklab,
-            rng_seed,
-        }
-    }
+/// Solve for CSS filter values using COBYLA optimization
+fn solve(target: FilterColor) -> FilterResult {
+    let target_oklab = target.oklab();
 
-    fn solve(&mut self) -> FilterResult {
-        let mut res = self.solve_narrow(&self.solve_wide());
+    // Objective function for COBYLA
+    let objective = |x: &[f64], (): &mut ()| compute_loss(x, target_oklab);
 
-        // If loss is still high, try with different seeds up to 10 times
-        for _ in 0..10 {
-            if res.loss <= 0.01 {
-                break;
-            }
-            self.rng_seed = self.rng_seed.wrapping_add(1);
-            let new_res = self.solve_narrow(&self.solve_wide());
-            if new_res.loss < res.loss {
-                res = new_res;
-            }
-        }
-        res
-    }
+    // Bounds for each parameter:
+    // [invert, sepia, saturate, hue_rotate, brightness, contrast]
+    let bounds = [
+        (0.0, 100.0),  // invert: 0-100%
+        (0.0, 100.0),  // sepia: 0-100%
+        (0.0, 7500.0), // saturate: 0-7500%
+        (0.0, 100.0),  // hue_rotate: 0-100 (×3.6 = 0-360deg)
+        (0.0, 200.0),  // brightness: 0-200%
+        (0.0, 200.0),  // contrast: 0-200%
+    ];
 
-    fn solve_wide(&self) -> FilterResult {
-        let a_val = 5.0;
-        let c = 15.0;
-        let a = [60.0, 180.0, 18000.0, 600.0, 1.2, 1.2];
+    // No additional constraints beyond bounds
+    let cons: Vec<&dyn cobyla::Func<()>> = vec![];
 
-        let mut best = FilterResult {
-            loss: f64::INFINITY,
-            values: [0.0; 6],
-        };
-
-        for _ in 0..10 {
-            if best.loss <= 0.01 {
-                break;
-            }
-            let initial = [50.0, 20.0, 3750.0, 50.0, 100.0, 100.0];
-            let result = self.spsa(a_val, &a, c, &initial, 1000);
-            if result.loss < best.loss {
-                best = result;
-            }
-        }
-        best
-    }
-
-    fn solve_narrow(&self, wide: &FilterResult) -> FilterResult {
-        let a_val = wide.loss;
-        let c = 2.0;
-        let a1 = a_val + 1.0;
-        let a = [0.25 * a1, 0.25 * a1, a1, 0.25 * a1, 0.2 * a1, 0.2 * a1];
-        self.spsa(a_val, &a, c, &wide.values, 1000)
-    }
-
-    fn spsa(
-        &self,
-        big_a: f64,
-        a: &[f64; 6],
-        c: f64,
-        initial_values: &[f64; 6],
-        iters: usize,
-    ) -> FilterResult {
-        let alpha = 1.0;
-        let gamma = 1.0 / 6.0;
-
-        let mut best: Option<FilterResult> = None;
-        let mut best_loss = f64::INFINITY;
-        let mut values = *initial_values;
-        // Use ChaCha8Rng for deterministic, cross-platform reproducible results
-        let mut rng = ChaCha8Rng::seed_from_u64(self.rng_seed);
-
-        for k in 0..iters {
-            let ck = c / f64::from(k as u32 + 1).powf(gamma);
-            let mut deltas = [0.0; 6];
-            let mut high_args = [0.0; 6];
-            let mut low_args = [0.0; 6];
-
-            for i in 0..6 {
-                deltas[i] = if rng.gen::<f64>() > 0.5 { 1.0 } else { -1.0 };
-                high_args[i] = values[i] + ck * deltas[i];
-                low_args[i] = values[i] - ck * deltas[i];
-            }
-
-            let loss_diff = self.loss(&high_args) - self.loss(&low_args);
-            for i in 0..6 {
-                let g = loss_diff / (2.0 * ck) * deltas[i];
-                let ak = a[i] / f64::from((big_a as u32) + k as u32 + 1).powf(alpha);
-                values[i] = fix(values[i] - ak * g, i);
-            }
-
-            let loss = self.loss(&values);
-            if loss < best_loss {
-                best = Some(FilterResult { values, loss });
-                best_loss = loss;
-            }
-        }
-
-        best.unwrap_or(FilterResult {
-            values,
-            loss: best_loss,
-        })
-    }
-
-    fn loss(&self, filters: &[f64; 6]) -> f64 {
-        let mut color = FilterColor::new(0, 0, 0);
-
-        color.invert((filters[0] / 100.0) as f32);
-        color.sepia((filters[1] / 100.0) as f32);
-        color.saturate((filters[2] / 100.0) as f32);
-        color.hue_rotate((filters[3] * 3.6) as f32);
-        color.brightness((filters[4] / 100.0) as f32);
-        color.contrast((filters[5] / 100.0) as f32);
-
-        // Compute Euclidean distance in Oklab color space (perceptually uniform)
-        let current_oklab = color.oklab();
-        let dl = current_oklab.l - self.target_oklab.l;
-        let da = current_oklab.a - self.target_oklab.a;
-        let db = current_oklab.b - self.target_oklab.b;
-        f64::from(dl * dl + da * da + db * db) * 5000.0
-    }
-}
-
-fn fix(value: f64, idx: usize) -> f64 {
-    let max = match idx {
-        2 => 7500.0,    // saturate
-        4 | 5 => 200.0, // brightness, contrast
-        _ => 100.0,
+    let stop_tols = StopTols {
+        ftol_rel: 1e-10,
+        ftol_abs: 1e-10,
+        xtol_rel: 1e-8,
+        ..StopTols::default()
     };
 
-    if idx == 3 {
-        // hue-rotate
-        if value > max {
-            value % max
-        } else if value < 0.0 {
-            max + value % max
-        } else {
-            value
+    // Try multiple starting points and keep the best result
+    // Parameters: [invert, sepia, saturate, hue_rotate, brightness, contrast]
+    // Starting points derived from known good solutions for Catppuccin accent colors
+    let starting_points = [
+        // Rosewater-like
+        [100.0, 0.0, 519.0, 63.0, 103.0, 80.0],
+        // Flamingo-like
+        [100.0, 0.0, 532.0, 37.0, 94.0, 77.0],
+        // Pink-like
+        [69.0, 15.0, 3742.0, 57.5, 122.0, 118.0],
+        // Mauve-like
+        [63.0, 71.0, 1010.0, 57.7, 110.0, 94.0],
+        // Red-like
+        [66.0, 83.0, 4997.0, 90.0, 157.0, 149.0],
+        // Maroon-like
+        [70.0, 24.0, 510.0, 83.3, 100.0, 82.0],
+        // Peach-like
+        [48.0, 89.0, 2010.0, 4.7, 124.0, 100.0],
+        // Yellow-like
+        [100.0, 0.0, 520.0, 63.6, 103.0, 79.0],
+        // Green-like
+        [87.0, 24.0, 529.0, 16.7, 97.0, 86.0],
+        // Teal-like
+        [90.0, 24.0, 521.0, 29.2, 96.0, 85.0],
+        // Sky-like
+        [81.0, 27.0, 525.0, 39.4, 100.0, 84.0],
+        // Sapphire-like
+        [76.0, 28.0, 508.0, 42.2, 95.0, 86.0],
+        // Blue-like
+        [66.0, 32.0, 518.0, 49.4, 100.0, 94.0],
+        // Lavender-like
+        [66.0, 19.0, 3749.0, 55.8, 117.0, 113.0],
+    ];
+
+    let mut best_result = FilterResult {
+        values: [0.0; 6],
+        loss: f64::INFINITY,
+    };
+
+    for x0 in &starting_points {
+        let (x_opt, loss) = match minimize(
+            objective,
+            x0,
+            &bounds,
+            &cons,
+            (),
+            3000, // max iterations
+            RhoBeg::All(10.0),
+            Some(stop_tols.clone()),
+        ) {
+            Ok((_, x_opt, loss)) | Err((_, x_opt, loss)) => (x_opt, loss),
+        };
+        let result = FilterResult {
+            values: [x_opt[0], x_opt[1], x_opt[2], x_opt[3], x_opt[4], x_opt[5]],
+            loss,
+        };
+
+        if result.loss < best_result.loss {
+            best_result = result;
         }
-    } else if value < 0.0 {
-        0.0
-    } else if value > max {
-        max
-    } else {
-        value
+
+        // Early exit if we found a good solution
+        if best_result.loss < 0.01 {
+            break;
+        }
     }
+
+    best_result
 }
 
 /// Generate a CSS filter string that transforms black to the given color
 ///
 /// Results are cached in memory to avoid redundant expensive computations.
-/// The cache key includes both the color and the seed.
 ///
 /// # Arguments
 /// * `color` - A Color object containing RGB values
-/// * `seed` - Optional seed for the RNG. If not provided, a deterministic seed based on RGB values is used.
 ///
 /// # Returns
 /// A CSS filter string
 ///
 /// # Panics
 /// Panics if the cache mutex is poisoned (i.e., a thread panicked while holding the lock)
-pub fn css_filter(color: &crate::models::Color, seed: Option<u64>) -> String {
-    let cache_key = (color.rgb.r, color.rgb.g, color.rgb.b, seed);
+pub fn css_filter(color: &crate::models::Color) -> String {
+    let cache_key = (color.rgb.r, color.rgb.g, color.rgb.b);
 
     // Initialize cache if needed
     let cache = FILTER_CACHE.get_or_init(|| Mutex::new(HashMap::new()));
 
-    // Check cache for color + seed combination
+    // Check cache for color
     if let Some(cached) = cache.lock().expect("lock good").get(&cache_key) {
         return cached.clone();
     }
 
     // Compute if not cached
     let target = FilterColor::new(color.rgb.r, color.rgb.g, color.rgb.b);
-    let mut solver = Solver::new(target, seed);
-    let result = solver.solve();
+    let result = solve(target);
     let filter_string = result.css();
 
     // Store in cache
@@ -394,21 +342,7 @@ pub fn css_filter(color: &crate::models::Color, seed: Option<u64>) -> String {
 
 #[cfg(test)]
 mod tests {
-    #![allow(clippy::float_cmp)]
     use super::*;
-
-    #[test]
-    fn test_fix_saturate() {
-        assert_eq!(fix(8000.0, 2), 7500.0);
-        assert_eq!(fix(-10.0, 2), 0.0);
-        assert_eq!(fix(5000.0, 2), 5000.0);
-    }
-
-    #[test]
-    fn test_fix_hue_rotate() {
-        assert!(fix(150.0, 3) > 0.0);
-        assert!(fix(-50.0, 3) > 0.0);
-    }
 
     #[test]
     fn test_oklab_conversion() {
@@ -424,37 +358,22 @@ mod tests {
     fn test_repeated_output() {
         // Same color should produce identical results across multiple runs
         let color1 = FilterColor::new(210, 15, 57);
-        let mut solver1 = Solver::new(color1, None);
-        let result1 = solver1.solve();
+        let result1 = solve(color1);
 
         let color2 = FilterColor::new(210, 15, 57);
-        let mut solver2 = Solver::new(color2, None);
-        let result2 = solver2.solve();
+        let result2 = solve(color2);
 
         assert_eq!(result1.css(), result2.css());
         assert_eq!(result1.values, result2.values);
     }
 
     #[test]
-    fn test_custom_seed() {
-        // Same color with different seeds should produce different results
-        let color1 = FilterColor::new(210, 15, 57);
-        let mut solver1 = Solver::new(color1, Some(12345));
-        let result1 = solver1.solve();
+    fn test_low_loss() {
+        // The solver should achieve a low loss for typical colors
+        let color = FilterColor::new(210, 15, 57); // Catppuccin red
+        let result = solve(color);
 
-        let color2 = FilterColor::new(210, 15, 57);
-        let mut solver2 = Solver::new(color2, Some(67890));
-        let result2 = solver2.solve();
-
-        // Results should differ (different seeds)
-        assert_ne!(result1.values, result2.values);
-
-        // Same seed should produce same result
-        let color3 = FilterColor::new(210, 15, 57);
-        let mut solver3 = Solver::new(color3, Some(12345));
-        let result3 = solver3.solve();
-
-        assert_eq!(result1.css(), result3.css());
-        assert_eq!(result1.values, result3.values);
+        // Loss should be reasonably low (good color match)
+        assert!(result.loss < 1.0, "Loss {} is too high", result.loss);
     }
 }

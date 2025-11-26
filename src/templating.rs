@@ -127,7 +127,7 @@ pub fn all_functions() -> Vec<Function> {
         Function {
             name: "css_filter".to_string(),
             description:
-                "Generate a CSS filter that transforms black to the given color using SPSA"
+                "Generate a CSS filter that transforms black to the given color using COBYLA"
                     .to_string(),
             examples: vec![
                 function_example!(css_filter(color=red) => "invert(71%) sepia(9%) saturate(2897%) hue-rotate(300deg) brightness(101%) contrast(91%)"),
@@ -210,7 +210,7 @@ pub fn all_filters() -> Vec<Filter> {
         Filter {
             name: "css_filter".to_string(),
             description:
-                "Generate a CSS filter that transforms black to the given color using SPSA"
+                "Generate a CSS filter that transforms black to the given color using COBYLA"
                     .to_string(),
             examples: vec![
                 filter_example!(red | css_filter => "invert(71%) sepia(9%) saturate(2897%) hue-rotate(300deg) brightness(101%) contrast(91%)"),

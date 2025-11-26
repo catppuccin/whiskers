@@ -4,56 +4,56 @@
 
 Red filter:
 ```css
-invert(71%) sepia(9%) saturate(2897%) hue-rotate(300deg) brightness(101%) contrast(91%)
+invert(70%) sepia(70%) saturate(1022%) hue-rotate(296deg) brightness(105%) contrast(91%)
 ```
 
 Green filter:
 ```css
-invert(84%) sepia(44%) saturate(277%) hue-rotate(61deg) brightness(93%) contrast(95%)
+invert(88%) sepia(25%) saturate(546%) hue-rotate(58deg) brightness(100%) contrast(79%)
 ```
 
 Blue filter:
 ```css
-invert(60%) sepia(32%) saturate(494%) hue-rotate(179deg) brightness(106%) contrast(103%)
+invert(59%) sepia(73%) saturate(1023%) hue-rotate(194deg) brightness(112%) contrast(96%)
 ```
 
 ## Using css_filter as a pipe filter
 
 Red:
 ```css
-invert(71%) sepia(9%) saturate(2897%) hue-rotate(300deg) brightness(101%) contrast(91%)
+invert(70%) sepia(70%) saturate(1022%) hue-rotate(296deg) brightness(105%) contrast(91%)
 ```
 
 Green:
 ```css
-invert(84%) sepia(44%) saturate(277%) hue-rotate(61deg) brightness(93%) contrast(95%)
+invert(88%) sepia(25%) saturate(546%) hue-rotate(58deg) brightness(100%) contrast(79%)
 ```
 
 Blue:
 ```css
-invert(60%) sepia(32%) saturate(494%) hue-rotate(179deg) brightness(106%) contrast(103%)
+invert(59%) sepia(73%) saturate(1023%) hue-rotate(194deg) brightness(112%) contrast(96%)
 ```
 
 ## Multiple colors to verify caching
 
 Rosewater:
 ```css
-invert(93%) sepia(10%) saturate(500%) hue-rotate(313deg) brightness(96%) contrast(99%)
+invert(83%) sepia(18%) saturate(512%) hue-rotate(314deg) brightness(113%) contrast(92%)
 ```
 
 Flamingo:
 ```css
-invert(84%) sepia(11%) saturate(647%) hue-rotate(311deg) brightness(103%) contrast(90%)
+invert(80%) sepia(24%) saturate(510%) hue-rotate(311deg) brightness(110%) contrast(90%)
 ```
 
 Pink:
 ```css
-invert(89%) sepia(9%) saturate(1467%) hue-rotate(279deg) brightness(100%) contrast(91%)
+invert(82%) sepia(15%) saturate(535%) hue-rotate(268deg) brightness(100%) contrast(92%)
 ```
 
 Mauve:
 ```css
-invert(64%) sepia(20%) saturate(814%) hue-rotate(221deg) brightness(109%) contrast(94%)
+invert(68%) sepia(27%) saturate(533%) hue-rotate(225deg) brightness(100%) contrast(93%)
 ```
 
 ## SVG Output
