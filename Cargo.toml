@@ -41,7 +41,7 @@ anyhow = "1.0.100"
 base64 = "0.22.1"
 catppuccin = { version = "2.5.1", features = ["serde", "css-colors"] }
 clap = { version = "4.5.48", features = ["derive"] }
-clap-stdin = "0.7.0"
+clap-stdin = "0.8.0"
 css-colors = "1.0.1"
 detect-newline-style = "0.1.2"
 encoding_rs_io = "0.1.7"
