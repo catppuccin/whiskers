@@ -1,0 +1,65 @@
+---
+whiskers:
+  version: ^2.0.0
+---
+# CSS Filter Test - {{ flavor.name }}
+
+## Using css_filter as a function
+
+Red filter:
+```css
+{{ css_filter(color=red) }}
+```
+
+Green filter:
+```css
+{{ css_filter(color=green) }}
+```
+
+Blue filter:
+```css
+{{ css_filter(color=blue) }}
+```
+
+## Using css_filter as a pipe filter
+
+Red:
+```css
+{{ red | css_filter }}
+```
+
+Green:
+```css
+{{ green | css_filter }}
+```
+
+Blue:
+```css
+{{ blue | css_filter }}
+```
+
+## Multiple colors to verify caching
+
+Rosewater:
+```css
+{{ rosewater | css_filter }}
+```
+
+Flamingo:
+```css
+{{ flamingo | css_filter }}
+```
+
+Pink:
+```css
+{{ pink | css_filter }}
+```
+
+Mauve:
+```css
+{{ mauve | css_filter }}
+```
+
+## SVG Output
+
+![CSS Filter Preview](css_filter.svg)

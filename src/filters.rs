@@ -168,3 +168,12 @@ pub fn css_hsla(
     let color: css_colors::HSLA = (&color).into();
     Ok(tera::to_value(color.to_string())?)
 }
+
+pub fn css_filter(
+    value: &tera::Value,
+    _args: &HashMap<String, tera::Value>,
+) -> Result<tera::Value, tera::Error> {
+    let color: Color = tera::from_value(value.clone())?;
+    let filter = crate::css_filter::css_filter(&color);
+    Ok(tera::to_value(filter)?)
+}

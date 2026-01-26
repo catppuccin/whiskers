@@ -57,3 +57,11 @@ of the [existing Tera built-ins](https://keats.github.io/tera/docs/#built-ins).
 
 - **Description**: Convert a color to an HSLA CSS string
 - **Example**: `red | css_hsla` ⇒ `hsla(347, 87%, 44%, 1.00)`
+
+## `css_filter` {#filters-css_filter}
+
+- **Description**: Generate a CSS filter string that transforms black into the given color. Useful for coloring SVG icons and other elements that cannot use `fill` or `color` properties directly.
+- **Arguments**:
+  - `seed` (optional): A positive integer seed for the RNG. If not provided, a deterministic seed based on the color's RGB values is used.
+- **Example**: `red | css_filter` ⇒ `invert(71%) sepia(9%) saturate(2897%) hue-rotate(300deg) brightness(101%) contrast(91%)`
+- **Example with seed**: `red | css_filter(seed=12345)` ⇒ `invert(67%) sepia(16%) saturate(1259%) hue-rotate(296deg) brightness(98%) contrast(91%)`
