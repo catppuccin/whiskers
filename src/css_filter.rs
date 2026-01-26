@@ -277,7 +277,11 @@ fn compute_loss(filters: &[f64], target_oklab: oklab::Oklab) -> f64 {
 
     // Euclidean distance in Oklab color space (perceptually uniform)
     let ok = color.to_oklab();
-    let (dl, da, db) = (ok.l - target_oklab.l, ok.a - target_oklab.a, ok.b - target_oklab.b);
+    let (dl, da, db) = (
+        ok.l - target_oklab.l,
+        ok.a - target_oklab.a,
+        ok.b - target_oklab.b,
+    );
     f64::from(dl.mul_add(dl, da.mul_add(da, db * db))) * 5000.0
 }
 
