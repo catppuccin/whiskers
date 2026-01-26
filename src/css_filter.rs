@@ -55,11 +55,11 @@ struct FilterColor {
 
 impl FilterColor {
     fn new(r: u8, g: u8, b: u8) -> Self {
-        // Convert to 0.0-1.0 range (divide in f32 first to avoid I8F24 overflow)
+        // Convert to 0.0-1.0 range (divide in f32 first since u8 255 > I8F24 max ~127)
         Self {
-            r: Fx::from_num(r).saturating_div(Fx::from_num(255.0)),
-            g: Fx::from_num(g).saturating_div(Fx::from_num(255.0)),
-            b: Fx::from_num(b).saturating_div(Fx::from_num(255.0)),
+            r: Fx::from_num(f32::from(r) / 255.0),
+            g: Fx::from_num(f32::from(g) / 255.0),
+            b: Fx::from_num(f32::from(b) / 255.0),
         }
     }
 
