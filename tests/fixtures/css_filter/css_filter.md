@@ -4,51 +4,51 @@
 
 Red filter:
 ```css
-invert(70%) sepia(69%) saturate(1024%) hue-rotate(296deg) brightness(105%) contrast(91%)
+invert(61%) sepia(33%) saturate(540%) hue-rotate(293deg) brightness(101%) contrast(90%)
 ```
 
 Green filter:
 ```css
-invert(89%) sepia(25%) saturate(545%) hue-rotate(57deg) brightness(100%) contrast(78%)
+invert(86%) sepia(22%) saturate(538%) hue-rotate(63deg) brightness(97%) contrast(88%)
 ```
 
 Blue filter:
 ```css
-invert(59%) sepia(73%) saturate(1023%) hue-rotate(193deg) brightness(111%) contrast(96%)
+invert(57%) sepia(66%) saturate(1020%) hue-rotate(195deg) brightness(115%) contrast(96%)
 ```
 
 ## Using css_filter as a pipe filter
 
 Red:
 ```css
-invert(70%) sepia(69%) saturate(1024%) hue-rotate(296deg) brightness(105%) contrast(91%)
+invert(61%) sepia(33%) saturate(540%) hue-rotate(293deg) brightness(101%) contrast(90%)
 ```
 
 Green:
 ```css
-invert(89%) sepia(25%) saturate(545%) hue-rotate(57deg) brightness(100%) contrast(78%)
+invert(86%) sepia(22%) saturate(538%) hue-rotate(63deg) brightness(97%) contrast(88%)
 ```
 
 Blue:
 ```css
-invert(59%) sepia(73%) saturate(1023%) hue-rotate(193deg) brightness(111%) contrast(96%)
+invert(57%) sepia(66%) saturate(1020%) hue-rotate(195deg) brightness(115%) contrast(96%)
 ```
 
 ## Multiple colors to verify caching
 
 Rosewater:
 ```css
-invert(83%) sepia(17%) saturate(512%) hue-rotate(314deg) brightness(114%) contrast(92%)
+invert(84%) sepia(22%) saturate(508%) hue-rotate(312deg) brightness(113%) contrast(91%)
 ```
 
 Flamingo:
 ```css
-invert(80%) sepia(25%) saturate(510%) hue-rotate(311deg) brightness(110%) contrast(90%)
+invert(79%) sepia(23%) saturate(510%) hue-rotate(311deg) brightness(110%) contrast(90%)
 ```
 
 Pink:
 ```css
-invert(81%) sepia(16%) saturate(536%) hue-rotate(271deg) brightness(101%) contrast(92%)
+invert(76%) sepia(28%) saturate(508%) hue-rotate(290deg) brightness(112%) contrast(92%)
 ```
 
 Mauve:

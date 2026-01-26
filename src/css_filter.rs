@@ -253,25 +253,31 @@ impl FilterResult {
     }
 }
 
+/// Quantize to 0.1 precision to ensure deterministic optimizer convergence across platforms
+#[inline]
+fn quantize(x: f64) -> f64 {
+    (x * 10.0).round() / 10.0
+}
+
 /// Compute the loss (distance in Oklab color space) for given filter values
 fn compute_loss(filters: &[f64], target_oklab: oklab::Oklab) -> f64 {
     let mut color = FilterColor::black();
 
-    // Convert f64 params to fixed-point at the boundary
-    color.invert(Fx::from_num(filters[0] / 100.0));
-    color.sepia(Fx::from_num(filters[1] / 100.0));
-    color.saturate(FxParam::from_num(filters[2] / 100.0));
-    color.hue_rotate(filters[3] * 3.6);
-    color.brightness(Fx::from_num(filters[4] / 100.0));
-    color.contrast(Fx::from_num(filters[5] / 100.0));
+    // Quantize params to ensure deterministic convergence across platforms
+    // (COBYLA uses f64 internally which can vary slightly by platform)
+    let f: [f64; 6] = std::array::from_fn(|i| quantize(filters[i]));
+
+    // Convert quantized f64 params to fixed-point
+    color.invert(Fx::from_num(f[0] / 100.0));
+    color.sepia(Fx::from_num(f[1] / 100.0));
+    color.saturate(FxParam::from_num(f[2] / 100.0));
+    color.hue_rotate(f[3] * 3.6);
+    color.brightness(Fx::from_num(f[4] / 100.0));
+    color.contrast(Fx::from_num(f[5] / 100.0));
 
     // Euclidean distance in Oklab color space (perceptually uniform)
     let ok = color.to_oklab();
-    let (dl, da, db) = (
-        ok.l - target_oklab.l,
-        ok.a - target_oklab.a,
-        ok.b - target_oklab.b,
-    );
+    let (dl, da, db) = (ok.l - target_oklab.l, ok.a - target_oklab.a, ok.b - target_oklab.b);
     f64::from(dl.mul_add(dl, da.mul_add(da, db * db))) * 5000.0
 }
 
