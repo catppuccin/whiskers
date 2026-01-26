@@ -7,6 +7,8 @@
 //! The loss function uses the Oklab perceptually uniform color space for more accurate
 //! color matching.
 //!
+//! This implementation uses fixed-point arithmetic for deterministic cross-platform results.
+//!
 //! Reference implementations:
 //! - <https://stackoverflow.com/questions/42966641>
 //! - <https://codepen.io/sosuke/pen/Pjoqqp>
@@ -16,6 +18,7 @@ use std::collections::HashMap;
 use std::sync::{Mutex, OnceLock};
 
 use cobyla::{minimize, RhoBeg, StopTols};
+use fixed::types::{I16F16, I3F29, I8F24};
 
 /// Type alias for the filter cache (RGB)
 type FilterCache = Mutex<HashMap<(u8, u8, u8), String>>;
@@ -23,142 +26,206 @@ type FilterCache = Mutex<HashMap<(u8, u8, u8), String>>;
 /// In-memory cache for filter results
 static FILTER_CACHE: OnceLock<FilterCache> = OnceLock::new();
 
-/// Internal color representation for filter computation
+/// Fixed-point type for RGB color channels (0.0-1.0 range, 24 fractional bits)
+type Fx = I8F24;
+
+/// Fixed-point type for saturate parameter (can be up to 75.0, 16 integer bits)
+type FxParam = I16F16;
+
+// Rec. 709 luma coefficients and their complements
+const R_LUMA: f64 = 0.2126;
+const G_LUMA: f64 = 0.7152;
+const B_LUMA: f64 = 0.0722;
+const R_COMP: f64 = 1.0 - R_LUMA; // 0.7874
+const G_COMP: f64 = 1.0 - G_LUMA; // 0.2848
+const B_COMP: f64 = 1.0 - B_LUMA; // 0.9278
+
+// Hue rotation auxiliary coefficients (derived from luma)
+const HUE_A: f64 = 0.14303; // sqrt(1/3) * R_COMP
+const HUE_B: f64 = 0.14014; // sqrt(1/3) * (1 - G_LUMA - R_LUMA)
+const HUE_C: f64 = 0.28302; // sqrt(1/3) * (G_LUMA + R_LUMA)
+
+/// Internal color representation for filter computation using fixed-point arithmetic
 #[derive(Debug, Clone, Copy)]
-struct FilterColor(f32, f32, f32);
+struct FilterColor {
+    r: Fx,
+    g: Fx,
+    b: Fx,
+}
 
 impl FilterColor {
     fn new(r: u8, g: u8, b: u8) -> Self {
-        Self(
-            f32::from(r) / 255.0,
-            f32::from(g) / 255.0,
-            f32::from(b) / 255.0,
-        )
+        // Convert to 0.0-1.0 range (divide in f32 first to avoid I8F24 overflow)
+        Self {
+            r: Fx::from_num(r).saturating_div(Fx::from_num(255.0)),
+            g: Fx::from_num(g).saturating_div(Fx::from_num(255.0)),
+            b: Fx::from_num(b).saturating_div(Fx::from_num(255.0)),
+        }
     }
 
-    const fn r(&self) -> f32 {
-        self.0
+    const fn black() -> Self {
+        Self {
+            r: Fx::ZERO,
+            g: Fx::ZERO,
+            b: Fx::ZERO,
+        }
     }
 
-    const fn g(&self) -> f32 {
-        self.1
+    fn set_rgb(&mut self, r: Fx, g: Fx, b: Fx) {
+        self.r = r.clamp(Fx::ZERO, Fx::ONE);
+        self.g = g.clamp(Fx::ZERO, Fx::ONE);
+        self.b = b.clamp(Fx::ZERO, Fx::ONE);
     }
 
-    const fn b(&self) -> f32 {
-        self.2
+    fn invert(&mut self, value: Fx) {
+        // r * (1 - 2*value) + value
+        let factor = Fx::ONE.saturating_sub(Fx::from_num(2).saturating_mul(value));
+        self.set_rgb(
+            self.r.saturating_mul(factor).saturating_add(value),
+            self.g.saturating_mul(factor).saturating_add(value),
+            self.b.saturating_mul(factor).saturating_add(value),
+        );
     }
 
-    const fn set_rgb(&mut self, r: f32, g: f32, b: f32) {
-        // Handle NaN and ensure valid ranges
-        let r = if r.is_finite() { r } else { 0.0 };
-        let g = if g.is_finite() { g } else { 0.0 };
-        let b = if b.is_finite() { b } else { 0.0 };
-        self.0 = r.clamp(0.0, 1.0);
-        self.1 = g.clamp(0.0, 1.0);
-        self.2 = b.clamp(0.0, 1.0);
+    fn sepia(&mut self, value: Fx) {
+        let inv = Fx::ONE.saturating_sub(value);
+        // Sepia matrix coefficients (standard sepia tone values)
+        let f = |a: f64, b: f64| {
+            Fx::from_num(a)
+                .saturating_mul(inv)
+                .saturating_add(Fx::from_num(b))
+        };
+        let g = |a: f64| Fx::from_num(a).saturating_sub(Fx::from_num(a).saturating_mul(inv));
+        self.multiply(&[
+            f(0.607, 0.393),
+            g(0.769),
+            g(0.189),
+            g(0.349),
+            f(0.314, 0.686),
+            g(0.168),
+            g(0.272),
+            g(0.534),
+            f(0.869, 0.131),
+        ]);
     }
 
-    fn invert(&mut self, value: f32) {
-        let r = self
-            .r()
-            .mul_add(2.0f32.mul_add(-value, 1.0), value)
-            .clamp(0.0, 1.0);
-        let g = self
-            .g()
-            .mul_add(2.0f32.mul_add(-value, 1.0), value)
-            .clamp(0.0, 1.0);
-        let b = self
-            .b()
-            .mul_add(2.0f32.mul_add(-value, 1.0), value)
-            .clamp(0.0, 1.0);
-        self.set_rgb(r, g, b);
+    fn saturate(&mut self, value: FxParam) {
+        // Saturate can be up to 75.0, so we use I16F16 then convert to I8F24
+        let (r, g, b) = (
+            FxParam::from_num(R_LUMA),
+            FxParam::from_num(G_LUMA),
+            FxParam::from_num(B_LUMA),
+        );
+        let (rc, gc, bc) = (
+            FxParam::from_num(R_COMP),
+            FxParam::from_num(G_COMP),
+            FxParam::from_num(B_COMP),
+        );
+        let sat = |base: FxParam, mult: FxParam, add: bool| {
+            let result = if add {
+                base.saturating_add(mult.saturating_mul(value))
+            } else {
+                base.saturating_sub(mult.saturating_mul(value))
+            };
+            Fx::saturating_from_num(result)
+        };
+        self.multiply(&[
+            sat(r, rc, true),
+            sat(g, g, false),
+            sat(b, b, false),
+            sat(r, r, false),
+            sat(g, gc, true),
+            sat(b, b, false),
+            sat(r, r, false),
+            sat(g, g, false),
+            sat(b, bc, true),
+        ]);
     }
 
-    fn sepia(&mut self, value: f32) {
-        let matrix = [
-            0.607f32.mul_add(1.0 - value, 0.393),
-            0.769f32.mul_add(-(1.0 - value), 0.769),
-            0.189f32.mul_add(-(1.0 - value), 0.189),
-            0.349f32.mul_add(-(1.0 - value), 0.349),
-            0.314f32.mul_add(1.0 - value, 0.686),
-            0.168f32.mul_add(-(1.0 - value), 0.168),
-            0.272f32.mul_add(-(1.0 - value), 0.272),
-            0.534f32.mul_add(-(1.0 - value), 0.534),
-            0.869f32.mul_add(1.0 - value, 0.131),
-        ];
-        self.multiply(&matrix);
+    fn hue_rotate(&mut self, angle_deg: f64) {
+        // Normalize to [-π, π] for I3F29 compatibility with cordic
+        let pi = std::f64::consts::PI;
+        let angle_rad = angle_deg.to_radians();
+        let normalized = ((angle_rad + pi).rem_euclid(2.0 * pi)) - pi;
+        let (sin, cos) = cordic::sin_cos(I3F29::from_num(normalized));
+        let (sin, cos) = (Fx::from_num(sin), Fx::from_num(cos));
+
+        // Luma coefficients
+        let (r, g, b) = (
+            Fx::from_num(R_LUMA),
+            Fx::from_num(G_LUMA),
+            Fx::from_num(B_LUMA),
+        );
+        let (rc, gc, bc) = (
+            Fx::from_num(R_COMP),
+            Fx::from_num(G_COMP),
+            Fx::from_num(B_COMP),
+        );
+        let (ha, hb, hc) = (
+            Fx::from_num(HUE_A),
+            Fx::from_num(HUE_B),
+            Fx::from_num(HUE_C),
+        );
+
+        self.multiply(&[
+            r.saturating_add(cos.saturating_mul(rc))
+                .saturating_sub(sin.saturating_mul(r)),
+            g.saturating_sub(cos.saturating_mul(g))
+                .saturating_sub(sin.saturating_mul(g)),
+            b.saturating_sub(cos.saturating_mul(b))
+                .saturating_add(sin.saturating_mul(bc)),
+            r.saturating_sub(cos.saturating_mul(r))
+                .saturating_add(sin.saturating_mul(ha)),
+            g.saturating_add(cos.saturating_mul(gc))
+                .saturating_add(sin.saturating_mul(hb)),
+            b.saturating_sub(cos.saturating_mul(b))
+                .saturating_sub(sin.saturating_mul(hc)),
+            r.saturating_sub(cos.saturating_mul(r))
+                .saturating_sub(sin.saturating_mul(rc)),
+            g.saturating_sub(cos.saturating_mul(g))
+                .saturating_add(sin.saturating_mul(g)),
+            b.saturating_add(cos.saturating_mul(bc))
+                .saturating_add(sin.saturating_mul(b)),
+        ]);
     }
 
-    fn saturate(&mut self, value: f32) {
-        let matrix = [
-            0.787f32.mul_add(value, 0.213),
-            0.715f32.mul_add(-value, 0.715),
-            0.072f32.mul_add(-value, 0.072),
-            0.213f32.mul_add(-value, 0.213),
-            0.285f32.mul_add(value, 0.715),
-            0.072f32.mul_add(-value, 0.072),
-            0.213f32.mul_add(-value, 0.213),
-            0.715f32.mul_add(-value, 0.715),
-            0.928f32.mul_add(value, 0.072),
-        ];
-        self.multiply(&matrix);
+    fn brightness(&mut self, value: Fx) {
+        self.linear(value, Fx::ZERO);
     }
 
-    fn hue_rotate(&mut self, angle: f32) {
-        let angle = angle / 180.0 * std::f32::consts::PI;
-        let sin = angle.sin();
-        let cos = angle.cos();
-
-        let matrix = [
-            0.213 + cos * 0.787 - sin * 0.213,
-            0.715 - cos * 0.715 - sin * 0.715,
-            0.072 - cos * 0.072 + sin * 0.928,
-            0.213 - cos * 0.213 + sin * 0.143,
-            0.715 + cos * 0.285 + sin * 0.140,
-            0.072 - cos * 0.072 - sin * 0.283,
-            0.213 - cos * 0.213 - sin * 0.787,
-            0.715 - cos * 0.715 + sin * 0.715,
-            0.072 + cos * 0.928 + sin * 0.072,
-        ];
-        self.multiply(&matrix);
+    fn contrast(&mut self, value: Fx) {
+        let half = Fx::from_num(0.5);
+        self.linear(value, half.saturating_sub(half.saturating_mul(value)));
     }
 
-    fn brightness(&mut self, value: f32) {
-        self.linear(value, 0.0);
+    fn linear(&mut self, slope: Fx, intercept: Fx) {
+        self.set_rgb(
+            self.r.saturating_mul(slope).saturating_add(intercept),
+            self.g.saturating_mul(slope).saturating_add(intercept),
+            self.b.saturating_mul(slope).saturating_add(intercept),
+        );
     }
 
-    fn contrast(&mut self, value: f32) {
-        self.linear(value, -(0.5 * value) + 0.5);
+    fn multiply(&mut self, m: &[Fx; 9]) {
+        let (r, g, b) = (self.r, self.g, self.b);
+        self.set_rgb(
+            r.saturating_mul(m[0])
+                .saturating_add(g.saturating_mul(m[1]))
+                .saturating_add(b.saturating_mul(m[2])),
+            r.saturating_mul(m[3])
+                .saturating_add(g.saturating_mul(m[4]))
+                .saturating_add(b.saturating_mul(m[5])),
+            r.saturating_mul(m[6])
+                .saturating_add(g.saturating_mul(m[7]))
+                .saturating_add(b.saturating_mul(m[8])),
+        );
     }
 
-    fn linear(&mut self, slope: f32, intercept: f32) {
-        let r = self.r().mul_add(slope, intercept).clamp(0.0, 1.0);
-        let g = self.g().mul_add(slope, intercept).clamp(0.0, 1.0);
-        let b = self.b().mul_add(slope, intercept).clamp(0.0, 1.0);
-        self.set_rgb(r, g, b);
-    }
-
-    fn multiply(&mut self, matrix: &[f32; 9]) {
-        let r = self.r();
-        let g = self.g();
-        let b = self.b();
-        let new_r = b
-            .mul_add(matrix[2], r.mul_add(matrix[0], g * matrix[1]))
-            .clamp(0.0, 1.0);
-        let new_g = b
-            .mul_add(matrix[5], r.mul_add(matrix[3], g * matrix[4]))
-            .clamp(0.0, 1.0);
-        let new_b = b
-            .mul_add(matrix[8], r.mul_add(matrix[6], g * matrix[7]))
-            .clamp(0.0, 1.0);
-        self.set_rgb(new_r, new_g, new_b);
-    }
-
-    fn oklab(&self) -> oklab::Oklab {
+    fn to_oklab(self) -> oklab::Oklab {
         oklab::srgb_f32_to_oklab(oklab::Rgb {
-            r: self.0,
-            g: self.1,
-            b: self.2,
+            r: self.r.to_num(),
+            g: self.g.to_num(),
+            b: self.b.to_num(),
         })
     }
 }
@@ -188,26 +255,29 @@ impl FilterResult {
 
 /// Compute the loss (distance in Oklab color space) for given filter values
 fn compute_loss(filters: &[f64], target_oklab: oklab::Oklab) -> f64 {
-    let mut color = FilterColor::new(0, 0, 0);
+    let mut color = FilterColor::black();
 
-    color.invert((filters[0] / 100.0) as f32);
-    color.sepia((filters[1] / 100.0) as f32);
-    color.saturate((filters[2] / 100.0) as f32);
-    color.hue_rotate((filters[3] * 3.6) as f32);
-    color.brightness((filters[4] / 100.0) as f32);
-    color.contrast((filters[5] / 100.0) as f32);
+    // Convert f64 params to fixed-point at the boundary
+    color.invert(Fx::from_num(filters[0] / 100.0));
+    color.sepia(Fx::from_num(filters[1] / 100.0));
+    color.saturate(FxParam::from_num(filters[2] / 100.0));
+    color.hue_rotate(filters[3] * 3.6);
+    color.brightness(Fx::from_num(filters[4] / 100.0));
+    color.contrast(Fx::from_num(filters[5] / 100.0));
 
-    // Compute Euclidean distance in Oklab color space (perceptually uniform)
-    let current_oklab = color.oklab();
-    let dl = current_oklab.l - target_oklab.l;
-    let da = current_oklab.a - target_oklab.a;
-    let db = current_oklab.b - target_oklab.b;
-    f64::from(dl * dl + da * da + db * db) * 5000.0
+    // Euclidean distance in Oklab color space (perceptually uniform)
+    let ok = color.to_oklab();
+    let (dl, da, db) = (
+        ok.l - target_oklab.l,
+        ok.a - target_oklab.a,
+        ok.b - target_oklab.b,
+    );
+    f64::from(dl.mul_add(dl, da.mul_add(da, db * db))) * 5000.0
 }
 
 /// Solve for CSS filter values using COBYLA optimization
 fn solve(target: FilterColor) -> FilterResult {
-    let target_oklab = target.oklab();
+    let target_oklab = target.to_oklab();
 
     // Objective function for COBYLA
     let objective = |x: &[f64], (): &mut ()| compute_loss(x, target_oklab);
@@ -347,7 +417,7 @@ mod tests {
     #[test]
     fn test_oklab_conversion() {
         let color = FilterColor::new(255, 0, 0);
-        let oklab = color.oklab();
+        let oklab = color.to_oklab();
         // Red in Oklab should have positive a (towards red) and positive b (towards yellow)
         assert!(oklab.l > 0.5); // Should have decent lightness
         assert!(oklab.a > 0.1); // Should be strongly towards red

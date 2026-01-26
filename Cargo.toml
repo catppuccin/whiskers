@@ -49,6 +49,8 @@ indexmap = { version = "2.11.4", features = ["serde"] }
 itertools = "0.14.0"
 lzma-rust = "0.1.6"
 cobyla = "0.6"
+cordic = "0.1"
+fixed = "1.28"
 oklab = "1"
 rmp-serde = "1.3.0"
 semver = { version = "1.0.27", features = ["serde"] }
