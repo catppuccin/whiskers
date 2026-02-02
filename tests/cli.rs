@@ -163,7 +163,7 @@ mod happy_path {
             .assert();
         assert
             .success()
-            .stdout(include_str!("fixtures/ansi/ansi.txt"))
+            .stdout(include_str!("fixtures/ansi/ansi.md"))
             .stderr("");
     }
 }

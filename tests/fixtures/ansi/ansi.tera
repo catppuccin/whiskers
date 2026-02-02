@@ -3,9 +3,32 @@ whiskers:
   version: "^2"
   hex_format: "#{{r}}{{g}}{{b}}{{z}}"
 ---
+
+{%- macro rgb(col) -%}
+rgb({{ col.rgb.r }},{{ col.rgb.g }},{{ col.rgb.b }})
+{%- endmacro rgb -%}
+
+{%- macro hsl(col) -%}
+hsl({{ col.hsl.h }},{{ col.hsl.s }},{{ col.hsl.l }})
+{%- endmacro hsl -%}
+
+{% for flavor_key, flavor in flavors %}
+# {{ flavor.name }}
+
+## Colors
+
 {% for _, color in flavor.ansi_colors -%}
-{{ color.name }}: [{{ color.code }}] {{ color.hex }}
+| Color | Code | HEX | RGB | HSL |
+|-------|------|-----|-----|-----|
+{{ color.name }} | {{ color.code }} | {{ color.hex }} | {{self::rgb(col=color)}} | {{ self::hsl(col=color) }} |
 {% endfor %}
+
+## Pairs
+
 {% for _, pair in flavor.ansi_color_pairs -%}
-{{pair.name}}: [{{ pair.normal.code }}] {{ pair.normal.hex}} | [{{ pair.bright.code }}] {{ pair.bright.hex }}
+{{pair.name}}:
+  \[{{ pair.normal.code }}\] {{ pair.normal.hex}} | {{ self::rgb(col=pair.normal) }} | {{ self::hsl(col=pair.normal) }}
+  \[{{ pair.bright.code }}\] {{ pair.bright.hex }} | {{ self::rgb(col=pair.bright) }} | {{ self::hsl(col=pair.normal) }}
+{% endfor -%}
+
 {% endfor -%}
