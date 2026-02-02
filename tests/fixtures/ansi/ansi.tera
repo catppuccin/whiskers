@@ -9,7 +9,7 @@ rgb({{ col.rgb.r }},{{ col.rgb.g }},{{ col.rgb.b }})
 {%- endmacro rgb -%}
 
 {%- macro hsl(col) -%}
-hsl({{ col.hsl.h }},{{ col.hsl.s }},{{ col.hsl.l }})
+hsl({{ col.hsl.h | round }}, {{ col.hsl.s * 100 | round }}%, {{ col.hsl.l * 100 | round }}%)
 {%- endmacro hsl -%}
 
 {% for flavor_key, flavor in flavors %}
@@ -17,18 +17,19 @@ hsl({{ col.hsl.h }},{{ col.hsl.s }},{{ col.hsl.l }})
 
 ## Colors
 
-{% for _, color in flavor.ansi_colors -%}
 | Color | Code | HEX | RGB | HSL |
 |-------|------|-----|-----|-----|
+{% for _, color in flavor.ansi_colors -%}
 {{ color.name }} | {{ color.code }} | {{ color.hex }} | {{self::rgb(col=color)}} | {{ self::hsl(col=color) }} |
 {% endfor %}
 
 ## Pairs
 
+| Color | Code | HEX | RGB | HSL |
+|-------|------|-----|-----|-----|
 {% for _, pair in flavor.ansi_color_pairs -%}
-{{pair.name}}:
-  \[{{ pair.normal.code }}\] {{ pair.normal.hex}} | {{ self::rgb(col=pair.normal) }} | {{ self::hsl(col=pair.normal) }}
-  \[{{ pair.bright.code }}\] {{ pair.bright.hex }} | {{ self::rgb(col=pair.bright) }} | {{ self::hsl(col=pair.normal) }}
+{{pair.name}} | {{ pair.normal.code }} | {{ pair.normal.hex}} | {{ self::rgb(col=pair.normal) }} | {{ self::hsl(col=pair.normal) }}
+|| {{ pair.bright.code }} | {{ pair.bright.hex }} | {{ self::rgb(col=pair.bright) }} | {{ self::hsl(col=pair.normal) }}
 {% endfor -%}
 
 {% endfor -%}
