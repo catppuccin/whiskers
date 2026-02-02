@@ -74,6 +74,16 @@ These types are designed to closely match the
 - **Description**: A map of color identifiers to their respective values.
 - **Type**: `Map<String,`[`Color`](#color)`>`
 
+### `ansi_colors` {#flavor-ansi}
+
+- **Description**: A map of color identifiers for the ANSI terminal to their respective values.
+- **Type**: `Map<String, `[`AnsiColor`](#ansi)`>`
+
+### `ansi_color_pairs` {#flavor-ansi-pairs}
+
+- **Description**: A map of color identifiers (without brightness modifier) for the ANSI terminal to their respective pairs.
+- **Type**: `Map<String, `[`AnsiColorPair`](#ansi-pair)`>`
+
 ### Color
 
 #### `name` {#color-name}
@@ -84,7 +94,7 @@ These types are designed to closely match the
 
 #### `identifier` {#color-identifier}
 
-- **Description**: The identifier of the color.
+- **Description**: The lowercase identifier of the color.
 - **Type**: `String`
 - **Examples**: `"rosewater"`, `"surface0"`, `"base"`
 
@@ -138,6 +148,68 @@ These types are designed to closely match the
 - **Description**: The opacity of the color.
 - **Type**: `u8`
 - **Examples**: `0` to `255`
+
+### `AnsiColor` {#ansi}
+
+#### `name` {#ansi-name}
+
+- **Description**: The name corresponding to the ANSI terminal color.
+- **Type**: `String`
+- **Examples**: `Black`, `Green`, `Magenta`, `Cyan`, `Bright Red`, `Bright Yellow`, `Bright Blue`, `Bright White`
+
+#### `identifier` {#ansi-identifier}
+
+- **Description**: The lower camel_case identifier of the ANSI terminal color.
+- **Type**: `String`
+- **Examples**: `black`, `green`, `magenta`, `cyan`, `bright_red`, `bright_yellow`, `bright_blue`, `bright_white`
+
+#### `code` {#ansi-code}
+
+- **Description**: The ANSI terminal escape code corresponding to the color.
+- **Type**: `u8`
+- **Examples**: `0` to `15`
+
+#### [`hex`](#color-hex)
+
+#### [`int24`](#color-int24)
+
+#### [`uint32`](#color-uint32)
+
+#### [`sint32`](#color-sint32)
+
+#### [`rgb`](#color-rgb)
+
+#### [`hsl`](#color-hsl)
+
+### `AnsiColorPair` {#ansi-pairs}
+
+#### `name` {#ansi-pair-name}
+
+- **Description**: The name corresponding to the ANSI terminal color pair.
+- **Type**: `String`
+- **Examples**: `Black`, `Green`, `Magenta`, `Cyan`
+
+#### `identifier` {#ansi-pair-identifier}
+
+- **Description**: The lowercase identifier of the ANSI terminal color pair.
+- **Type**: `String`
+- **Examples**: `black`, `green`, `magenta`, `cyan`
+
+#### `order` {#ansi-pair-order}
+
+- **Description**: Order of the ANSI terminal color pair in the palette spec.
+- **Type**: `u8`
+- **Examples**: `0` to `7`
+
+#### `normal` {#ansi-pair-normal}
+
+- **Description**: The normal variant of the ANSI terminal color corresponded to by the pair's [`name`](#ansi-pair-name).
+- **Type**: `AnsiColor`
+
+#### `bright` {#ansi-pair-bright}
+
+- **Description**: The bright variant of the ANSI terminal color corresponded to by the pair's [`name`](#ansi-pair-name).
+- **Type**: `AnsiColor`
 
 ### RGB
 

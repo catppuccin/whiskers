@@ -59,7 +59,7 @@ pub struct AnsiColor {
 pub struct AnsiColorPair {
     pub name: String,
     pub identifier: String,
-    pub order: u32,
+    pub order: u8,
     pub normal: AnsiColor,
     pub bright: AnsiColor,
 }
