@@ -222,7 +222,8 @@ fn ansi_color_pair_from_catppuccin(
     Ok(AnsiColorPair {
         name: ansi_color_pair.name.to_string(),
         identifier: ansi_color_pair.name.identifier().to_string(),
-        order: ansi_color_pair.order,
+        // TODO: remove this when https://github.com/catppuccin/rust/pull/66 merges.
+        order: ansi_color_pair.order as u8,
         normal: ansi_color_from_catppuccin(&ansi_color_pair.normal)?,
         bright: ansi_color_from_catppuccin(&ansi_color_pair.bright)?,
     })
