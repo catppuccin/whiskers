@@ -23,6 +23,8 @@ pub struct Flavor {
     pub dark: bool,
     pub light: bool,
     pub colors: IndexMap<String, Color>,
+    pub ansi_colors: IndexMap<String, AnsiColor>,
+    pub ansi_color_pairs: IndexMap<String, AnsiColorPair>,
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
@@ -38,6 +40,28 @@ pub struct Color {
     pub rgb: RGB,
     pub hsl: HSL,
     pub opacity: u8,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+pub struct AnsiColor {
+    pub name: String,
+    pub identifier: String,
+    pub code: u8,
+    pub hex: String,
+    pub int24: u32,
+    pub uint32: u32,
+    pub sint32: i32,
+    pub rgb: RGB,
+    pub hsl: HSL,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+pub struct AnsiColorPair {
+    pub name: String,
+    pub identifier: String,
+    pub order: u32,
+    pub normal: AnsiColor,
+    pub bright: AnsiColor,
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
@@ -161,13 +185,46 @@ fn color_from_catppuccin(color: &catppuccin::Color) -> tera::Result<Color> {
         int24,
         uint32,
         sint32,
-        rgb: RGB::new(color.rgb.r, color.rgb.g, color.rgb.b),
+        rgb,
         hsl: HSL {
             h: color.hsl.h.round() as u16,
             s: color.hsl.s as f32,
             l: color.hsl.l as f32,
         },
         opacity: 255,
+    })
+}
+
+fn ansi_color_from_catppuccin(ansi_color: &catppuccin::AnsiColor) -> tera::Result<AnsiColor> {
+    let hex = format_hex!(ansi_color.rgb.r, ansi_color.rgb.g, ansi_color.rgb.b, 0xFF)?;
+    let rgb: RGB = ansi_color.rgb.into();
+    let (int24, uint32, sint32) = rgb_to_ints(&rgb, None);
+    Ok(AnsiColor {
+        name: ansi_color.name.to_string(),
+        identifier: ansi_color.name.identifier().to_string(),
+        code: ansi_color.code,
+        hex,
+        int24,
+        uint32,
+        sint32,
+        rgb,
+        hsl: HSL {
+            h: ansi_color.hsl.h.round() as u16,
+            s: ansi_color.hsl.s as f32,
+            l: ansi_color.hsl.l as f32,
+        },
+    })
+}
+
+fn ansi_color_pair_from_catppuccin(
+    ansi_color_pair: &catppuccin::AnsiColorPair,
+) -> tera::Result<AnsiColorPair> {
+    Ok(AnsiColorPair {
+        name: ansi_color_pair.name.to_string(),
+        identifier: ansi_color_pair.name.identifier().to_string(),
+        order: ansi_color_pair.order,
+        normal: ansi_color_from_catppuccin(&ansi_color_pair.normal)?,
+        bright: ansi_color_from_catppuccin(&ansi_color_pair.bright)?,
     })
 }
 
@@ -204,12 +261,29 @@ pub fn build_palette(color_overrides: Option<&ColorOverrides>) -> Result<Palette
     let mut flavors = IndexMap::new();
     for flavor in &catppuccin::PALETTE {
         let mut colors = IndexMap::new();
-        for color in flavor {
+        for color in &flavor.colors {
             colors.insert(
                 color.name.identifier().to_string(),
                 make_color(color, flavor.name)?,
             );
         }
+
+        let mut ansi_colors = IndexMap::new();
+        for ansi_color in &flavor.ansi_colors {
+            ansi_colors.insert(
+                ansi_color.name.identifier().to_string(),
+                ansi_color_from_catppuccin(ansi_color)?,
+            );
+        }
+
+        let mut ansi_color_pairs = IndexMap::new();
+        for ansi_color_pair in &flavor.ansi_colors.all_pairs() {
+            ansi_color_pairs.insert(
+                ansi_color_pair.name.identifier().to_string(),
+                ansi_color_pair_from_catppuccin(ansi_color_pair)?,
+            );
+        }
+
         flavors.insert(
             flavor.name.identifier().to_string(),
             Flavor {
@@ -220,6 +294,8 @@ pub fn build_palette(color_overrides: Option<&ColorOverrides>) -> Result<Palette
                 dark: flavor.dark,
                 light: !flavor.dark,
                 colors,
+                ansi_colors,
+                ansi_color_pairs,
             },
         );
     }
