@@ -3,6 +3,7 @@ whiskers:
   version: "^2"
   hex_format: "#{{r}}{{g}}{{b}}{{z}}"
 ---
+# ANSI TEST
 
 {%- macro rgb(col) -%}
 rgb({{ col.rgb.r }},{{ col.rgb.g }},{{ col.rgb.b }})
@@ -13,17 +14,17 @@ hsl({{ col.hsl.h | round }}, {{ col.hsl.s * 100 | round }}%, {{ col.hsl.l * 100 
 {%- endmacro hsl -%}
 
 {% for flavor_key, flavor in flavors %}
-# {{ flavor.name }}
+## {{ flavor.name }}
 
-## Colors
+### Colors
 
 | Color | Code | HEX | RGB | HSL |
 |-------|------|-----|-----|-----|
 {% for _, color in flavor.ansi_colors -%}
 {{ color.name }} | {{ color.code }} | {{ color.hex }} | {{self::rgb(col=color)}} | {{ self::hsl(col=color) }} |
-{% endfor %}
+{% endfor -%}
 
-## Pairs
+### Pairs
 
 | Color | Code | HEX | RGB | HSL |
 |-------|------|-----|-----|-----|
