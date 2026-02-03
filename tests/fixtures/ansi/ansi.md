@@ -1,4 +1,5 @@
 # ANSI TEST
+
 ## Latte
 
 ### Colors
@@ -21,6 +22,7 @@ Bright Blue | 12 | #456eff | rgb(69,110,255) | hsl(227, 100%, 64%) |
 Bright Magenta | 13 | #fe85d8 | rgb(254,133,216) | hsl(319, 98%, 76%) |
 Bright Cyan | 14 | #2d9fa8 | rgb(45,159,168) | hsl(184, 58%, 42%) |
 Bright White | 15 | #bcc0cc | rgb(188,192,204) | hsl(225, 14%, 77%) |
+
 ### Pairs
 
 | Color | Code | HEX | RGB | HSL |
@@ -41,7 +43,6 @@ Cyan | 6 | #179299 | rgb(23,146,153) | hsl(183, 74%, 35%)
 || 14 | #2d9fa8 | rgb(45,159,168) | hsl(183, 74%, 35%)
 White | 7 | #acb0be | rgb(172,176,190) | hsl(227, 12%, 71%)
 || 15 | #bcc0cc | rgb(188,192,204) | hsl(227, 12%, 71%)
-
 ## Frappé
 
 ### Colors
@@ -64,6 +65,7 @@ Bright Blue | 12 | #7b9ef0 | rgb(123,158,240) | hsl(222, 80%, 71%) |
 Bright Magenta | 13 | #f2a4db | rgb(242,164,219) | hsl(318, 75%, 80%) |
 Bright Cyan | 14 | #5abfb5 | rgb(90,191,181) | hsl(174, 44%, 55%) |
 Bright White | 15 | #b5bfe2 | rgb(181,191,226) | hsl(227, 44%, 80%) |
+
 ### Pairs
 
 | Color | Code | HEX | RGB | HSL |
@@ -84,7 +86,6 @@ Cyan | 6 | #81c8be | rgb(129,200,190) | hsl(172, 39%, 65%)
 || 14 | #5abfb5 | rgb(90,191,181) | hsl(172, 39%, 65%)
 White | 7 | #a5adce | rgb(165,173,206) | hsl(228, 29%, 73%)
 || 15 | #b5bfe2 | rgb(181,191,226) | hsl(228, 29%, 73%)
-
 ## Macchiato
 
 ### Colors
@@ -107,6 +108,7 @@ Bright Blue | 12 | #78a1f6 | rgb(120,161,246) | hsl(220, 88%, 72%) |
 Bright Magenta | 13 | #f2a9dd | rgb(242,169,221) | hsl(317, 74%, 81%) |
 Bright Cyan | 14 | #63cbc0 | rgb(99,203,192) | hsl(174, 50%, 59%) |
 Bright White | 15 | #b8c0e0 | rgb(184,192,224) | hsl(228, 39%, 80%) |
+
 ### Pairs
 
 | Color | Code | HEX | RGB | HSL |
@@ -127,7 +129,6 @@ Cyan | 6 | #8bd5ca | rgb(139,213,202) | hsl(171, 47%, 69%)
 || 14 | #63cbc0 | rgb(99,203,192) | hsl(171, 47%, 69%)
 White | 7 | #a5adcb | rgb(165,173,203) | hsl(227, 27%, 72%)
 || 15 | #b8c0e0 | rgb(184,192,224) | hsl(227, 27%, 72%)
-
 ## Mocha
 
 ### Colors
@@ -150,6 +151,7 @@ Bright Blue | 12 | #74a8fc | rgb(116,168,252) | hsl(217, 96%, 72%) |
 Bright Magenta | 13 | #f2aede | rgb(242,174,222) | hsl(318, 72%, 82%) |
 Bright Cyan | 14 | #6bd7ca | rgb(107,215,202) | hsl(173, 57%, 63%) |
 Bright White | 15 | #bac2de | rgb(186,194,222) | hsl(227, 35%, 80%) |
+
 ### Pairs
 
 | Color | Code | HEX | RGB | HSL |
