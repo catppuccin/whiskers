@@ -153,6 +153,19 @@ mod happy_path {
             .stdout(include_str!("fixtures/ansi/ansi.txt"))
             .stderr("");
     }
+
+    /// Test that the CLI can render ANSI colors & color pairs
+    #[test]
+    fn test_ansi() {
+        let mut cmd = Command::cargo_bin("whiskers").expect("binary exists");
+        let assert = cmd
+            .args(["tests/fixtures/ansi/ansi.tera", "-f", "latte"])
+            .assert();
+        assert
+            .success()
+            .stdout(include_str!("fixtures/ansi/ansi.md"))
+            .stderr("");
+    }
 }
 
 #[cfg(test)]
