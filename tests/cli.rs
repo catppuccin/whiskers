@@ -1,12 +1,12 @@
 #[cfg(test)]
 mod happy_path {
-    use assert_cmd::Command;
+    use assert_cmd::cargo::cargo_bin_cmd;
     use predicates::prelude::{predicate, PredicateBooleanExt};
 
     /// Test that the CLI can render a single-flavor template file
     #[test]
     fn test_single() {
-        let mut cmd = Command::cargo_bin("whiskers").expect("binary exists");
+        let mut cmd = cargo_bin_cmd!("whiskers");
         let assert = cmd
             .args(["tests/fixtures/single/single.tera", "-f", "latte"])
             .assert();
@@ -19,7 +19,7 @@ mod happy_path {
     /// Test that the CLI can render a multi-flavor template file
     #[test]
     fn test_multi() {
-        let mut cmd = Command::cargo_bin("whiskers").expect("binary exists");
+        let mut cmd = cargo_bin_cmd!("whiskers");
         let assert = cmd.args(["tests/fixtures/multi/multi.tera"]).assert();
         assert
             .success()
@@ -30,7 +30,7 @@ mod happy_path {
     /// Test that the CLI can render a multi-flavor matrix template
     #[test]
     fn test_multifile_render() {
-        let mut cmd = Command::cargo_bin("whiskers").expect("binary exists");
+        let mut cmd = cargo_bin_cmd!("whiskers");
         let assert = cmd
             .args(["--dry-run", "tests/fixtures/multifile.tera"])
             .assert();
@@ -45,7 +45,7 @@ mod happy_path {
     /// Test that the CLI can render a template which uses `read_file`
     #[test]
     fn test_read_file() {
-        let mut cmd = Command::cargo_bin("whiskers").expect("binary exists");
+        let mut cmd = cargo_bin_cmd!("whiskers");
         let assert = cmd
             .args(["tests/fixtures/read_file/read_file.tera", "-f", "latte"])
             .assert();
@@ -58,7 +58,7 @@ mod happy_path {
     /// Test that the CLI can render colours in specific formats
     #[test]
     fn test_formats() {
-        let mut cmd = Command::cargo_bin("whiskers").expect("binary exists");
+        let mut cmd = cargo_bin_cmd!("whiskers");
         let assert = cmd
             .args(["tests/fixtures/formats.tera", "-f", "latte"])
             .assert();
@@ -76,7 +76,7 @@ mod happy_path {
     /// Test that the CLI can render a UTF-8 template file
     #[test]
     fn test_utf8() {
-        let mut cmd = Command::cargo_bin("whiskers").expect("binary exists");
+        let mut cmd = cargo_bin_cmd!("whiskers");
         let assert = cmd.args(["tests/fixtures/encodings/utf8.tera"]).assert();
         assert
             .success()
@@ -87,7 +87,7 @@ mod happy_path {
     /// Test that the CLI can render a UTF-8 with BOM template file
     #[test]
     fn test_utf8_bom() {
-        let mut cmd = Command::cargo_bin("whiskers").expect("binary exists");
+        let mut cmd = cargo_bin_cmd!("whiskers");
         let assert = cmd.args(["tests/fixtures/encodings/utf8bom.tera"]).assert();
         assert
             .success()
@@ -98,7 +98,7 @@ mod happy_path {
     /// Test that the CLI can render a UTF-16 BE template file
     #[test]
     fn test_utf16be() {
-        let mut cmd = Command::cargo_bin("whiskers").expect("binary exists");
+        let mut cmd = cargo_bin_cmd!("whiskers");
         let assert = cmd.args(["tests/fixtures/encodings/utf16be.tera"]).assert();
         assert
             .success()
@@ -109,7 +109,7 @@ mod happy_path {
     /// Test that the CLI can render a UTF-16 LE template file
     #[test]
     fn test_utf16le() {
-        let mut cmd = Command::cargo_bin("whiskers").expect("binary exists");
+        let mut cmd = cargo_bin_cmd!("whiskers");
         let assert = cmd.args(["tests/fixtures/encodings/utf16le.tera"]).assert();
         assert
             .success()
@@ -120,7 +120,7 @@ mod happy_path {
     /// Test that the default hex format is rrggbb and full alpha is hidden
     #[test]
     fn test_default_hex_format() {
-        let mut cmd = Command::cargo_bin("whiskers").expect("binary exists");
+        let mut cmd = cargo_bin_cmd!("whiskers");
         let assert = cmd.args(["tests/fixtures/hexformat/default.tera"]).assert();
         assert
             .success()
@@ -131,7 +131,7 @@ mod happy_path {
     /// Test that the CLI can render a template with a custom hex format
     #[test]
     fn test_custom_hex_format() {
-        let mut cmd = Command::cargo_bin("whiskers").expect("binary exists");
+        let mut cmd = cargo_bin_cmd!("whiskers");
         let assert = cmd
             .args(["tests/fixtures/hexformat/custom.tera", "-f", "latte"])
             .assert();
@@ -144,12 +144,12 @@ mod happy_path {
 
 #[cfg(test)]
 mod sad_path {
-    use assert_cmd::Command;
+    use assert_cmd::cargo::cargo_bin_cmd;
     use predicates::prelude::predicate;
 
     #[test]
     fn nonexistent_template_file() {
-        let mut cmd = Command::cargo_bin("whiskers").expect("binary exists");
+        let mut cmd = cargo_bin_cmd!("whiskers");
         cmd.arg("test/file/doesnt/exist");
         cmd.assert()
             .failure()
@@ -158,7 +158,7 @@ mod sad_path {
 
     #[test]
     fn invalid_flavor() {
-        let mut cmd = Command::cargo_bin("whiskers").expect("binary exists");
+        let mut cmd = cargo_bin_cmd!("whiskers");
         cmd.arg("tests/fixtures/single/single.tera")
             .args(["--flavor", "invalid"]);
         cmd.assert().failure().stderr(predicate::str::contains(
@@ -168,7 +168,7 @@ mod sad_path {
 
     #[test]
     fn template_contains_invalid_syntax() {
-        let mut cmd = Command::cargo_bin("whiskers").expect("binary exists");
+        let mut cmd = cargo_bin_cmd!("whiskers");
         cmd.arg("tests/fixtures/errors.tera").args(["-f", "mocha"]);
         cmd.assert()
             .failure()
