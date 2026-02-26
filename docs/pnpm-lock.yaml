@@ -13,7 +13,7 @@ importers:
         version: 0.37.6(astro@5.14.4(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2))
       '@catppuccin/starlight':
         specifier: ^1.0.2
-        version: 1.0.2(@astrojs/starlight@0.37.6(astro@5.14.4(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2)))(astro@5.14.4(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2))
+        version: 1.1.1(@astrojs/starlight@0.37.6(astro@5.14.4(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2)))(astro@5.14.4(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2))
       astro:
         specifier: ^5.14.4
         version: 5.14.4(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2)
@@ -99,10 +99,10 @@ packages:
     resolution: {integrity: sha512-+ntATQe1AlL7nTOYjwjj6w3299CgRot48wL761TUGYpYgAou3AaONZazp0PKZyCyWhudWsjhq1nvRHOvbMzhTA==}
     engines: {node: '>=18'}
 
-  '@catppuccin/starlight@1.0.2':
-    resolution: {integrity: sha512-Qfy0l5EjGCoyRFlpsyDm9YFaxHCZXrMbLaEFPjzbFHMndKLv457nEyNlFnP7EkN1djnJgfORmmoaQ4ru2wiQEg==}
+  '@catppuccin/starlight@1.1.1':
+    resolution: {integrity: sha512-iyI/gdGfqREetGti3O11l7iMLCmt0LRSbIis8ySlZo8hqb749KyMmisO/9kqBvk2oFKw9hGNDbutcNxKSI2spg==}
     peerDependencies:
-      '@astrojs/starlight': '>=0.32'
+      '@astrojs/starlight': '>=0.34'
       astro: ^5.0.0
 
   '@ctrl/tinycolor@4.1.0':
@@ -2027,7 +2027,7 @@ snapshots:
     dependencies:
       fontkit: 2.0.4
 
-  '@catppuccin/starlight@1.0.2(@astrojs/starlight@0.37.6(astro@5.14.4(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2)))(astro@5.14.4(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2))':
+  '@catppuccin/starlight@1.1.1(@astrojs/starlight@0.37.6(astro@5.14.4(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2)))(astro@5.14.4(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2))':
     dependencies:
       '@astrojs/starlight': 0.37.6(astro@5.14.4(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2))
       astro: 5.14.4(@types/node@24.3.0)(rollup@4.48.0)(typescript@5.9.2)
