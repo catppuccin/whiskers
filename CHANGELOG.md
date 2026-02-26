@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.6.1](https://github.com/catppuccin/whiskers/compare/v2.6.0...v2.6.1) (2026-02-26)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @astrojs/starlight to ^0.37.0 ([#123](https://github.com/catppuccin/whiskers/issues/123)) ([9f9c090](https://github.com/catppuccin/whiskers/commit/9f9c090166b5162a97de0d8be3f539accede5301))
+* **deps:** update dependency starlight-changelogs to ^0.4.0 ([#124](https://github.com/catppuccin/whiskers/issues/124)) ([acd0ad9](https://github.com/catppuccin/whiskers/commit/acd0ad9e0205ddcb3a76bacc64875dc8885f635c))
+* **deps:** update dependency starlight-links-validator to ^0.19.0 ([#107](https://github.com/catppuccin/whiskers/issues/107)) ([65b358a](https://github.com/catppuccin/whiskers/commit/65b358a82ae39d9864caa66adc1f8ed3a07a6aa3))
+
 ## [2.6.0](https://github.com/catppuccin/whiskers/compare/v2.5.1...v2.6.0) (2026-02-17)
 
 
