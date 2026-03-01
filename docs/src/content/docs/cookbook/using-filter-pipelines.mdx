@@ -1,0 +1,61 @@
+---
+title: Using filter pipelines
+description: How to get a value, such as a Colour's hex representation, at the end of a filter pipeline.
+---
+
+Let's say we want to modify a colour and then insert its hex into the template:
+
+```txt title="my-cool-template.txt"
+highlight = {{ (red | sub(saturation=60)).hex }}
+```
+
+```console
+$ whiskers -f mocha my-cool-template.txt
+Error: Template is invalid
+
+Caused by:
+    0: Failed to parse 'test.tera'
+    1:  --> 1:42
+         |
+       1 | highlight = {{ (red | sub(saturation=60)).hex }}
+         |                                          ^---
+         |
+         = expected `or`, `and`, or a variable end (`}}`)
+```
+
+What happened? Well, Tera doesn't allow inserting parentheses around a filter pipeline like this. Instead, you have to use the `get` filter:
+
+```diff title="my-cool-template.txt"
+- highlight = {{ (red | sub(saturation=60)).hex }}
++ highlight = {{ red | sub(saturation=60) | get(key="hex") }}
+```
+
+```console
+$ whiskers -f mocha my-cool-template.txt
+highlight = cdb1b9
+```
+
+This works for getting any property from an object:
+
+```txt title="my-cool-template.txt"
+highlight_red = {{ red | sub(saturation=60) | get(key="rgb") | get(key="r") }}
+```
+
+```console
+$ whiskers -f mocha my-cool-template.txt
+highlight_red = 205
+```
+
+This example is equivalent to adding `.rgb.r` on the end of the object.
+
+Getting the hex string from a colour at the end of a filter pipeline is such a common need that we added a dedicated `hex` filter for it:
+
+```diff title="my-cool-template.txt"
+- highlight = {{ red | sub(saturation=60) | get(key="hex") }}
++ highlight = {{ red | sub(saturation=60) | hex }}
+```
+
+```console
+$ whiskers -f mocha my-cool-template.txt
+highlight = cdb1b9
+```

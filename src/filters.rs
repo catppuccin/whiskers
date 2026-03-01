@@ -142,6 +142,14 @@ pub fn css_rgb(
     Ok(tera::to_value(color.to_string())?)
 }
 
+pub fn hex(
+    value: &tera::Value,
+    _args: &HashMap<String, tera::Value>,
+) -> Result<tera::Value, tera::Error> {
+    let color: Color = tera::from_value(value.clone())?;
+    Ok(tera::to_value(color.hex)?)
+}
+
 pub fn css_rgba(
     value: &tera::Value,
     _args: &HashMap<String, tera::Value>,
