@@ -53,6 +53,7 @@ pub fn make_engine(template_directory: &Path) -> tera::Tera {
     tera.register_filter("urlencode_lzma", filters::urlencode_lzma);
     tera.register_filter("trunc", filters::trunc);
     tera.register_filter("mix", filters::mix);
+    tera.register_filter("hex", filters::hex);
     tera.register_filter("css_rgb", filters::css_rgb);
     tera.register_filter("css_rgba", filters::css_rgba);
     tera.register_filter("css_hsl", filters::css_hsl);
@@ -162,7 +163,6 @@ pub fn all_filters() -> Vec<Filter> {
             description: "Serialize an object into a URL-safe string with LZMA compression"
                 .to_string(),
             examples: vec![
-                filter_example!(red | urlencode_lzma => "#ff6666"),
                 filter_example!(some_object | urlencode_lzma => "XQAAgAAEAAAAAAAAAABAqEggMAAAAA=="),
             ],
         },
@@ -170,6 +170,12 @@ pub fn all_filters() -> Vec<Filter> {
             name: "trunc".to_string(),
             description: "Truncate a number to a certain number of places".to_string(),
             examples: vec![filter_example!(1.123456 | trunc(places=3) => "1.123")],
+        },
+        Filter {
+            name: "hex".to_string(),
+            description: "Fetch a colour's hex representation. Shortcut for `get(key=\"hex\")`"
+                .to_string(),
+            examples: vec![filter_example!(red | hex => "#d20f39")],
         },
         Filter {
             name: "css_rgb".to_string(),
