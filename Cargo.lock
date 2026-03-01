@@ -167,9 +167,9 @@ dependencies = [
  "catppuccin",
  "clap",
  "clap-stdin",
- "css-colors",
  "detect-newline-style",
  "encoding_rs_io",
+ "farver",
  "indexmap",
  "itertools",
  "lzma-rust",
@@ -414,6 +414,12 @@ dependencies = [
  "libc",
  "windows-sys",
 ]
+
+[[package]]
+name = "farver"
+version = "3.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "645f9b5d984ab12e636173350770aa8e5904fe574b0676a29001160038425fe9"
 
 [[package]]
 name = "fastrand"
