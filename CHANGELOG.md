@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.7.0](https://github.com/catppuccin/whiskers/compare/v2.6.1...v2.7.0) (2026-03-01)
+
+
+### Features
+
+* add `hex` filter & filter pipelines documentation ([#133](https://github.com/catppuccin/whiskers/issues/133)) ([49b7c84](https://github.com/catppuccin/whiskers/commit/49b7c84bc32fb00966bbb38b56b906cd544da163))
+
 ## [2.6.1](https://github.com/catppuccin/whiskers/compare/v2.6.0...v2.6.1) (2026-02-26)
 
 
