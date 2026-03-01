@@ -26,9 +26,9 @@ base64 = "0.22.1"
 catppuccin = { version = "2.6.0", features = ["css-colors", "serde"] }
 clap = { version = "4.5.59", features = ["derive"] }
 clap-stdin = "0.8.0"
-css-colors = "1.0.1"
 detect-newline-style = "0.1.2"
 encoding_rs_io = "0.1.7"
+farver = "3.1.0"
 indexmap = { version = "2.13.0", features = ["serde"] }
 itertools = "0.14.0"
 lzma-rust = "0.1.7"
