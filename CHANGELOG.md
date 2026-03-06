@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.8.0](https://github.com/catppuccin/whiskers/compare/v2.7.0...v2.8.0) (2026-03-06)
+
+
+### Features
+
+* switch from css-colors to farver ([#135](https://github.com/catppuccin/whiskers/issues/135)) ([b85f4c4](https://github.com/catppuccin/whiskers/commit/b85f4c4a38e83ede402e7feab41e691c9c2e4f70))
+
 ## [2.7.0](https://github.com/catppuccin/whiskers/compare/v2.6.1...v2.7.0) (2026-03-01)
 
 
