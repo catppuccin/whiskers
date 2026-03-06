@@ -31,7 +31,7 @@ of the [existing Tera built-ins](https://keats.github.io/tera/docs/#built-ins).
 ## `urlencode_lzma` {#filters-urlencode_lzma}
 
 - **Description**: Serialize an object into a URL-safe string with LZMA compression
-- **Example**: `red | urlencode_lzma` ⇒ `#ff6666`
+- **Example**: `some_object | urlencode_lzma` ⇒ `"XQAAgAAEAAAAAAAAAABAqEggMAAAAA=="`
 
 ## `trunc` {#filters-trunc}
 
@@ -41,7 +41,7 @@ of the [existing Tera built-ins](https://keats.github.io/tera/docs/#built-ins).
 ## `hex` {#filters-hex}
 
 - **Description**: Fetch a colour's hex representation. Shortcut for `get(key="hex")`.
-- **Example**: `red | hex` ⇒ `#d20f39`
+- **Example**: `red | hex` ⇒ `d20f39`
 
 ## `css_rgb` {#filters-css_rgb}
 
