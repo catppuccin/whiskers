@@ -315,6 +315,7 @@ impl Color {
 
     pub fn mix(base: &Self, blend: &Self, amount: f64) -> tera::Result<Self> {
         let amount = (amount * 100.0).clamp(0.0, 100.0).round() as u8;
+        let amount = 100 - amount;
         let blueprint = base;
         let base: farver::RGBA = base.into();
         let base = base.to_rgba();
