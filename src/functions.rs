@@ -37,7 +37,7 @@ pub fn css_rgb(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera:
             .clone(),
     )?;
 
-    let color: css_colors::RGB = (&color).into();
+    let color: farver::RGB = (&color).into();
     Ok(tera::to_value(color.to_string())?)
 }
 
@@ -47,7 +47,7 @@ pub fn css_rgba(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera
             .ok_or_else(|| tera::Error::msg("color is required"))?
             .clone(),
     )?;
-    let color: css_colors::RGBA = (&color).into();
+    let color: farver::RGBA = (&color).into();
     Ok(tera::to_value(color.to_string())?)
 }
 
@@ -58,7 +58,7 @@ pub fn css_hsl(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera:
             .clone(),
     )?;
 
-    let color: css_colors::HSL = (&color).into();
+    let color: farver::HSL = (&color).into();
     Ok(tera::to_value(color.to_string())?)
 }
 
@@ -68,7 +68,7 @@ pub fn css_hsla(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera
             .ok_or_else(|| tera::Error::msg("color is required"))?
             .clone(),
     )?;
-    let color: css_colors::HSLA = (&color).into();
+    let color: farver::HSLA = (&color).into();
     Ok(tera::to_value(color.to_string())?)
 }
 

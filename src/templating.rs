@@ -175,7 +175,7 @@ pub fn all_filters() -> Vec<Filter> {
             name: "hex".to_string(),
             description: "Fetch a colour's hex representation. Shortcut for `get(key=\"hex\")`"
                 .to_string(),
-            examples: vec![filter_example!(red | hex => "#d20f39")],
+            examples: vec![filter_example!(red | hex => "d20f39")],
         },
         Filter {
             name: "css_rgb".to_string(),

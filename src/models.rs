@@ -1,13 +1,13 @@
 use std::sync::OnceLock;
 
-use css_colors::Color as _;
+use farver::Color as _;
 use indexmap::IndexMap;
 use serde_json::json;
 use tera::Tera;
 
 use crate::cli::ColorOverrides;
 
-// a frankenstein mix of Catppuccin & css_colors types to get all the
+// a frankenstein mix of Catppuccin & farver types to get all the
 // functionality we want.
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct Palette {
@@ -126,7 +126,7 @@ fn color_from_hex_override(hex: &str, blueprint: &catppuccin::Color) -> Result<C
         ((i >> 8) & 0xFF) as u8,
         (i & 0xFF) as u8,
     );
-    let hsl = css_colors::rgb(rgb.r, rgb.g, rgb.b).to_hsl();
+    let hsl = farver::rgb(rgb.r, rgb.g, rgb.b).to_hsl();
     let hex = format_hex!(rgb.r, rgb.g, rgb.b, 0xFF)?;
     let (int24, uint32, sint32) = rgb_to_ints(&rgb, None);
     Ok(Color {
@@ -263,7 +263,7 @@ fn rgb_to_hex(rgb: &RGB, opacity: u8) -> tera::Result<String> {
 }
 
 impl Color {
-    fn from_hsla(hsla: css_colors::HSLA, blueprint: &Self) -> tera::Result<Self> {
+    fn from_hsla(hsla: farver::HSLA, blueprint: &Self) -> tera::Result<Self> {
         let rgb = hsla.to_rgb();
         let rgb = RGB::new(rgb.r.as_u8(), rgb.g.as_u8(), rgb.b.as_u8());
         let hsl = HSL {
@@ -288,7 +288,7 @@ impl Color {
         })
     }
 
-    fn from_rgba(rgba: css_colors::RGBA, blueprint: &Self) -> tera::Result<Self> {
+    fn from_rgba(rgba: farver::RGBA, blueprint: &Self) -> tera::Result<Self> {
         let hsl = rgba.to_hsl();
         let rgb = RGB::new(rgba.r.as_u8(), rgba.g.as_u8(), rgba.b.as_u8());
         let hsl = HSL {
@@ -316,64 +316,64 @@ impl Color {
     pub fn mix(base: &Self, blend: &Self, amount: f64) -> tera::Result<Self> {
         let amount = (amount * 100.0).clamp(0.0, 100.0).round() as u8;
         let blueprint = base;
-        let base: css_colors::RGBA = base.into();
+        let base: farver::RGBA = base.into();
         let base = base.to_rgba();
-        let blend: css_colors::RGBA = blend.into();
-        let result = base.mix(blend, css_colors::percent(amount));
+        let blend: farver::RGBA = blend.into();
+        let result = base.mix(blend, farver::percent(amount));
         Self::from_rgba(result, blueprint)
     }
 
     pub fn mod_hue(&self, hue: i32) -> tera::Result<Self> {
-        let mut hsl: css_colors::HSL = self.into();
-        hsl.h = css_colors::deg(hue);
+        let mut hsl: farver::HSL = self.into();
+        hsl.h = farver::deg(hue);
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
     pub fn add_hue(&self, hue: i32) -> tera::Result<Self> {
-        let hsl: css_colors::HSL = self.into();
-        let hsl = hsl.spin(css_colors::deg(hue));
+        let hsl: farver::HSL = self.into();
+        let hsl = hsl.spin(farver::deg(hue));
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
     pub fn sub_hue(&self, hue: i32) -> tera::Result<Self> {
-        let hsl: css_colors::HSL = self.into();
-        let hsl = hsl.spin(-css_colors::deg(hue));
+        let hsl: farver::HSL = self.into();
+        let hsl = hsl.spin(-farver::deg(hue));
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
     pub fn mod_saturation(&self, saturation: u8) -> tera::Result<Self> {
-        let mut hsl: css_colors::HSL = self.into();
-        hsl.s = css_colors::percent(saturation);
+        let mut hsl: farver::HSL = self.into();
+        hsl.s = farver::percent(saturation);
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
     pub fn add_saturation(&self, saturation: u8) -> tera::Result<Self> {
-        let hsl: css_colors::HSL = self.into();
-        let hsl = hsl.saturate(css_colors::percent(saturation));
+        let hsl: farver::HSL = self.into();
+        let hsl = hsl.saturate(farver::percent(saturation));
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
     pub fn sub_saturation(&self, saturation: u8) -> tera::Result<Self> {
-        let hsl: css_colors::HSL = self.into();
-        let hsl = hsl.desaturate(css_colors::percent(saturation));
+        let hsl: farver::HSL = self.into();
+        let hsl = hsl.desaturate(farver::percent(saturation));
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
     pub fn mod_lightness(&self, lightness: u8) -> tera::Result<Self> {
-        let mut hsl: css_colors::HSL = self.into();
-        hsl.l = css_colors::percent(lightness);
+        let mut hsl: farver::HSL = self.into();
+        hsl.l = farver::percent(lightness);
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
     pub fn add_lightness(&self, lightness: u8) -> tera::Result<Self> {
-        let hsl: css_colors::HSL = self.into();
-        let hsl = hsl.lighten(css_colors::percent(lightness));
+        let hsl: farver::HSL = self.into();
+        let hsl = hsl.lighten(farver::percent(lightness));
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
     pub fn sub_lightness(&self, lightness: u8) -> tera::Result<Self> {
-        let hsl: css_colors::HSL = self.into();
-        let hsl = hsl.darken(css_colors::percent(lightness));
+        let hsl: farver::HSL = self.into();
+        let hsl = hsl.darken(farver::percent(lightness));
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
@@ -419,44 +419,44 @@ impl Color {
     }
 }
 
-impl From<&Color> for css_colors::RGB {
+impl From<&Color> for farver::RGB {
     fn from(c: &Color) -> Self {
         Self {
-            r: css_colors::Ratio::from_u8(c.rgb.r),
-            g: css_colors::Ratio::from_u8(c.rgb.g),
-            b: css_colors::Ratio::from_u8(c.rgb.b),
+            r: farver::Ratio::from_u8(c.rgb.r),
+            g: farver::Ratio::from_u8(c.rgb.g),
+            b: farver::Ratio::from_u8(c.rgb.b),
         }
     }
 }
 
-impl From<&Color> for css_colors::RGBA {
+impl From<&Color> for farver::RGBA {
     fn from(c: &Color) -> Self {
         Self {
-            r: css_colors::Ratio::from_u8(c.rgb.r),
-            g: css_colors::Ratio::from_u8(c.rgb.g),
-            b: css_colors::Ratio::from_u8(c.rgb.b),
-            a: css_colors::Ratio::from_u8(c.opacity),
+            r: farver::Ratio::from_u8(c.rgb.r),
+            g: farver::Ratio::from_u8(c.rgb.g),
+            b: farver::Ratio::from_u8(c.rgb.b),
+            a: farver::Ratio::from_u8(c.opacity),
         }
     }
 }
 
-impl From<&Color> for css_colors::HSL {
+impl From<&Color> for farver::HSL {
     fn from(c: &Color) -> Self {
         Self {
-            h: css_colors::Angle::new(c.hsl.h),
-            s: css_colors::Ratio::from_f32(c.hsl.s),
-            l: css_colors::Ratio::from_f32(c.hsl.l),
+            h: farver::Angle::new(c.hsl.h),
+            s: farver::Ratio::from_f32(c.hsl.s),
+            l: farver::Ratio::from_f32(c.hsl.l),
         }
     }
 }
 
-impl From<&Color> for css_colors::HSLA {
+impl From<&Color> for farver::HSLA {
     fn from(c: &Color) -> Self {
         Self {
-            h: css_colors::Angle::new(c.hsl.h),
-            s: css_colors::Ratio::from_f32(c.hsl.s),
-            l: css_colors::Ratio::from_f32(c.hsl.l),
-            a: css_colors::Ratio::from_u8(c.opacity),
+            h: farver::Angle::new(c.hsl.h),
+            s: farver::Ratio::from_f32(c.hsl.s),
+            l: farver::Ratio::from_f32(c.hsl.l),
+            a: farver::Ratio::from_u8(c.opacity),
         }
     }
 }
