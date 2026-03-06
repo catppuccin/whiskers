@@ -47,9 +47,6 @@ impl TemplateOptions {
             matrix: Option<Vec<tera::Value>>,
             filename: Option<String>,
             hex_format: Option<String>,
-            hex_prefix: Option<String>,
-            #[serde(default)]
-            capitalize_hex: bool,
             skip_if: Option<String>,
         }
 
@@ -63,28 +60,7 @@ impl TemplateOptions {
                 .transpose()
                 .context("Frontmatter matrix is invalid")?;
 
-            // if there's no hex_format but there is hex_prefix and/or capitalize_hex,
-            // we can construct a hex_format from those.
-            let hex_format = if let Some(hex_format) = raw_opts.hex_format {
-                hex_format
-            } else {
-                // throw a deprecation warning for hex_prefix and capitalize_hex
-                if raw_opts.hex_prefix.is_some() {
-                    eprintln!("warning: `hex_prefix` is deprecated and will be removed in a future version. Use `hex_format` instead.");
-                }
-
-                if raw_opts.capitalize_hex {
-                    eprintln!("warning: `capitalize_hex` is deprecated and will be removed in a future version. Use `hex_format` instead.");
-                }
-
-                let prefix = raw_opts.hex_prefix.unwrap_or_default();
-                let components = default_hex_format();
-                if raw_opts.capitalize_hex {
-                    format!("{prefix}{}", components.to_uppercase())
-                } else {
-                    format!("{prefix}{components}")
-                }
-            };
+            let hex_format = raw_opts.hex_format.unwrap_or_else(default_hex_format);
 
             Ok(Self {
                 version: raw_opts.version.map(|version| {
