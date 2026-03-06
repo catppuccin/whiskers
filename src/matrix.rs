@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::sync::OnceLock;
 
 use catppuccin::FlavorName;
 
@@ -44,22 +45,25 @@ pub fn from_values(
         .collect::<Result<Matrix, Error>>()
 }
 
-fn magic_iterables(only_flavor: Option<FlavorName>) -> HashMap<&'static str, Vec<String>> {
-    HashMap::from([
-        (
-            "flavor",
-            only_flavor.map_or_else(
-                || {
-                    catppuccin::PALETTE
-                        .into_iter()
-                        .map(|flavor| flavor.identifier().to_string())
-                        .collect::<Vec<String>>()
-                },
-                |flavor| vec![flavor.identifier().to_string()],
+fn magic_iterables(only_flavor: Option<FlavorName>) -> &'static HashMap<&'static str, Vec<String>> {
+    static CACHE: OnceLock<HashMap<&'static str, Vec<String>>> = OnceLock::new();
+    CACHE.get_or_init(|| {
+        HashMap::from([
+            (
+                "flavor",
+                only_flavor.map_or_else(
+                    || {
+                        catppuccin::PALETTE
+                            .into_iter()
+                            .map(|flavor| flavor.identifier().to_string())
+                            .collect::<Vec<String>>()
+                    },
+                    |flavor| vec![flavor.identifier().to_string()],
+                ),
             ),
-        ),
-        ("accent", ctp_accents()),
-    ])
+            ("accent", ctp_accents()),
+        ])
+    })
 }
 
 fn ctp_accents() -> Vec<String> {
