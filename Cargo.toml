@@ -28,7 +28,7 @@ clap = { version = "4.5.59", features = ["derive"] }
 clap-stdin = "0.8.0"
 detect-newline-style = "0.1.2"
 encoding_rs_io = "0.1.7"
-farver = "3.1.0"
+farver = "3.2.1"
 indexmap = { version = "2.13.0", features = ["serde"] }
 itertools = "0.14.0"
 lzma-rust = "0.1.7"
