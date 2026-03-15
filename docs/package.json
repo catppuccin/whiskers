@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@astrojs/starlight": "^0.37.0",
-    "@catppuccin/starlight": "^1.0.2",
+    "@catppuccin/starlight": "^2.0.0",
     "astro": "^5.14.4",
     "remark-custom-heading-id": "^2.0.0",
     "sharp": "^0.34.4",
