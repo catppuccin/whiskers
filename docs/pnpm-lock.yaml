@@ -12,8 +12,8 @@ importers:
         specifier: ^0.37.0
         version: 0.37.7(astro@5.18.0(@types/node@25.3.1)(rollup@4.59.0)(typescript@5.9.2))
       '@catppuccin/starlight':
-        specifier: ^1.0.2
-        version: 1.1.1(@astrojs/starlight@0.37.7(astro@5.18.0(@types/node@25.3.1)(rollup@4.59.0)(typescript@5.9.2)))(astro@5.18.0(@types/node@25.3.1)(rollup@4.59.0)(typescript@5.9.2))
+        specifier: ^2.0.0
+        version: 2.0.1(@astrojs/starlight@0.37.7(astro@5.18.0(@types/node@25.3.1)(rollup@4.59.0)(typescript@5.9.2)))(astro@5.18.0(@types/node@25.3.1)(rollup@4.59.0)(typescript@5.9.2))
       astro:
         specifier: ^5.14.4
         version: 5.18.0(@types/node@25.3.1)(rollup@4.59.0)(typescript@5.9.2)
@@ -93,11 +93,11 @@ packages:
     resolution: {integrity: sha512-VERIM64vtTP1C4mxQ5thVT9fK0apjPFobqybMtA1UdUujWka24ERHbRHFGmpbbhp73MhV+KSsHQH9C6uOTdEQA==}
     engines: {node: '>=18'}
 
-  '@catppuccin/starlight@1.1.1':
-    resolution: {integrity: sha512-iyI/gdGfqREetGti3O11l7iMLCmt0LRSbIis8ySlZo8hqb749KyMmisO/9kqBvk2oFKw9hGNDbutcNxKSI2spg==}
+  '@catppuccin/starlight@2.0.1':
+    resolution: {integrity: sha512-+ddv7PS8z0E+eae92KYVPTKl3f7zi6Rz/y1aLC0pleybtHfvqrM4eHRa5TUS9R5xfXEcoFWShDw3rPBJ4sBF9g==}
     peerDependencies:
-      '@astrojs/starlight': '>=0.34'
-      astro: ^5.0.0
+      '@astrojs/starlight': '>=0.38'
+      astro: ^6.0.0
 
   '@ctrl/tinycolor@4.2.0':
     resolution: {integrity: sha512-kzyuwOAQnXJNLS9PSyrk0CWk35nWJW/zl/6KvnTBMFK65gm7U1/Z5BqjxeapjZCIhQcM/DsrEmcbRwDyXyXK4A==}
@@ -2230,7 +2230,7 @@ snapshots:
     dependencies:
       fontkitten: 1.0.2
 
-  '@catppuccin/starlight@1.1.1(@astrojs/starlight@0.37.7(astro@5.18.0(@types/node@25.3.1)(rollup@4.59.0)(typescript@5.9.2)))(astro@5.18.0(@types/node@25.3.1)(rollup@4.59.0)(typescript@5.9.2))':
+  '@catppuccin/starlight@2.0.1(@astrojs/starlight@0.37.7(astro@5.18.0(@types/node@25.3.1)(rollup@4.59.0)(typescript@5.9.2)))(astro@5.18.0(@types/node@25.3.1)(rollup@4.59.0)(typescript@5.9.2))':
     dependencies:
       '@astrojs/starlight': 0.37.7(astro@5.18.0(@types/node@25.3.1)(rollup@4.59.0)(typescript@5.9.2))
       astro: 5.18.0(@types/node@25.3.1)(rollup@4.59.0)(typescript@5.9.2)
