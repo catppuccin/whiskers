@@ -173,7 +173,7 @@ pub fn all_filters() -> Vec<Filter> {
         },
         Filter {
             name: "hex".to_string(),
-            description: "Fetch a colour's hex representation. Shortcut for `get(key=\"hex\")`"
+            description: "Fetch a color's hex representation. Shortcut for `get(key=\"hex\")`"
                 .to_string(),
             examples: vec![filter_example!(red | hex => "d20f39")],
         },
