@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.9.0](https://github.com/catppuccin/whiskers/compare/v2.8.0...v2.9.0) (2026-03-20)
+
+
+### Features
+
+* use miette for consistent error & warning diagnostics ([#161](https://github.com/catppuccin/whiskers/issues/161)) ([17c6a70](https://github.com/catppuccin/whiskers/commit/17c6a70be32ca997903cf597268927d36595a2fa))
+
 ## [2.8.0](https://github.com/catppuccin/whiskers/compare/v2.7.0...v2.8.0) (2026-03-06)
 
 
