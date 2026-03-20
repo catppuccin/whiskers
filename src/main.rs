@@ -1,3 +1,6 @@
+use miette::Diagnostic;
+use thiserror::Error;
+
 use std::{
     collections::{hash_map::Entry, HashMap},
     env,
@@ -19,6 +22,38 @@ use whiskers::{
     models::{self, HEX_FORMAT},
     templating,
 };
+
+#[derive(Debug, Error, Diagnostic)]
+#[error("{message}")]
+#[diagnostic(severity(Warning))]
+struct Warning {
+    message: String,
+}
+
+#[derive(Debug, Error, Diagnostic)]
+#[error("{message}")]
+#[diagnostic(severity(Error))]
+struct Err {
+    message: String,
+}
+
+fn warn(msg: impl Into<String>) {
+    eprintln!(
+        "{:?}",
+        miette::Report::new(Warning {
+            message: msg.into()
+        })
+    );
+}
+
+fn err(msg: impl Into<String>) {
+    eprintln!(
+        "{:?}",
+        miette::Report::new(Err {
+            message: msg.into()
+        })
+    );
+}
 
 const FRONTMATTER_OPTIONS_SECTION: &str = "whiskers";
 
@@ -72,11 +107,11 @@ impl TemplateOptions {
             } else {
                 // throw a deprecation warning for hex_prefix and capitalize_hex
                 if raw_opts.hex_prefix.is_some() {
-                    eprintln!("warning: `hex_prefix` is deprecated and will be removed in a future version. Use `hex_format` instead.");
+                    warn("`hex_prefix` is deprecated and will be removed in a future version. Use `hex_format` instead.");
                 }
 
                 if raw_opts.capitalize_hex {
-                    eprintln!("warning: `capitalize_hex` is deprecated and will be removed in a future version. Use `hex_format` instead.");
+                    warn("`capitalize_hex` is deprecated and will be removed in a future version. Use `hex_format` instead.");
                 }
 
                 let prefix = raw_opts.hex_prefix.unwrap_or_default();
@@ -475,30 +510,31 @@ fn template_is_compatible(template_opts: &TemplateOptions) -> bool {
         // i.e. `version: "2.5.1"` instead of `version: "^2.5.1"`
         if let &[comp] = &template_version.comparators.as_slice() {
             if comp.op == semver::Op::Caret && !template_version_raw.starts_with('^') {
-                eprintln!("warning: Template specifies an implicit constraint of {template_version_raw}, consider explicitly specifying ^{template_version_raw} instead");
+                warn(format!("Template specifies an implicit constraint of {template_version_raw}, consider explicitly specifying ^{template_version_raw} instead"));
             }
         }
 
         if !template_version.matches(&whiskers_version) {
-            eprintln!(
-                "error: This template requires a version of Whiskers compatible with \
+            err(format!(
+                "This template requires a version of Whiskers compatible with \
                 \"{template_version}\", but you are running Whiskers \
                 {whiskers_version} which is not compatible with this \
                 requirement."
-            );
+            ));
             return false;
         }
     } else {
-        eprintln!("warning: No Whiskers version requirement specified in template.");
-        eprintln!("This template may not be compatible with this version of Whiskers.");
-        eprintln!();
-        eprintln!("To fix this, specify a Whiskers version requirement in the template frontmatter as follows:");
-        eprintln!();
-        eprintln!("---");
-        eprintln!("whiskers:");
-        eprintln!("    version: \"^{whiskers_version}\"");
-        eprintln!("---");
-        eprintln!();
+        warn(format!(
+            "No Whiskers version requirement specified in template.\n\
+            This template may not be compatible with this version of Whiskers.\n\
+            \n\
+            To fix this, specify a Whiskers version requirement in the template frontmatter as follows:\n\
+            \n\
+            ---\n\
+            whiskers:\n\
+                version: \"^{whiskers_version}\"\n\
+            ---\n"
+        ));
     }
 
     true
@@ -666,7 +702,7 @@ where
     if *result == expected {
         Ok(CheckResult::Pass)
     } else {
-        eprintln!("error: Output does not match {}", path.display());
+        err(format!("Output does not match {}", path.display()));
         invoke_difftool(result, path)?;
         Ok(CheckResult::Fail)
     }
@@ -687,7 +723,7 @@ where
     {
         child.wait().into_diagnostic()?;
     } else {
-        eprintln!("warning: Can't display diff, try setting $DIFFTOOL.");
+        warn("Can't display diff, try setting $DIFFTOOL.");
     }
 
     Ok(())
