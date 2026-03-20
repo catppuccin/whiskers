@@ -32,6 +32,7 @@ struct TemplateOptions {
     matrix: Option<Matrix>,
     filename: Option<String>,
     hex_format: String,
+    skip_if: Option<String>,
 }
 
 impl TemplateOptions {
@@ -49,6 +50,7 @@ impl TemplateOptions {
             hex_prefix: Option<String>,
             #[serde(default)]
             capitalize_hex: bool,
+            skip_if: Option<String>,
         }
 
         if let Some(opts_section) = frontmatter.get(FRONTMATTER_OPTIONS_SECTION) {
@@ -96,6 +98,7 @@ impl TemplateOptions {
                 matrix,
                 filename: raw_opts.filename,
                 hex_format,
+                skip_if: raw_opts.skip_if,
             })
         } else {
             Ok(Self {
@@ -193,9 +196,11 @@ fn main() -> anyhow::Result<()> {
         let Some(filename_template) = template_opts.filename else {
             anyhow::bail!("Filename template is required for multi-output render");
         };
+
         render_multi_output(
             matrix,
             &filename_template,
+            template_opts.skip_if.as_deref(),
             &ctx,
             &palette,
             &tera,
@@ -217,6 +222,7 @@ fn main() -> anyhow::Result<()> {
             &template_name,
             check,
             template_opts.filename,
+            template_opts.skip_if.as_deref(),
             args.dry_run,
         )
         .context("Single-output render failed")?;
@@ -516,8 +522,13 @@ fn render_single_output(
     template_name: &str,
     check: Option<PathBuf>,
     filename: Option<String>,
+    skip_if: Option<&str>,
     dry_run: bool,
 ) -> Result<(), anyhow::Error> {
+    if should_skip(skip_if, ctx)? {
+        return Ok(());
+    }
+
     let result = tera
         .render(template_name, ctx)
         .context("Template render failed")?;
@@ -538,9 +549,11 @@ fn render_single_output(
     Ok(())
 }
 
+#[allow(clippy::too_many_arguments)]
 fn render_multi_output(
     matrix: HashMap<String, Vec<String>>,
     filename_template: &str,
+    skip_if: Option<&str>,
     ctx: &tera::Context,
     palette: &models::Palette,
     tera: &tera::Tera,
@@ -573,6 +586,11 @@ fn render_multi_output(
                 ctx.insert(key, &value);
             }
         }
+
+        if should_skip(skip_if, &ctx)? {
+            continue;
+        }
+
         let result = tera
             .render(template_name, &ctx)
             .context("Main template render failed")?;
@@ -592,6 +610,13 @@ fn render_multi_output(
     }
 
     Ok(())
+}
+
+fn should_skip(skip_if: Option<&str>, ctx: &tera::Context) -> Result<bool, anyhow::Error> {
+    Ok(skip_if
+        .map(|cond| tera::Tera::one_off(cond, ctx, false))
+        .transpose()?
+        .is_some_and(|s| s.trim().to_lowercase() == "true"))
 }
 
 fn maybe_create_parents(filename: &Path) -> anyhow::Result<()> {

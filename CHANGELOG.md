@@ -1,5 +1,43 @@
 # Changelog
 
+## [2.8.0](https://github.com/catppuccin/whiskers/compare/v2.7.0...v2.8.0) (2026-03-06)
+
+
+### Features
+
+* switch from css-colors to farver ([#135](https://github.com/catppuccin/whiskers/issues/135)) ([b85f4c4](https://github.com/catppuccin/whiskers/commit/b85f4c4a38e83ede402e7feab41e691c9c2e4f70))
+
+## [2.7.0](https://github.com/catppuccin/whiskers/compare/v2.6.1...v2.7.0) (2026-03-01)
+
+
+### Features
+
+* add `hex` filter & filter pipelines documentation ([#133](https://github.com/catppuccin/whiskers/issues/133)) ([49b7c84](https://github.com/catppuccin/whiskers/commit/49b7c84bc32fb00966bbb38b56b906cd544da163))
+
+## [2.6.1](https://github.com/catppuccin/whiskers/compare/v2.6.0...v2.6.1) (2026-02-26)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @astrojs/starlight to ^0.37.0 ([#123](https://github.com/catppuccin/whiskers/issues/123)) ([9f9c090](https://github.com/catppuccin/whiskers/commit/9f9c090166b5162a97de0d8be3f539accede5301))
+* **deps:** update dependency starlight-changelogs to ^0.4.0 ([#124](https://github.com/catppuccin/whiskers/issues/124)) ([acd0ad9](https://github.com/catppuccin/whiskers/commit/acd0ad9e0205ddcb3a76bacc64875dc8885f635c))
+* **deps:** update dependency starlight-links-validator to ^0.19.0 ([#107](https://github.com/catppuccin/whiskers/issues/107)) ([65b358a](https://github.com/catppuccin/whiskers/commit/65b358a82ae39d9864caa66adc1f8ed3a07a6aa3))
+
+## [2.6.0](https://github.com/catppuccin/whiskers/compare/v2.5.1...v2.6.0) (2026-02-17)
+
+
+### Features
+
+* add RGB channels field (https://github.com/catppuccin/whiskers/pull/91) ([4ce83af](https://github.com/catppuccin/whiskers/commit/4ce83af4353440a1bcb6ef03c5504aabff1f7616))
+* add skip_if frontmatter var ([#120](https://github.com/catppuccin/whiskers/issues/120)) ([fcbfeb5](https://github.com/catppuccin/whiskers/commit/fcbfeb58f7582403347b4404afebd65960b63de4))
+
+
+### Bug Fixes
+
+* **deps:** update rust crate anyhow to v1.0.96 ([#57](https://github.com/catppuccin/whiskers/issues/57)) ([eec49ec](https://github.com/catppuccin/whiskers/commit/eec49ec39b81cdd668b0c76e5ca9dfb15ecfa670))
+* **deps:** update rust crate serde to v1.0.218 ([#58](https://github.com/catppuccin/whiskers/issues/58)) ([83d393a](https://github.com/catppuccin/whiskers/commit/83d393aaf66f1b174e7e11095cd4ecce0a1cd95d))
+* **deps:** update rust crate serde_json to v1.0.139 ([#56](https://github.com/catppuccin/whiskers/issues/56)) ([9a7d0be](https://github.com/catppuccin/whiskers/commit/9a7d0be780793596c46a44ed294bdacace268682))
+
 ## [2.5.1](https://github.com/catppuccin/whiskers/compare/v2.5.0...v2.5.1) (2024-10-12)
 
 

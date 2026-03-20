@@ -138,8 +138,16 @@ pub fn css_rgb(
     _args: &HashMap<String, tera::Value>,
 ) -> Result<tera::Value, tera::Error> {
     let color: Color = tera::from_value(value.clone())?;
-    let color: css_colors::RGB = (&color).into();
+    let color: farver::RGB = (&color).into();
     Ok(tera::to_value(color.to_string())?)
+}
+
+pub fn hex(
+    value: &tera::Value,
+    _args: &HashMap<String, tera::Value>,
+) -> Result<tera::Value, tera::Error> {
+    let color: Color = tera::from_value(value.clone())?;
+    Ok(tera::to_value(color.hex)?)
 }
 
 pub fn css_rgba(
@@ -147,7 +155,7 @@ pub fn css_rgba(
     _args: &HashMap<String, tera::Value>,
 ) -> Result<tera::Value, tera::Error> {
     let color: Color = tera::from_value(value.clone())?;
-    let color: css_colors::RGBA = (&color).into();
+    let color: farver::RGBA = (&color).into();
     Ok(tera::to_value(color.to_string())?)
 }
 
@@ -156,7 +164,7 @@ pub fn css_hsl(
     _args: &HashMap<String, tera::Value>,
 ) -> Result<tera::Value, tera::Error> {
     let color: Color = tera::from_value(value.clone())?;
-    let color: css_colors::HSL = (&color).into();
+    let color: farver::HSL = (&color).into();
     Ok(tera::to_value(color.to_string())?)
 }
 
@@ -165,6 +173,6 @@ pub fn css_hsla(
     _args: &HashMap<String, tera::Value>,
 ) -> Result<tera::Value, tera::Error> {
     let color: Color = tera::from_value(value.clone())?;
-    let color: css_colors::HSLA = (&color).into();
+    let color: farver::HSLA = (&color).into();
     Ok(tera::to_value(color.to_string())?)
 }
