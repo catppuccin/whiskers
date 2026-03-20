@@ -11,12 +11,12 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/starlight": "^0.37.0",
-    "@catppuccin/starlight": "^1.0.2",
-    "astro": "^5.14.4",
+    "@astrojs/starlight": "^0.38.2",
+    "@catppuccin/starlight": "^2.0.1",
+    "astro": "^6.0.8",
     "remark-custom-heading-id": "^2.0.0",
-    "sharp": "^0.34.4",
-    "starlight-changelogs": "^0.4.0",
-    "starlight-links-validator": "^0.19.0"
+    "sharp": "^0.34.5",
+    "starlight-changelogs": "^0.5.0",
+    "starlight-links-validator": "^0.20.1"
   }
 }
