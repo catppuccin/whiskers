@@ -172,6 +172,6 @@ mod sad_path {
         cmd.arg("tests/fixtures/errors.tera").args(["-f", "mocha"]);
         cmd.assert()
             .failure()
-            .stderr(predicate::str::contains("Error: Template is invalid"));
+            .stderr(predicate::str::contains("Template is invalid"));
     }
 }
