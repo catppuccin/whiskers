@@ -15,7 +15,7 @@ struct Err {
     message: String,
 }
 
-pub(crate) fn warn(msg: impl Into<String>) {
+pub fn warn(msg: impl Into<String>) {
     eprintln!(
         "{:?}",
         miette::Report::new(Warning {
@@ -24,7 +24,7 @@ pub(crate) fn warn(msg: impl Into<String>) {
     );
 }
 
-pub(crate) fn err(msg: impl Into<String>) {
+pub fn err(msg: impl Into<String>) {
     eprintln!(
         "{:?}",
         miette::Report::new(Err {
@@ -33,7 +33,7 @@ pub(crate) fn err(msg: impl Into<String>) {
     );
 }
 
-pub(crate) fn set_miette_hook() -> miette::Result<()> {
+pub fn set_miette_hook() -> miette::Result<()> {
     miette::set_hook(Box::new(|_| {
         let mut theme = miette::GraphicalTheme::unicode();
         // the default warning character seems to render weirdly in some terminal emulators...

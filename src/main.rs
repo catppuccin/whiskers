@@ -155,51 +155,14 @@ fn main() -> miette::Result<()> {
     }
 
     // merge frontmatter with command-line overrides and add to Tera context
-    let mut frontmatter = doc.frontmatter;
-    if let Some(ref overrides) = args.overrides {
-        for (key, value) in overrides {
-            frontmatter
-                .entry(key.clone())
-                .and_modify(|v| {
-                    *v = merge_values(v, value);
-                })
-                .or_insert(
-                    tera::to_value(value)
-                        .into_diagnostic()
-                        .wrap_err_with(|| format!("Value of {key} override is invalid"))?,
-                );
-
-            // overrides also work on matrix iterables
-            if let Some(ref mut matrix) = template_opts.matrix {
-                override_matrix(matrix, value, key)?;
-            }
-        }
-    }
-    let mut ctx = tera::Context::new();
-    for (key, value) in &frontmatter {
-        ctx.insert(key, &value);
-    }
+    let mut ctx = make_tera_context(&args, &mut template_opts, doc.frontmatter)?;
 
     HEX_FORMAT
         .set(template_opts.hex_format)
         .expect("can always set HEX_FORMAT");
 
     // build the palette and add it to the templating context
-    let palette = models::build_palette(args.color_overrides.as_ref())
-        .into_diagnostic()
-        .wrap_err("Palette context cannot be built")?;
-
-    ctx.insert("flavors", &palette.flavors);
-    if let Some(flavor) = args.flavor {
-        let flavor: catppuccin::FlavorName = flavor.into();
-        let flavor = &palette.flavors[flavor.identifier()];
-        ctx.insert("flavor", flavor);
-
-        // also throw in the flavor's colors for convenience
-        for (_, color) in flavor {
-            ctx.insert(&color.identifier, &color);
-        }
-    }
+    let palette = add_palette_to_tera_context(&args, &mut ctx)?;
 
     // build the Tera engine
     let mut tera = templating::make_engine(&template_directory);
@@ -244,6 +207,58 @@ fn main() -> miette::Result<()> {
     }
 
     Ok(())
+}
+
+fn add_palette_to_tera_context(
+    args: &Args,
+    ctx: &mut tera::Context,
+) -> miette::Result<models::Palette> {
+    let palette = models::build_palette(args.color_overrides.as_ref())
+        .into_diagnostic()
+        .wrap_err("Palette context cannot be built")?;
+    ctx.insert("flavors", &palette.flavors);
+    if let Some(flavor) = args.flavor {
+        let flavor: catppuccin::FlavorName = flavor.into();
+        let flavor = &palette.flavors[flavor.identifier()];
+        ctx.insert("flavor", flavor);
+
+        // also throw in the flavor's colors for convenience
+        for (_, color) in flavor {
+            ctx.insert(&color.identifier, &color);
+        }
+    }
+    Ok(palette)
+}
+
+fn make_tera_context(
+    args: &Args,
+    template_opts: &mut TemplateOptions,
+    mut frontmatter: HashMap<String, tera::Value>,
+) -> miette::Result<tera::Context> {
+    if let Some(ref overrides) = args.overrides {
+        for (key, value) in overrides {
+            frontmatter
+                .entry(key.clone())
+                .and_modify(|v| {
+                    *v = merge_values(v, value);
+                })
+                .or_insert(
+                    tera::to_value(value)
+                        .into_diagnostic()
+                        .wrap_err_with(|| format!("Value of {key} override is invalid"))?,
+                );
+
+            // overrides also work on matrix iterables
+            if let Some(ref mut matrix) = template_opts.matrix {
+                override_matrix(matrix, value, key)?;
+            }
+        }
+    }
+    let mut ctx = tera::Context::new();
+    for (key, value) in &frontmatter {
+        ctx.insert(key, &value);
+    }
+    Ok(ctx)
 }
 
 fn handle_list_flags(args: &Args) -> miette::Result<()> {
