@@ -1,6 +1,3 @@
-use miette::Diagnostic;
-use thiserror::Error;
-
 use std::{
     collections::{hash_map::Entry, HashMap},
     env,
@@ -23,37 +20,9 @@ use whiskers::{
     templating,
 };
 
-#[derive(Debug, Error, Diagnostic)]
-#[error("{message}")]
-#[diagnostic(severity(Warning))]
-struct Warning {
-    message: String,
-}
+use crate::diagnostics::{err, set_miette_hook, warn};
 
-#[derive(Debug, Error, Diagnostic)]
-#[error("{message}")]
-#[diagnostic(severity(Error))]
-struct Err {
-    message: String,
-}
-
-fn warn(msg: impl Into<String>) {
-    eprintln!(
-        "{:?}",
-        miette::Report::new(Warning {
-            message: msg.into()
-        })
-    );
-}
-
-fn err(msg: impl Into<String>) {
-    eprintln!(
-        "{:?}",
-        miette::Report::new(Err {
-            message: msg.into()
-        })
-    );
-}
+mod diagnostics;
 
 const FRONTMATTER_OPTIONS_SECTION: &str = "whiskers";
 
@@ -147,6 +116,8 @@ impl TemplateOptions {
 }
 
 fn main() -> miette::Result<()> {
+    set_miette_hook()?;
+
     // parse command-line arguments & template frontmatter
     let args = Args::parse();
     handle_list_flags(&args)?;
