@@ -11,16 +11,31 @@ of the [existing Tera built-ins](https://keats.github.io/tera/docs/#built-ins).
 ## `add` {#filters-add}
 
 - **Description**: Add a value to a color
+- **Attributes**
+  - **`hue`**: `i32` (degrees)
+  - **`saturation`**: `u8` (0–100)
+  - **`lightness`**: `u8` (0–100)
+  - **`opacity`**: `f32` (0.0–1.0)
 - **Example**: `red | add(hue=30)` ⇒ `#ff6666`
 
 ## `sub` {#filters-sub}
 
 - **Description**: Subtract a value from a color
+- **Attributes**
+  - **`hue`**: `i32` (degrees)
+  - **`saturation`**: `u8` (0–100)
+  - **`lightness`**: `u8` (0–100)
+  - **`opacity`**: `f32` (0.0–1.0)
 - **Example**: `red | sub(hue=30)` ⇒ `#d30f9b`
 
 ## `mod` {#filters-mod}
 
 - **Description**: Modify a color
+- **Attributes**
+  - **`hue`**: `i32` (degrees)
+  - **`saturation`**: `u8` (0–100)
+  - **`lightness`**: `u8` (0–100)
+  - **`opacity`**: `f32` (0.0–1.0)
 - **Example**: `red | mod(lightness=80)` ⇒ `#f8a0b3`
 
 ## `mix` {#filters-mix}
