@@ -2,6 +2,7 @@ use std::fmt::Display;
 use std::fmt::Write as _;
 
 use itertools::Itertools as _;
+use miette::IntoDiagnostic;
 
 pub trait TableDisplay {
     fn table_headings() -> Box<[String]>;
@@ -13,7 +14,7 @@ pub fn display_as_list<T: Display>(items: &[T], heading: &str) -> String {
     format!("### {heading}\n\n{items}")
 }
 
-pub fn display_as_table<T: TableDisplay>(items: &[T], heading: &str) -> anyhow::Result<String> {
+pub fn display_as_table<T: TableDisplay>(items: &[T], heading: &str) -> miette::Result<String> {
     let mut result = String::new();
     let rows = items.iter().map(T::table_row).collect::<Vec<_>>();
 
@@ -34,7 +35,7 @@ pub fn display_as_table<T: TableDisplay>(items: &[T], heading: &str) -> anyhow::
         .collect::<Vec<_>>();
 
     // add the section heading
-    write!(result, "### {heading}\n\n")?;
+    write!(result, "### {heading}\n\n").into_diagnostic()?;
 
     // add the table headings
     writeln!(
@@ -44,7 +45,8 @@ pub fn display_as_table<T: TableDisplay>(items: &[T], heading: &str) -> anyhow::
             .iter()
             .map(|(heading, max_width)| format!("{heading:<max_width$}"))
             .join(" | ")
-    )?;
+    )
+    .into_diagnostic()?;
 
     // add the separator
     writeln!(
@@ -54,7 +56,8 @@ pub fn display_as_table<T: TableDisplay>(items: &[T], heading: &str) -> anyhow::
             .iter()
             .map(|(_, max_width)| "-".repeat(*max_width))
             .join(" | ")
-    )?;
+    )
+    .into_diagnostic()?;
 
     // add the rows
     for row in rows {
@@ -68,7 +71,8 @@ pub fn display_as_table<T: TableDisplay>(items: &[T], heading: &str) -> anyhow::
                     format!("{cell:<max_width$}")
                 })
                 .join(" | ")
-        )?;
+        )
+        .into_diagnostic()?;
     }
 
     Ok(result.trim().to_string())

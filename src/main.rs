@@ -6,11 +6,11 @@ use std::{
     process::{self, exit},
 };
 
-use anyhow::{anyhow, Context as _};
 use catppuccin::FlavorName;
 use clap::Parser as _;
 use encoding_rs_io::DecodeReaderBytes;
 use itertools::Itertools;
+use miette::{miette, Context as _, IntoDiagnostic};
 use whiskers::{
     cli::{Args, OutputFormat},
     context::merge_values,
@@ -39,7 +39,7 @@ impl TemplateOptions {
     fn from_frontmatter(
         frontmatter: &HashMap<String, tera::Value>,
         only_flavor: Option<FlavorName>,
-    ) -> anyhow::Result<Self> {
+    ) -> miette::Result<Self> {
         // a `TemplateOptions` object before matrix transformation
         #[derive(serde::Deserialize)]
         struct RawTemplateOptions {
@@ -55,13 +55,15 @@ impl TemplateOptions {
 
         if let Some(opts_section) = frontmatter.get(FRONTMATTER_OPTIONS_SECTION) {
             let raw_opts: RawTemplateOptions = tera::from_value(opts_section.clone())
-                .context("Frontmatter `whiskers` section is invalid")?;
+                .into_diagnostic()
+                .wrap_err("Frontmatter `whiskers` section is invalid")?;
 
             let matrix = raw_opts
                 .matrix
                 .map(|m| matrix::from_values(m, only_flavor))
                 .transpose()
-                .context("Frontmatter matrix is invalid")?;
+                .into_diagnostic()
+                .wrap_err("Frontmatter matrix is invalid")?;
 
             // if there's no hex_format but there is hex_prefix and/or capitalize_hex,
             // we can construct a hex_format from those.
@@ -109,7 +111,7 @@ impl TemplateOptions {
     }
 }
 
-fn main() -> anyhow::Result<()> {
+fn main() -> miette::Result<()> {
     // parse command-line arguments & template frontmatter
     let args = Args::parse();
     handle_list_flags(&args)?;
@@ -126,14 +128,18 @@ fn main() -> anyhow::Result<()> {
     let mut decoder = DecodeReaderBytes::new(
         template_arg
             .into_reader()
-            .context("Failed to open template file")?,
+            .into_diagnostic()
+            .wrap_err("Failed to open template file")?,
     );
     let mut template = String::new();
     decoder
         .read_to_string(&mut template)
-        .context("Template could not be read")?;
+        .into_diagnostic()
+        .wrap_err("Template could not be read")?;
 
-    let doc = frontmatter::parse(&template).context("Frontmatter is invalid")?;
+    let doc = frontmatter::parse(&template)
+        .into_diagnostic()
+        .wrap_err("Frontmatter is invalid")?;
     let mut template_opts =
         TemplateOptions::from_frontmatter(&doc.frontmatter, args.flavor.map(Into::into))
             .context("Could not get template options from frontmatter")?;
@@ -153,7 +159,8 @@ fn main() -> anyhow::Result<()> {
                 })
                 .or_insert(
                     tera::to_value(value)
-                        .with_context(|| format!("Value of {key} override is invalid"))?,
+                        .into_diagnostic()
+                        .wrap_err_with(|| format!("Value of {key} override is invalid"))?,
                 );
 
             // overrides also work on matrix iterables
@@ -173,7 +180,8 @@ fn main() -> anyhow::Result<()> {
 
     // build the palette and add it to the templating context
     let palette = models::build_palette(args.color_overrides.as_ref())
-        .context("Palette context cannot be built")?;
+        .into_diagnostic()
+        .wrap_err("Palette context cannot be built")?;
 
     ctx.insert("flavors", &palette.flavors);
     if let Some(flavor) = args.flavor {
@@ -190,11 +198,12 @@ fn main() -> anyhow::Result<()> {
     // build the Tera engine
     let mut tera = templating::make_engine(&template_directory);
     tera.add_raw_template(&template_name, &doc.body)
-        .context("Template is invalid")?;
+        .into_diagnostic()
+        .wrap_err("Template is invalid")?;
 
     if let Some(matrix) = template_opts.matrix {
         let Some(filename_template) = template_opts.filename else {
-            anyhow::bail!("Filename template is required for multi-output render");
+            miette::bail!("Filename template is required for multi-output render");
         };
 
         render_multi_output(
@@ -212,7 +221,7 @@ fn main() -> anyhow::Result<()> {
         let check = args
             .check
             .map(|c| {
-                c.ok_or_else(|| anyhow!("--check requires a file argument in single-output mode"))
+                c.ok_or_else(|| miette!("--check requires a file argument in single-output mode"))
             })
             .transpose()?;
 
@@ -231,7 +240,7 @@ fn main() -> anyhow::Result<()> {
     Ok(())
 }
 
-fn handle_list_flags(args: &Args) -> anyhow::Result<()> {
+fn handle_list_flags(args: &Args) -> miette::Result<()> {
     if args.list_functions {
         list_functions(args.output_format)?;
         exit(0);
@@ -250,11 +259,7 @@ fn handle_list_flags(args: &Args) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn override_matrix(
-    matrix: &mut Matrix,
-    value: &tera::Value,
-    key: &str,
-) -> Result<(), anyhow::Error> {
+fn override_matrix(matrix: &mut Matrix, value: &tera::Value, key: &str) -> miette::Result<()> {
     let Entry::Occupied(e) = matrix.entry(key.to_string()) else {
         return Ok(());
     };
@@ -277,7 +282,7 @@ fn override_matrix(
     Ok(())
 }
 
-fn list_functions(format: OutputFormat) -> anyhow::Result<()> {
+fn list_functions(format: OutputFormat) -> miette::Result<()> {
     let functions = templating::all_functions();
     let filters = templating::all_filters();
     println!(
@@ -317,7 +322,7 @@ fn list_functions(format: OutputFormat) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn list_flavors(format: OutputFormat) -> anyhow::Result<()> {
+fn list_flavors(format: OutputFormat) -> miette::Result<()> {
     // we want all the flavor info minus the colors
     #[derive(serde::Serialize)]
     struct FlavorInfo {
@@ -449,12 +454,13 @@ fn template_name(template: &clap_stdin::FileOrStdin) -> String {
     }
 }
 
-fn template_directory(template: &clap_stdin::FileOrStdin) -> anyhow::Result<PathBuf> {
+fn template_directory(template: &clap_stdin::FileOrStdin) -> miette::Result<PathBuf> {
     if template.is_stdin() {
-        Ok(std::env::current_dir()?)
+        Ok(std::env::current_dir().into_diagnostic()?)
     } else {
         Ok(Path::new(template.filename())
-            .canonicalize()?
+            .canonicalize()
+            .into_diagnostic()?
             .parent()
             .expect("file path must have a parent")
             .to_owned())
@@ -498,7 +504,7 @@ fn template_is_compatible(template_opts: &TemplateOptions) -> bool {
     true
 }
 
-fn write_template(dry_run: bool, filename: &str, result: String) -> Result<(), anyhow::Error> {
+fn write_template(dry_run: bool, filename: &str, result: String) -> miette::Result<()> {
     let filename = Path::new(&filename);
 
     if dry_run || cfg!(test) {
@@ -510,7 +516,8 @@ fn write_template(dry_run: bool, filename: &str, result: String) -> Result<(), a
     } else {
         maybe_create_parents(filename)?;
         std::fs::write(filename, result)
-            .with_context(|| format!("Couldn't write to {}", filename.display()))?;
+            .into_diagnostic()
+            .wrap_err_with(|| format!("Couldn't write to {}", filename.display()))?;
     }
 
     Ok(())
@@ -524,14 +531,15 @@ fn render_single_output(
     filename: Option<String>,
     skip_if: Option<&str>,
     dry_run: bool,
-) -> Result<(), anyhow::Error> {
+) -> miette::Result<()> {
     if should_skip(skip_if, ctx)? {
         return Ok(());
     }
 
     let result = tera
         .render(template_name, ctx)
-        .context("Template render failed")?;
+        .into_diagnostic()
+        .wrap_err("Template render failed")?;
 
     if let Some(path) = check {
         if matches!(
@@ -559,7 +567,7 @@ fn render_multi_output(
     tera: &tera::Tera,
     template_name: &str,
     args: &Args,
-) -> Result<(), anyhow::Error> {
+) -> miette::Result<()> {
     let iterables = matrix
         .into_iter()
         .map(|(key, iterable)| iterable.into_iter().map(move |v| (key.clone(), v)))
@@ -574,7 +582,7 @@ fn render_multi_output(
             // `{% set flavor = flavors[flavor] %}`
             // at the top of every template.
             if key == "flavor" {
-                let flavor: catppuccin::FlavorName = value.parse()?;
+                let flavor: catppuccin::FlavorName = value.parse().into_diagnostic()?;
                 let flavor = &palette.flavors[flavor.identifier()];
                 ctx.insert("flavor", flavor);
 
@@ -593,9 +601,11 @@ fn render_multi_output(
 
         let result = tera
             .render(template_name, &ctx)
-            .context("Main template render failed")?;
+            .into_diagnostic()
+            .wrap_err("Main template render failed")?;
         let filename = tera::Tera::one_off(filename_template, &ctx, false)
-            .context("Filename template render failed")?;
+            .into_diagnostic()
+            .wrap_err("Filename template render failed")?;
 
         if args.check.is_some() {
             check_results
@@ -612,21 +622,24 @@ fn render_multi_output(
     Ok(())
 }
 
-fn should_skip(skip_if: Option<&str>, ctx: &tera::Context) -> Result<bool, anyhow::Error> {
+fn should_skip(skip_if: Option<&str>, ctx: &tera::Context) -> miette::Result<bool> {
     Ok(skip_if
         .map(|cond| tera::Tera::one_off(cond, ctx, false))
-        .transpose()?
+        .transpose()
+        .into_diagnostic()?
         .is_some_and(|s| s.trim().to_lowercase() == "true"))
 }
 
-fn maybe_create_parents(filename: &Path) -> anyhow::Result<()> {
+fn maybe_create_parents(filename: &Path) -> miette::Result<()> {
     if let Some(parent) = filename.parent() {
-        std::fs::create_dir_all(parent).with_context(|| {
-            format!(
-                "Couldn't create parent directories for {}",
-                filename.display()
-            )
-        })?;
+        std::fs::create_dir_all(parent)
+            .into_diagnostic()
+            .wrap_err_with(|| {
+                format!(
+                    "Couldn't create parent directories for {}",
+                    filename.display()
+                )
+            })?;
     }
     Ok(())
 }
@@ -637,17 +650,19 @@ enum CheckResult {
     Fail,
 }
 
-fn check_result_with_file<P>(path: &P, result: &str) -> anyhow::Result<CheckResult>
+fn check_result_with_file<P>(path: &P, result: &str) -> miette::Result<CheckResult>
 where
     P: AsRef<Path>,
 {
     let path = path.as_ref();
-    let expected = std::fs::read_to_string(path).with_context(|| {
-        format!(
-            "error: Couldn't read {} for comparison against result",
-            path.display()
-        )
-    })?;
+    let expected = std::fs::read_to_string(path)
+        .into_diagnostic()
+        .wrap_err_with(|| {
+            format!(
+                "error: Couldn't read {} for comparison against result",
+                path.display()
+            )
+        })?;
     if *result == expected {
         Ok(CheckResult::Pass)
     } else {
@@ -657,20 +672,20 @@ where
     }
 }
 
-fn invoke_difftool<P>(actual: &str, expected_path: P) -> anyhow::Result<()>
+fn invoke_difftool<P>(actual: &str, expected_path: P) -> miette::Result<()>
 where
     P: AsRef<Path>,
 {
     let expected_path = expected_path.as_ref();
     let tool = env::var("DIFFTOOL").unwrap_or_else(|_| "diff".to_string());
 
-    let mut actual_file = tempfile::NamedTempFile::new()?;
-    write!(&mut actual_file, "{actual}")?;
+    let mut actual_file = tempfile::NamedTempFile::new().into_diagnostic()?;
+    write!(&mut actual_file, "{actual}").into_diagnostic()?;
     if let Ok(mut child) = process::Command::new(tool)
         .args([actual_file.path(), expected_path])
         .spawn()
     {
-        child.wait()?;
+        child.wait().into_diagnostic()?;
     } else {
         eprintln!("warning: Can't display diff, try setting $DIFFTOOL.");
     }
