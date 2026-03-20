@@ -517,8 +517,7 @@ fn template_is_compatible(template_opts: &TemplateOptions) -> bool {
             To fix this, specify a Whiskers version requirement in the template frontmatter as follows:\n\
             \n\
             ---\n\
-            whiskers:\n\
-                version: \"^{whiskers_version}\"\n\
+            whiskers:\n  version: \"^{whiskers_version}\"\n\
             ---\n"
         ));
     }
