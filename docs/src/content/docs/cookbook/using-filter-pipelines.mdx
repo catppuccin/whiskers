@@ -1,9 +1,9 @@
 ---
 title: Using filter pipelines
-description: How to get a value, such as a Colour's hex representation, at the end of a filter pipeline.
+description: How to get a value, such as a color's hex representation, at the end of a filter pipeline.
 ---
 
-Let's say we want to modify a colour and then insert its hex into the template:
+Let's say we want to modify a color and then insert its hex into the template:
 
 ```txt title="my-cool-template.txt"
 highlight = {{ (red | sub(saturation=60)).hex }}
@@ -48,7 +48,7 @@ highlight_red = 205
 
 This example is equivalent to adding `.rgb.r` on the end of the object.
 
-Getting the hex string from a colour at the end of a filter pipeline is such a common need that we added a dedicated `hex` filter for it:
+Getting the hex string from a color at the end of a filter pipeline is such a common need that we added a dedicated `hex` filter for it:
 
 ```diff title="my-cool-template.txt"
 - highlight = {{ red | sub(saturation=60) | get(key="hex") }}
