@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.9.1](https://github.com/catppuccin/whiskers/compare/v2.9.0...v2.9.1) (2026-06-22)
+
+
+### Bug Fixes
+
+* **templating:** fully remove rgb_array ([#179](https://github.com/catppuccin/whiskers/issues/179)) ([233654f](https://github.com/catppuccin/whiskers/commit/233654f3cd8101f572e6842dce426c56c86ff98b))
+
 ## [2.9.0](https://github.com/catppuccin/whiskers/compare/v2.8.0...v2.9.0) (2026-03-20)
 
 
