@@ -81,6 +81,22 @@ This string is rendered as a Tera template with the following context variables:
 
 The default value of `hex_format` is `{{r}}{{g}}{{b}}{{z}}`.
 
+### `encoding`
+
+Controls the encoding of the output file.
+
+#### Specification {#whiskers-encoding-specification}
+
+
+The available encoding formats are as follows:
+
+- `utf8` (default)
+- `utf8-bom`
+- `utf16-le`
+- `utf16-le-bom`
+- `utf16-be`
+- `utf16-be-bom`
+
 #### Example {#whiskers-hex-format-example}
 
 <Tabs>
