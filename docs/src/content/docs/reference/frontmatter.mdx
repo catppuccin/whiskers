@@ -76,7 +76,7 @@ This string is rendered as a Tera template with the following context variables:
 
 - `r`, `g`, `b`, `a`: The red, green, blue, and alpha channels of the color as lowercase 2-digit hexadecimal strings.
 - `R`, `G`, `B`, `A`: As above, but uppercase.
-- `z`: The same as `a` if the color is not fully opaque, otherwise an empty string.
+- `z`: The same as `a` if the color has transparency, otherwise an empty string.
 - `Z`: As above, but uppercase.
 
 The default value of `hex_format` is `{{r}}{{g}}{{b}}{{z}}`.
