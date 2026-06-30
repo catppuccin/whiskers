@@ -5,9 +5,9 @@ whiskers:
     - variant: ["normal", "no-italics"]
     - flavor
     - accent
-  filename: "catppuccin-{{flavor.identifier}}-{{accent}}-{{variant}}.ini"
+  filename: "catppuccin-{{flavor.identifier}}-{{accent.identifier}}-{{variant}}.ini"
 ---
 # Catppuccin {{flavor.name}}{% if variant == "no-italics" %} (no italics){% endif %}
 [theme]
-{{accent}}: #{{flavor.colors[accent].hex}}
+{{accent.identifier}}: #{{accent.hex}}
 rosewater: {{rosewater.hex}}

@@ -58,7 +58,7 @@ accents = 56 files), it's as simple as defining the frontmatter below:
     matrix:
       - flavor
       - accent
-    filename: "themes/{{flavor.identifier}}/catppuccin-{{flavor.identifier}}/{{accent}}.json"
+    filename: "themes/{{flavor.identifier}}/catppuccin-{{flavor.identifier}}/{{accent.identifier}}.json"
   ---
   # ...
   ```
@@ -107,11 +107,11 @@ flavors x 14 accents x 2 variants = 112 files):
       - variant: ["normal", "no-italics"]
       - flavor
       - accent
-    filename: "themes/{{flavor.identifier}}/catppuccin-{{flavor.identifier}}-{{accent}}-{{variant}}.ini"
+    filename: "themes/{{flavor.identifier}}/catppuccin-{{flavor.identifier}}-{{accent.identifier}}-{{variant}}.ini"
   ---
   # Catppuccin {{flavor.name}}{% if variant == "no-italics" %} (no italics){% endif %}
   [theme]
-  {{accent}}: {{flavor.colors[accent].hex}}
+  {{accent.identifier}}: {{accent.hex}}
   ```
   </TabItem>
   <TabItem label="Output">
