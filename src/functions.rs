@@ -87,3 +87,16 @@ pub fn read_file_handler(
         Ok(tera::to_value(contents)?)
     }
 }
+
+pub fn css_oklch(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera::Error> {
+    let color: Color = tera::from_value(
+        args.get("color")
+            .ok_or_else(|| tera::Error::msg("color is required"))?
+            .clone(),
+    )?;
+
+    Ok(tera::to_value(format!(
+        "oklch({} {} {})",
+        color.oklch.l, color.oklch.c, color.oklch.h
+    ))?)
+}

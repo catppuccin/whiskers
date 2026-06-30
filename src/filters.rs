@@ -176,3 +176,15 @@ pub fn css_hsla(
     let color: farver::HSLA = (&color).into();
     Ok(tera::to_value(color.to_string())?)
 }
+
+pub fn css_oklch(
+    value: &tera::Value,
+    _args: &HashMap<String, tera::Value>,
+) -> Result<tera::Value, tera::Error> {
+    let color: Color = tera::from_value(value.clone())?;
+
+    Ok(tera::to_value(format!(
+        "oklch({} {} {})",
+        color.oklch.l, color.oklch.c, color.oklch.h
+    ))?)
+}

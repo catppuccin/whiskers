@@ -37,6 +37,7 @@ pub struct Color {
     pub sint32: i32,
     pub rgb: RGB,
     pub hsl: HSL,
+    pub oklch: OKLCH,
     pub opacity: u8,
 }
 
@@ -53,6 +54,13 @@ pub struct HSL {
     pub h: u16,
     pub s: f32,
     pub l: f32,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+pub struct OKLCH {
+    pub l: f32,
+    pub c: f32,
+    pub h: f32,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -119,6 +127,48 @@ fn rgb_to_ints(rgb: &RGB, opacity: Option<u8>) -> (u32, u32, i32) {
     (uint24, uint32, uint32 as i32)
 }
 
+#[allow(clippy::many_single_char_names)]
+fn rgb_to_oklch(r: u8, g: u8, b: u8) -> OKLCH {
+    // sRGB -> linear RGB
+    let linearize = |c: u8| {
+        let c = f64::from(c) / 255.0;
+        if c <= 0.04045 {
+            c / 12.92
+        } else {
+            ((c + 0.055) / 1.055_f64).powf(2.4)
+        }
+    };
+    let (r, g, b) = (linearize(r), linearize(g), linearize(b));
+
+    // linear RGB -> LMS (Oklab intermediate)
+    let l = 0.051_445_992_9f64
+        .mul_add(b, 0.412_221_470_8f64.mul_add(r, 0.536_332_536_3 * g))
+        .cbrt();
+    let m = 0.107_396_956_6f64
+        .mul_add(b, 0.211_903_498_2f64.mul_add(r, 0.680_699_545_1 * g))
+        .cbrt();
+    let s = 0.629_978_700_5f64
+        .mul_add(b, 0.088_302_461_9f64.mul_add(r, 0.281_718_837_6 * g))
+        .cbrt();
+
+    // LMS -> OKLab
+    let lab_l = 0.004_072_046_8f64.mul_add(-s, 0.210_454_255_3f64.mul_add(l, 0.793_617_785_0 * m));
+    let lab_a =
+        0.450_593_709_9f64.mul_add(s, 1.977_998_495_1f64.mul_add(l, -(2.428_592_205_0 * m)));
+    let lab_b = 0.808_675_766_0f64.mul_add(-s, 0.025_904_037_1f64.mul_add(l, 0.782_771_766_2 * m));
+
+    // OKLab -> OKLCH
+    let c = lab_a.hypot(lab_b);
+    let h = lab_b.atan2(lab_a).to_degrees();
+    let h = if h < 0.0 { h + 360.0 } else { h };
+
+    OKLCH {
+        l: lab_l as f32,
+        c: c as f32,
+        h: h as f32,
+    }
+}
+
 fn color_from_hex_override(hex: &str, blueprint: &catppuccin::Color) -> Result<Color, Error> {
     let i = u32::from_str_radix(hex, 16)?;
     let rgb = RGB::new(
@@ -128,6 +178,7 @@ fn color_from_hex_override(hex: &str, blueprint: &catppuccin::Color) -> Result<C
     );
     let hsl = farver::rgb(rgb.r, rgb.g, rgb.b).to_hsl();
     let hex = format_hex!(rgb.r, rgb.g, rgb.b, 0xFF)?;
+    let oklch = rgb_to_oklch(rgb.r, rgb.g, rgb.b);
     let (int24, uint32, sint32) = rgb_to_ints(&rgb, None);
     Ok(Color {
         name: blueprint.name.to_string(),
@@ -144,6 +195,7 @@ fn color_from_hex_override(hex: &str, blueprint: &catppuccin::Color) -> Result<C
             s: hsl.s.as_f32(),
             l: hsl.l.as_f32(),
         },
+        oklch,
         opacity: 0xFF,
     })
 }
@@ -166,6 +218,11 @@ fn color_from_catppuccin(color: &catppuccin::Color) -> tera::Result<Color> {
             h: color.hsl.h.round() as u16,
             s: color.hsl.s as f32,
             l: color.hsl.l as f32,
+        },
+        oklch: OKLCH {
+            l: color.oklch.l as f32,
+            c: color.oklch.c as f32,
+            h: color.oklch.h as f32,
         },
         opacity: 255,
     })
@@ -271,6 +328,7 @@ impl Color {
             s: hsla.s.as_f32(),
             l: hsla.l.as_f32(),
         };
+        let oklch = rgb_to_oklch(rgb.r, rgb.g, rgb.b);
         let opacity = hsla.a.as_u8();
         let (int24, uint32, sint32) = rgb_to_ints(&rgb, Some(opacity));
         Ok(Self {
@@ -284,6 +342,7 @@ impl Color {
             sint32,
             rgb,
             hsl,
+            oklch,
             opacity,
         })
     }
@@ -296,6 +355,7 @@ impl Color {
             s: hsl.s.as_f32(),
             l: hsl.l.as_f32(),
         };
+        let oklch = rgb_to_oklch(rgb.r, rgb.g, rgb.b);
         let opacity = rgba.a.as_u8();
         let (int24, uint32, sint32) = rgb_to_ints(&rgb, Some(opacity));
         Ok(Self {
@@ -309,6 +369,7 @@ impl Color {
             sint32,
             rgb,
             hsl,
+            oklch,
             opacity,
         })
     }

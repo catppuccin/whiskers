@@ -10,13 +10,17 @@ rgb({{ v.r }}, {{ v.g }}, {{ v.b }})
 hsl({{ v.h | round }}, {{ v.s * 100 | round }}%, {{ v.l * 100 | round }}%)
 {%- endmacro -%}
 
+{%- macro css_oklch(v) -%}
+oklch({{ v.l | trunc(places=3) }} {{ v.c | trunc(places=3) }} {{ v.h | trunc(places=3) }})
+{%- endmacro -%}
+
 {% for flavor_key, flavor in flavors %}
 # {{ flavor.name }}
 
-| Color | Hex | RGB | HSL |
-|-------|-----|-----|-----|
+| Color | Hex | RGB | HSL | OKLCH |
+|-------|-----|-----|-----|-----|
 {%- for color_key, color in flavor.colors %}
-{{ color.name }} | #{{ color.hex }} | {{ self::css_rgb(v=color.rgb) }} | {{ self::css_hsl(v=color.hsl) }} |
+{{ color.name }} | #{{ color.hex }} | {{ self::css_rgb(v=color.rgb) }} | {{ self::css_hsl(v=color.hsl) }} | {{ self::css_oklch(v=color.oklch) }} |
 
 {%- endfor %}
 {% endfor -%}
