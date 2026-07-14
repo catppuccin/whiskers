@@ -98,12 +98,18 @@ pub fn read_file_handler(
         if start_line > end_line {
             return Err(tera::Error::msg("start_line is greater than end_line"));
         }
-        let start_line: usize = start_line.try_into().map_err(|_| tera::Error::msg("start_line must be a usize"))?;
-        let end_line: usize = end_line.try_into().map_err(|_| tera::Error::msg("end_line must be a usize"))?;
+        let start_line: usize = start_line
+            .try_into()
+            .map_err(|_| tera::Error::msg("start_line must be a usize"))?;
+        let end_line: usize = end_line
+            .try_into()
+            .map_err(|_| tera::Error::msg("end_line must be a usize"))?;
         if end_line > content_lines.len() {
-            return Err(tera::Error::msg("end_line is greater than the number of lines in the file"));
+            return Err(tera::Error::msg(
+                "end_line is greater than the number of lines in the file",
+            ));
         }
-        let lines: &[&str] = &content_lines[start_line-1..end_line];
+        let lines: &[&str] = &content_lines[start_line - 1..end_line];
         let lines = lines.join("\n");
         Ok(tera::to_value(lines)?)
     }

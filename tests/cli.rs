@@ -60,7 +60,11 @@ mod happy_path {
     fn test_read_file_lines() {
         let mut cmd = cargo_bin_cmd!("whiskers");
         let assert = cmd
-            .args(["tests/fixtures/read_file_lines/read_file_lines.tera", "-f", "latte"])
+            .args([
+                "tests/fixtures/read_file_lines/read_file_lines.tera",
+                "-f",
+                "latte",
+            ])
             .assert();
         assert
             .success()
