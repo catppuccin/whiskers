@@ -89,7 +89,11 @@ pub fn read_file_handler(
         let path = template_directory.join(path);
         let contents = fs::read_to_string(&path)
             .map_err(|_| format!("Failed to open file {}", path.display()))?;
-        let content_lines: Vec<&str> = contents.as_str().split('\n').collect();
+        let contents = contents.replace("\r\n", "\n");
+        let content_lines: Vec<&str> = contents
+            .split('\n')
+            .map(|l| l.trim_end_matches('\r'))
+            .collect();
         let end_line: u64 = args
             .get("end_line")
             .unwrap_or(&tera::to_value(content_lines.len())?)
