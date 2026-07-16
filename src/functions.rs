@@ -92,9 +92,7 @@ pub fn read_file_handler(
         let contents = fs::read_to_string(&path)
             .map_err(|_| format!("Failed to open file {}", path.display()))?;
         let contents = contents.replace("\r\n", "\n").replace('\r', "\n");
-        let content_lines: Vec<&str> = contents
-            .split('\n')
-            .collect();
+        let content_lines: Vec<&str> = contents.split('\n').collect();
         let end_line: usize = args
             .get("end_line")
             .unwrap_or(&tera::to_value(content_lines.len())?)
@@ -111,7 +109,11 @@ pub fn read_file_handler(
             ));
         }
         let mut lines = content_lines[start_line - 1..end_line].to_vec();
-        lines.last_mut().expect("could not get last value").to_string().push('\n');
+        lines
+            .last_mut()
+            .expect("could not get last value")
+            .to_string()
+            .push('\n');
         Ok(tera::to_value(lines.join("\n"))?)
     }
 }
