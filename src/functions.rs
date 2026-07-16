@@ -111,7 +111,7 @@ pub fn read_file_handler(
         let mut lines = content_lines[start_line - 1..end_line].to_vec();
         lines
             .last_mut()
-            .expect("could not get last value")
+            .ok_or_else(|| tera::Error::msg("could not read last value"))?
             .to_string()
             .push('\n');
         Ok(tera::to_value(lines.join("\n"))?)
