@@ -81,40 +81,37 @@ pub fn read_file_handler(
                 .ok_or_else(|| tera::Error::msg("path is required"))?
                 .clone(),
         )?;
-        let start_line: u64 = args
+        let start_line: usize = args
             .get("start_line")
             .unwrap_or(&tera::to_value(1)?)
             .as_u64()
-            .ok_or_else(|| tera::Error::msg("start_line must be a usize"))?;
+            .ok_or_else(|| tera::Error::msg("start_line must be a usize"))?
+            .try_into()
+            .map_err(|_| tera::Error::msg("start_line must be a usize"))?;
         let path = template_directory.join(path);
         let contents = fs::read_to_string(&path)
             .map_err(|_| format!("Failed to open file {}", path.display()))?;
-        let contents = contents.replace("\r\n", "\n");
+        let contents = contents.replace("\r\n", "\n").replace('\r', "\n");
         let content_lines: Vec<&str> = contents
             .split('\n')
-            .map(|l| l.trim_end_matches('\r'))
             .collect();
-        let end_line: u64 = args
+        let end_line: usize = args
             .get("end_line")
             .unwrap_or(&tera::to_value(content_lines.len())?)
             .as_u64()
-            .ok_or_else(|| tera::Error::msg("end_line must be a usize"))?;
+            .ok_or_else(|| tera::Error::msg("end_line must be a usize"))?
+            .try_into()
+            .map_err(|_| tera::Error::msg("end_line must be a usize"))?;
         if start_line > end_line {
             return Err(tera::Error::msg("start_line is greater than end_line"));
         }
-        let start_line: usize = start_line
-            .try_into()
-            .map_err(|_| tera::Error::msg("start_line must be a usize"))?;
-        let end_line: usize = end_line
-            .try_into()
-            .map_err(|_| tera::Error::msg("end_line must be a usize"))?;
         if end_line > content_lines.len() {
             return Err(tera::Error::msg(
                 "end_line is greater than the number of lines in the file",
             ));
         }
-        let lines: &[&str] = &content_lines[start_line - 1..end_line];
-        let lines = lines.join("\n");
-        Ok(tera::to_value(lines)?)
+        let mut lines = content_lines[start_line - 1..end_line].to_vec();
+        lines.last_mut().expect("could not get last value").to_string().push('\n');
+        Ok(tera::to_value(lines.join("\n"))?)
     }
 }
