@@ -90,8 +90,9 @@ pub fn read_file_handler(
             .map_err(|_| tera::Error::msg("start_line must be a usize"))?;
         let path = template_directory.join(path);
         let contents = fs::read_to_string(&path)
-            .map_err(|_| format!("Failed to open file {}", path.display()))?;
-        let contents = contents.replace("\r\n", "\n").replace('\r', "\n");
+            .map_err(|_| format!("Failed to open file {}", path.display()))?
+            .replace("\r\n", "\n")
+            .replace('\r', "\n");
         let content_lines: Vec<&str> = contents.split('\n').collect();
         let end_line: usize = args
             .get("end_line")
