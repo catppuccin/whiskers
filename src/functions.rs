@@ -112,10 +112,10 @@ pub fn read_file_handler(
                 "end_line is greater than the number of lines in the file",
             ));
         }
-        let line_ending = if contents.ends_with('\n') {
-            "\n"
-        } else if contents.ends_with("\r\n") {
+        let line_ending = if contents.ends_with("\r\n") {
             "\r\n"
+        } else if contents.ends_with('\n') {
+            "\n"
         } else {
             return Err(tera::Error::msg("couldn't get file ending of file"));
         };
