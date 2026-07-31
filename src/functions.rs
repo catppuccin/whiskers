@@ -90,10 +90,16 @@ pub fn read_file_handler(
             .map_err(|_| tera::Error::msg("start_line must be a usize"))?;
         let path = template_directory.join(path);
         let contents = fs::read_to_string(&path)
-            .map_err(|_| format!("Failed to open file {}", path.display()))?
-            .replace("\r\n", "\n")
-            .replace('\r', "\n");
-        let content_lines: Vec<&str> = contents.split('\n').collect();
+            .map_err(|_| format!("Failed to open file {}", path.display()))?;
+        let mut content_lines: Vec<&str> = contents.lines().collect();
+        if contents
+            .chars()
+            .last()
+            .ok_or_else(|| tera::Error::msg("couldn't get last two characters of file"))?
+            == '\n'
+        {
+            content_lines.push("");
+        }
         let end_line: usize = args
             .get("end_line")
             .unwrap_or(&tera::to_value(content_lines.len())?)
@@ -109,12 +115,27 @@ pub fn read_file_handler(
                 "end_line is greater than the number of lines in the file",
             ));
         }
+        let mut line_endings: Vec<char> = Vec::new();
+        for line in &content_lines {
+            let ending = line
+                .chars()
+                .last()
+                .ok_or_else(|| tera::Error::msg("couldn't get last two characters of line"))?;
+            line_endings.push(ending);
+        }
+        let line_ending = if line_endings.iter().all(|&item| item == line_endings[0]) {
+            line_endings[0]
+        } else {
+            return Err(tera::Error::msg(
+                "either line endings are not the same on each line or there are no line endings",
+            ));
+        };
         let mut lines = content_lines[start_line - 1..end_line].to_vec();
         lines
             .last_mut()
             .ok_or_else(|| tera::Error::msg("could not read last value"))?
             .to_string()
-            .push('\n');
+            .push(line_ending);
         Ok(tera::to_value(lines.join("\n"))?)
     }
 }
