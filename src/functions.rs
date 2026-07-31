@@ -112,16 +112,19 @@ pub fn read_file_handler(
                 "end_line is greater than the number of lines in the file",
             ));
         }
-        let line_ending = contents
-            .chars()
-            .last()
-            .ok_or_else(|| tera::Error::msg("couldn't get line ending of file"))?;
+        let line_ending = if contents.ends_with('\n') {
+            "\n"
+        } else if contents.ends_with("\r\n") {
+            "\r\n"
+        } else {
+            return Err(tera::Error::msg("couldn't get file ending of file"));
+        };
         let mut lines = content_lines[start_line - 1..end_line].to_vec();
         lines
             .last_mut()
             .ok_or_else(|| tera::Error::msg("could not read last value"))?
             .to_string()
-            .push(line_ending);
-        Ok(tera::to_value(lines.join("\n"))?)
+            .push_str(line_ending);
+        Ok(tera::to_value(lines.join(line_ending))?)
     }
 }
