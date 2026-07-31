@@ -92,13 +92,10 @@ pub fn read_file_handler(
         let contents = fs::read_to_string(&path)
             .map_err(|_| format!("Failed to open file {}", path.display()))?;
         let mut content_lines: Vec<&str> = contents.lines().collect();
-        if contents
-            .chars()
-            .last()
-            .ok_or_else(|| tera::Error::msg("couldn't get last two characters of file"))?
-            == '\n'
-        {
+        if contents.ends_with('\n') || contents.ends_with("\r\n") {
             content_lines.push("");
+        } else {
+            return Err(tera::Error::msg("couldn't get file ending of file"));
         }
         let end_line: usize = args
             .get("end_line")
@@ -115,21 +112,10 @@ pub fn read_file_handler(
                 "end_line is greater than the number of lines in the file",
             ));
         }
-        let mut line_endings: Vec<char> = Vec::new();
-        for line in &content_lines {
-            let ending = line
-                .chars()
-                .last()
-                .ok_or_else(|| tera::Error::msg("couldn't get last two characters of line"))?;
-            line_endings.push(ending);
-        }
-        let line_ending = if line_endings.iter().all(|&item| item == line_endings[0]) {
-            line_endings[0]
-        } else {
-            return Err(tera::Error::msg(
-                "either line endings are not the same on each line or there are no line endings",
-            ));
-        };
+        let line_ending = contents
+            .chars()
+            .last()
+            .ok_or_else(|| tera::Error::msg("couldn't get line ending of file"))?;
         let mut lines = content_lines[start_line - 1..end_line].to_vec();
         lines
             .last_mut()
