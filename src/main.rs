@@ -243,7 +243,7 @@ fn make_tera_context(
                     *v = merge_values(v, value);
                 })
                 .or_insert(
-                    tera::to_value(value)
+                    tera::value::Value::try_from_serializable(&value)
                         .into_diagnostic()
                         .wrap_err_with(|| format!("Value of {key} override is invalid"))?,
                 );

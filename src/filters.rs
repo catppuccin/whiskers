@@ -25,7 +25,7 @@ pub fn mix(
 
     let result = Color::mix(&base, &blend, amount)?;
 
-    Ok(tera::to_value(result)?)
+    Ok(tera::value::Value::try_from_serializable(&result)?)
 }
 
 pub fn modify(
@@ -35,16 +35,24 @@ pub fn modify(
     let color: Color = tera::from_value(value.clone())?;
     if let Some(hue) = args.get("hue") {
         let hue = tera::from_value(hue.clone())?;
-        Ok(tera::to_value(color.mod_hue(hue)?)?)
+        Ok(tera::value::Value::try_from_serializable(
+            &color.mod_hue(hue)?,
+        )?)
     } else if let Some(saturation) = args.get("saturation") {
         let saturation = tera::from_value(saturation.clone())?;
-        Ok(tera::to_value(color.mod_saturation(saturation)?)?)
+        Ok(tera::value::Value::try_from_serializable(
+            &color.mod_saturation(saturation)?,
+        )?)
     } else if let Some(lightness) = args.get("lightness") {
         let lightness = tera::from_value(lightness.clone())?;
-        Ok(tera::to_value(color.mod_lightness(lightness)?)?)
+        Ok(tera::value::Value::try_from_serializable(
+            &color.mod_lightness(lightness)?,
+        )?)
     } else if let Some(opacity) = args.get("opacity") {
         let opacity = tera::from_value(opacity.clone())?;
-        Ok(tera::to_value(color.mod_opacity(opacity)?)?)
+        Ok(tera::value::Value::try_from_serializable(
+            &color.mod_opacity(opacity)?,
+        )?)
     } else {
         Ok(value.clone())
     }
@@ -57,16 +65,24 @@ pub fn add(
     let color: Color = tera::from_value(value.clone())?;
     if let Some(hue) = args.get("hue") {
         let hue = tera::from_value(hue.clone())?;
-        Ok(tera::to_value(color.add_hue(hue)?)?)
+        Ok(tera::value::Value::try_from_serializable(
+            &color.add_hue(hue)?,
+        )?)
     } else if let Some(saturation) = args.get("saturation") {
         let saturation = tera::from_value(saturation.clone())?;
-        Ok(tera::to_value(color.add_saturation(saturation)?)?)
+        Ok(tera::value::Value::try_from_serializable(
+            &color.add_saturation(saturation)?,
+        )?)
     } else if let Some(lightness) = args.get("lightness") {
         let lightness = tera::from_value(lightness.clone())?;
-        Ok(tera::to_value(color.add_lightness(lightness)?)?)
+        Ok(tera::value::Value::try_from_serializable(
+            &color.add_lightness(lightness)?,
+        )?)
     } else if let Some(opacity) = args.get("opacity") {
         let opacity = tera::from_value(opacity.clone())?;
-        Ok(tera::to_value(color.add_opacity(opacity)?)?)
+        Ok(tera::value::Value::try_from_serializable(
+            &color.add_opacity(opacity)?,
+        )?)
     } else {
         Ok(value.clone())
     }
@@ -79,16 +95,24 @@ pub fn sub(
     let color: Color = tera::from_value(value.clone())?;
     if let Some(hue) = args.get("hue") {
         let hue = tera::from_value(hue.clone())?;
-        Ok(tera::to_value(color.sub_hue(hue)?)?)
+        Ok(tera::value::Value::try_from_serializable(
+            &color.sub_hue(hue)?,
+        )?)
     } else if let Some(saturation) = args.get("saturation") {
         let saturation = tera::from_value(saturation.clone())?;
-        Ok(tera::to_value(color.sub_saturation(saturation)?)?)
+        Ok(tera::value::Value::try_from_serializable(
+            &color.sub_saturation(saturation)?,
+        )?)
     } else if let Some(lightness) = args.get("lightness") {
         let lightness = tera::from_value(lightness.clone())?;
-        Ok(tera::to_value(color.sub_lightness(lightness)?)?)
+        Ok(tera::value::Value::try_from_serializable(
+            &color.sub_lightness(lightness)?,
+        )?)
     } else if let Some(opacity) = args.get("opacity") {
         let opacity = tera::from_value(opacity.clone())?;
-        Ok(tera::to_value(color.sub_opacity(opacity)?)?)
+        Ok(tera::value::Value::try_from_serializable(
+            &color.sub_opacity(opacity)?,
+        )?)
     } else {
         Ok(value.clone())
     }
@@ -117,7 +141,7 @@ pub fn urlencode_lzma(
     writer.write_all(&packed)?;
     let _ = writer.write(&[])?;
     let encoded = base64::engine::general_purpose::URL_SAFE.encode(compressed);
-    Ok(tera::to_value(encoded)?)
+    Ok(tera::value::Value::try_from_serializable(&encoded)?)
 }
 
 pub fn trunc(
@@ -130,7 +154,9 @@ pub fn trunc(
             .ok_or_else(|| tera::Error::message("number of places is required"))?
             .clone(),
     )?;
-    Ok(tera::to_value(format!("{value:.places$}"))?)
+    Ok(tera::value::Value::try_from_serializable(&format!(
+        "{value:.places$}"
+    ))?)
 }
 
 pub fn css_rgb(
@@ -139,7 +165,9 @@ pub fn css_rgb(
 ) -> Result<tera::Value, tera::Error> {
     let color: Color = tera::from_value(value.clone())?;
     let color: farver::RGB = (&color).into();
-    Ok(tera::to_value(color.to_string())?)
+    Ok(tera::value::Value::try_from_serializable(
+        &color.to_string(),
+    )?)
 }
 
 pub fn hex(
@@ -147,7 +175,7 @@ pub fn hex(
     _args: &HashMap<String, tera::Value>,
 ) -> Result<tera::Value, tera::Error> {
     let color: Color = tera::from_value(value.clone())?;
-    Ok(tera::to_value(color.hex)?)
+    Ok(tera::value::Value::try_from_serializable(&color.hex)?)
 }
 
 pub fn css_rgba(
@@ -156,7 +184,9 @@ pub fn css_rgba(
 ) -> Result<tera::Value, tera::Error> {
     let color: Color = tera::from_value(value.clone())?;
     let color: farver::RGBA = (&color).into();
-    Ok(tera::to_value(color.to_string())?)
+    Ok(tera::value::Value::try_from_serializable(
+        &color.to_string(),
+    )?)
 }
 
 pub fn css_hsl(
@@ -165,7 +195,9 @@ pub fn css_hsl(
 ) -> Result<tera::Value, tera::Error> {
     let color: Color = tera::from_value(value.clone())?;
     let color: farver::HSL = (&color).into();
-    Ok(tera::to_value(color.to_string())?)
+    Ok(tera::value::Value::try_from_serializable(
+        &color.to_string(),
+    )?)
 }
 
 pub fn css_hsla(
@@ -174,5 +206,7 @@ pub fn css_hsla(
 ) -> Result<tera::Value, tera::Error> {
     let color: Color = tera::from_value(value.clone())?;
     let color: farver::HSLA = (&color).into();
-    Ok(tera::to_value(color.to_string())?)
+    Ok(tera::value::Value::try_from_serializable(
+        &color.to_string(),
+    )?)
 }

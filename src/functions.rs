@@ -27,7 +27,7 @@ pub fn if_fn(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera::E
 pub fn object(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera::Error> {
     // sorting the args gives us stable output
     let args: BTreeMap<_, _> = args.iter().collect();
-    Ok(tera::to_value(args)?)
+    Ok(tera::value::Value::try_from_serializable(&args)?)
 }
 
 pub fn css_rgb(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera::Error> {
@@ -38,7 +38,9 @@ pub fn css_rgb(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera:
     )?;
 
     let color: farver::RGB = (&color).into();
-    Ok(tera::to_value(color.to_string())?)
+    Ok(tera::value::Value::try_from_serializable(
+        &color.to_string(),
+    )?)
 }
 
 pub fn css_rgba(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera::Error> {
@@ -48,7 +50,9 @@ pub fn css_rgba(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera
             .clone(),
     )?;
     let color: farver::RGBA = (&color).into();
-    Ok(tera::to_value(color.to_string())?)
+    Ok(tera::value::Value::try_from_serializable(
+        &color.to_string(),
+    )?)
 }
 
 pub fn css_hsl(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera::Error> {
@@ -59,7 +63,9 @@ pub fn css_hsl(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera:
     )?;
 
     let color: farver::HSL = (&color).into();
-    Ok(tera::to_value(color.to_string())?)
+    Ok(tera::value::Value::try_from_serializable(
+        &color.to_string(),
+    )?)
 }
 
 pub fn css_hsla(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera::Error> {
@@ -69,7 +75,9 @@ pub fn css_hsla(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera
             .clone(),
     )?;
     let color: farver::HSLA = (&color).into();
-    Ok(tera::to_value(color.to_string())?)
+    Ok(tera::value::Value::try_from_serializable(
+        &color.to_string(),
+    )?)
 }
 
 pub fn read_file_handler(
@@ -84,6 +92,6 @@ pub fn read_file_handler(
         let path = template_directory.join(path);
         let contents = fs::read_to_string(&path)
             .map_err(|_| format!("Failed to open file {}", path.display()))?;
-        Ok(tera::to_value(contents)?)
+        Ok(tera::value::Value::try_from_serializable(&contents)?)
     }
 }
