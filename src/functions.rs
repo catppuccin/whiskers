@@ -4,6 +4,8 @@ use std::{
     path::PathBuf,
 };
 
+use serde::Deserialize;
+
 use crate::models::Color;
 
 pub fn if_fn(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera::Error> {
@@ -31,11 +33,12 @@ pub fn object(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera::
 }
 
 pub fn css_rgb(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera::Error> {
-    let color: Color = tera::from_value(
+    let color: Color = Deserialize::deserialize(
         args.get("color")
             .ok_or_else(|| tera::Error::message("color is required"))?
             .clone(),
-    )?;
+    )
+    .map_err(|e| tera::Error::message(e.to_string()))?;
 
     let color: farver::RGB = (&color).into();
     Ok(tera::value::Value::try_from_serializable(
@@ -44,11 +47,12 @@ pub fn css_rgb(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera:
 }
 
 pub fn css_rgba(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera::Error> {
-    let color: Color = tera::from_value(
+    let color: Color = Deserialize::deserialize(
         args.get("color")
             .ok_or_else(|| tera::Error::message("color is required"))?
             .clone(),
-    )?;
+    )
+    .map_err(|e| tera::Error::message(e.to_string()))?;
     let color: farver::RGBA = (&color).into();
     Ok(tera::value::Value::try_from_serializable(
         &color.to_string(),
@@ -56,11 +60,12 @@ pub fn css_rgba(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera
 }
 
 pub fn css_hsl(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera::Error> {
-    let color: Color = tera::from_value(
+    let color: Color = Deserialize::deserialize(
         args.get("color")
             .ok_or_else(|| tera::Error::message("color is required"))?
             .clone(),
-    )?;
+    )
+    .map_err(|e| tera::Error::message(e.to_string()))?;
 
     let color: farver::HSL = (&color).into();
     Ok(tera::value::Value::try_from_serializable(
@@ -69,11 +74,12 @@ pub fn css_hsl(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera:
 }
 
 pub fn css_hsla(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera::Error> {
-    let color: Color = tera::from_value(
+    let color: Color = Deserialize::deserialize(
         args.get("color")
             .ok_or_else(|| tera::Error::message("color is required"))?
             .clone(),
-    )?;
+    )
+    .map_err(|e| tera::Error::message(e.to_string()))?;
     let color: farver::HSLA = (&color).into();
     Ok(tera::value::Value::try_from_serializable(
         &color.to_string(),
@@ -84,14 +90,16 @@ pub fn read_file_handler(
     template_directory: PathBuf,
 ) -> impl Fn(&HashMap<String, tera::Value>) -> Result<tera::Value, tera::Error> {
     move |args| -> Result<tera::Value, tera::Error> {
-        let path: String = tera::from_value(
+        let path: String = Deserialize::deserialize(
             args.get("path")
                 .ok_or_else(|| tera::Error::message("path is required"))?
                 .clone(),
-        )?;
+        )
+        .map_err(|e| tera::Error::message(e.to_string()))?;
         let path = template_directory.join(path);
         let contents = fs::read_to_string(&path)
-            .map_err(|_| format!("Failed to open file {}", path.display()))?;
+            .map_err(|_| format!("Failed to open file {}", path.display()))
+            .map_err(tera::Error::message)?;
         Ok(tera::value::Value::try_from_serializable(&contents)?)
     }
 }
