@@ -112,43 +112,12 @@ pub fn read_file_handler(
                 "end_line is greater than the number of lines in the file",
             ));
         }
-        let first_line: &str = contents
-            .split_inclusive('\n')
-            .next()
-            .ok_or_else(|| tera::Error::msg("couldn't get first line"))?;
-        let first_generated_line_ending = if first_line.ends_with("\r\n") {
+        let line_ending = if contents.ends_with("\r\n") {
             "\r\n"
-        } else if first_line.ends_with('\n') {
+        } else if contents.ends_with('\n') {
             "\n"
         } else {
-            return Err(tera::Error::msg(
-                "couldn't get file ending of the first line of the file",
-            ));
-        };
-        let first_generated_line_ending_format = if first_generated_line_ending == "\r\n" {
-            "crlf"
-        } else if first_generated_line_ending == "\n" {
-            "lf"
-        } else {
-            return Err(tera::Error::msg(
-                "first line ending is not a valid line ending",
-            ));
-        };
-        let line_ending: &str = match args
-            .get("line_ending")
-            .and_then(|v| v.as_str())
-            .unwrap_or(first_generated_line_ending_format)
-            .to_string()
-            .to_lowercase()
-            .as_str()
-        {
-            "crlf" => "\r\n",
-            "lf" => "\n",
-            x => {
-                return Err(tera::Error::msg(format!(
-                    "line_ending ({x}) is not a valid format"
-                )))
-            }
+            return Err(tera::Error::msg("couldn't get file ending of file"));
         };
         let mut lines = content_lines[start_line - 1..end_line].to_vec();
         lines
