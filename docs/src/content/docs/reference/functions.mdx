@@ -58,6 +58,9 @@ of the [existing Tera built-ins](https://keats.github.io/tera/docs/#built-ins).
   - **`end_line`**: `u64`
     - **Description**: Last line to read (inclusive).
     - **Default**: Last line of the file
+  - **`line_ending`**: `crlf` or `lf`
+    - **Description**: Format of line ending to use. Forces input file's line endings to be converted to the set value's format.
+    - **Default**: First newline's format.
 - **Examples**
   - `read_file(path="abc.txt")` ⇒ `abc`
   - `read_file(path="abc.txt", first_line=1, last_line=1)` ⇒ `abc`
