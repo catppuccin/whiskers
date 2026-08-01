@@ -9,16 +9,16 @@ use crate::models::Color;
 pub fn if_fn(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera::Error> {
     let cond = args
         .get("cond")
-        .ok_or_else(|| tera::Error::msg("cond is required"))?
+        .ok_or_else(|| tera::Error::message("cond is required"))?
         .as_bool()
-        .ok_or_else(|| tera::Error::msg("cond must be a boolean"))?;
+        .ok_or_else(|| tera::Error::message("cond must be a boolean"))?;
     let t = args
         .get("t")
-        .ok_or_else(|| tera::Error::msg("t is required"))?
+        .ok_or_else(|| tera::Error::message("t is required"))?
         .clone();
     let f = args
         .get("f")
-        .ok_or_else(|| tera::Error::msg("f is required"))?
+        .ok_or_else(|| tera::Error::message("f is required"))?
         .clone();
 
     Ok(if cond { t } else { f })
@@ -33,7 +33,7 @@ pub fn object(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera::
 pub fn css_rgb(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera::Error> {
     let color: Color = tera::from_value(
         args.get("color")
-            .ok_or_else(|| tera::Error::msg("color is required"))?
+            .ok_or_else(|| tera::Error::message("color is required"))?
             .clone(),
     )?;
 
@@ -44,7 +44,7 @@ pub fn css_rgb(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera:
 pub fn css_rgba(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera::Error> {
     let color: Color = tera::from_value(
         args.get("color")
-            .ok_or_else(|| tera::Error::msg("color is required"))?
+            .ok_or_else(|| tera::Error::message("color is required"))?
             .clone(),
     )?;
     let color: farver::RGBA = (&color).into();
@@ -54,7 +54,7 @@ pub fn css_rgba(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera
 pub fn css_hsl(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera::Error> {
     let color: Color = tera::from_value(
         args.get("color")
-            .ok_or_else(|| tera::Error::msg("color is required"))?
+            .ok_or_else(|| tera::Error::message("color is required"))?
             .clone(),
     )?;
 
@@ -65,7 +65,7 @@ pub fn css_hsl(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera:
 pub fn css_hsla(args: &HashMap<String, tera::Value>) -> Result<tera::Value, tera::Error> {
     let color: Color = tera::from_value(
         args.get("color")
-            .ok_or_else(|| tera::Error::msg("color is required"))?
+            .ok_or_else(|| tera::Error::message("color is required"))?
             .clone(),
     )?;
     let color: farver::HSLA = (&color).into();
@@ -78,7 +78,7 @@ pub fn read_file_handler(
     move |args| -> Result<tera::Value, tera::Error> {
         let path: String = tera::from_value(
             args.get("path")
-                .ok_or_else(|| tera::Error::msg("path is required"))?
+                .ok_or_else(|| tera::Error::message("path is required"))?
                 .clone(),
         )?;
         let path = template_directory.join(path);

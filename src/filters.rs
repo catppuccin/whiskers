@@ -14,14 +14,14 @@ pub fn mix(
     let base: Color = tera::from_value(value.clone())?;
     let blend: Color = tera::from_value(
         args.get("color")
-            .ok_or_else(|| tera::Error::msg("blend color is required"))?
+            .ok_or_else(|| tera::Error::message("blend color is required"))?
             .clone(),
     )?;
     let amount = args
         .get("amount")
-        .ok_or_else(|| tera::Error::msg("blend amount is required"))?
+        .ok_or_else(|| tera::Error::message("blend amount is required"))?
         .as_f64()
-        .ok_or_else(|| tera::Error::msg("blend amount must be a number"))?;
+        .ok_or_else(|| tera::Error::message("blend amount must be a number"))?;
 
     let result = Color::mix(&base, &blend, amount)?;
 
@@ -103,7 +103,7 @@ pub fn urlencode_lzma(
     // 2. compress the messagepacked data with lzma (v1, preset 9)
     // 3. urlsafe base64 encode the compressed data
     let value: BTreeMap<String, tera::Value> = tera::from_value(value.clone())?;
-    let packed = rmp_serde::to_vec(&value).map_err(|e| tera::Error::msg(e.to_string()))?;
+    let packed = rmp_serde::to_vec(&value).map_err(|e| tera::Error::message(e.to_string()))?;
     let mut options = lzma_rust::LZMA2Options::with_preset(9);
     options.dict_size = lzma_rust::LZMA2Options::DICT_SIZE_DEFAULT;
     let mut compressed = Vec::new();
@@ -127,7 +127,7 @@ pub fn trunc(
     let value: f64 = tera::from_value(value.clone())?;
     let places: usize = tera::from_value(
         args.get("places")
-            .ok_or_else(|| tera::Error::msg("number of places is required"))?
+            .ok_or_else(|| tera::Error::message("number of places is required"))?
             .clone(),
     )?;
     Ok(tera::to_value(format!("{value:.places$}"))?)
