@@ -43,6 +43,11 @@ of the [existing Tera built-ins](https://keats.github.io/tera/docs/#built-ins).
 
 ## `read_file` {#functions-read_file}
 
+> [!WARNING]
+> Ensure input file and template have the same line ending format as to avoid mixing line endings in the output file.
+>
+> This is a rare bug that only happens in specific circumstances and should not happen if you open and save both files in the same editor.
+
 - **Description**: Read and include the contents of a file.
 - **Attributes**
   - **`path`**: `string`
@@ -53,4 +58,6 @@ of the [existing Tera built-ins](https://keats.github.io/tera/docs/#built-ins).
   - **`end_line`**: `u64`
     - **Description**: Last line to read (inclusive).
     - **Default**: Last line of the file
-- **Example**: `read_file(path="abc.txt")` ⇒ `abc`
+- **Examples**
+  - `read_file(path="abc.txt")` ⇒ `abc`
+  - `read_file(path="abc.txt", first_line=1, last_line=1)` ⇒ `abc`
