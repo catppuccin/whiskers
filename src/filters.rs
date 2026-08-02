@@ -1,27 +1,23 @@
-use std::{
-    collections::{BTreeMap, HashMap},
-    io::Write,
-};
+use std::{collections::BTreeMap, io::Write};
 
 use base64::Engine as _;
 use serde::Deserialize;
+use tera::{Kwargs, State};
 
 use crate::models::Color;
 
-pub fn mix(
-    value: &tera::Value,
-    args: &HashMap<String, tera::Value>,
-) -> Result<tera::Value, tera::Error> {
+pub fn mix(value: &tera::Value, kwargs: Kwargs, _: &State) -> Result<tera::Value, tera::Error> {
     let base: Color =
         Deserialize::deserialize(value.clone()).map_err(|e| tera::Error::message(e.to_string()))?;
     let blend: Color = Deserialize::deserialize(
-        args.get("color")
+        kwargs
+            .get::<&tera::Value>("color")?
             .ok_or_else(|| tera::Error::message("blend color is required"))?
             .clone(),
     )
     .map_err(|e| tera::Error::message(e.to_string()))?;
-    let amount = args
-        .get("amount")
+    let amount = kwargs
+        .get::<&tera::Value>("amount")?
         .ok_or_else(|| tera::Error::message("blend amount is required"))?
         .as_f64()
         .ok_or_else(|| tera::Error::message("blend amount must be a number"))?;
@@ -31,31 +27,28 @@ pub fn mix(
     Ok(tera::value::Value::try_from_serializable(&result)?)
 }
 
-pub fn modify(
-    value: &tera::Value,
-    args: &HashMap<String, tera::Value>,
-) -> Result<tera::Value, tera::Error> {
+pub fn modify(value: &tera::Value, kwargs: Kwargs, _: &State) -> Result<tera::Value, tera::Error> {
     let color: Color =
         Deserialize::deserialize(value.clone()).map_err(|e| tera::Error::message(e.to_string()))?;
-    if let Some(hue) = args.get("hue") {
+    if let Some(hue) = kwargs.get::<&tera::Value>("hue")? {
         let hue = Deserialize::deserialize(hue.clone())
             .map_err(|e| tera::Error::message(e.to_string()))?;
         Ok(tera::value::Value::try_from_serializable(
             &color.mod_hue(hue)?,
         )?)
-    } else if let Some(saturation) = args.get("saturation") {
+    } else if let Some(saturation) = kwargs.get::<&tera::Value>("saturation")? {
         let saturation = Deserialize::deserialize(saturation.clone())
             .map_err(|e| tera::Error::message(e.to_string()))?;
         Ok(tera::value::Value::try_from_serializable(
             &color.mod_saturation(saturation)?,
         )?)
-    } else if let Some(lightness) = args.get("lightness") {
+    } else if let Some(lightness) = kwargs.get::<&tera::Value>("lightness")? {
         let lightness = Deserialize::deserialize(lightness.clone())
             .map_err(|e| tera::Error::message(e.to_string()))?;
         Ok(tera::value::Value::try_from_serializable(
             &color.mod_lightness(lightness)?,
         )?)
-    } else if let Some(opacity) = args.get("opacity") {
+    } else if let Some(opacity) = kwargs.get::<&tera::Value>("opacity")? {
         let opacity = Deserialize::deserialize(opacity.clone())
             .map_err(|e| tera::Error::message(e.to_string()))?;
         Ok(tera::value::Value::try_from_serializable(
@@ -66,31 +59,28 @@ pub fn modify(
     }
 }
 
-pub fn add(
-    value: &tera::Value,
-    args: &HashMap<String, tera::Value>,
-) -> Result<tera::Value, tera::Error> {
+pub fn add(value: &tera::Value, kwargs: Kwargs, _: &State) -> Result<tera::Value, tera::Error> {
     let color: Color =
         Deserialize::deserialize(value.clone()).map_err(|e| tera::Error::message(e.to_string()))?;
-    if let Some(hue) = args.get("hue") {
+    if let Some(hue) = kwargs.get::<&tera::Value>("hue")? {
         let hue = Deserialize::deserialize(hue.clone())
             .map_err(|e| tera::Error::message(e.to_string()))?;
         Ok(tera::value::Value::try_from_serializable(
             &color.add_hue(hue)?,
         )?)
-    } else if let Some(saturation) = args.get("saturation") {
+    } else if let Some(saturation) = kwargs.get::<&tera::Value>("saturation")? {
         let saturation = Deserialize::deserialize(saturation.clone())
             .map_err(|e| tera::Error::message(e.to_string()))?;
         Ok(tera::value::Value::try_from_serializable(
             &color.add_saturation(saturation)?,
         )?)
-    } else if let Some(lightness) = args.get("lightness") {
+    } else if let Some(lightness) = kwargs.get::<&tera::Value>("lightness")? {
         let lightness = Deserialize::deserialize(lightness.clone())
             .map_err(|e| tera::Error::message(e.to_string()))?;
         Ok(tera::value::Value::try_from_serializable(
             &color.add_lightness(lightness)?,
         )?)
-    } else if let Some(opacity) = args.get("opacity") {
+    } else if let Some(opacity) = kwargs.get::<&tera::Value>("opacity")? {
         let opacity = Deserialize::deserialize(opacity.clone())
             .map_err(|e| tera::Error::message(e.to_string()))?;
         Ok(tera::value::Value::try_from_serializable(
@@ -101,31 +91,28 @@ pub fn add(
     }
 }
 
-pub fn sub(
-    value: &tera::Value,
-    args: &HashMap<String, tera::Value>,
-) -> Result<tera::Value, tera::Error> {
+pub fn sub(value: &tera::Value, kwargs: Kwargs, _: &State) -> Result<tera::Value, tera::Error> {
     let color: Color =
         Deserialize::deserialize(value.clone()).map_err(|e| tera::Error::message(e.to_string()))?;
-    if let Some(hue) = args.get("hue") {
+    if let Some(hue) = kwargs.get::<&tera::Value>("hue")? {
         let hue = Deserialize::deserialize(hue.clone())
             .map_err(|e| tera::Error::message(e.to_string()))?;
         Ok(tera::value::Value::try_from_serializable(
             &color.sub_hue(hue)?,
         )?)
-    } else if let Some(saturation) = args.get("saturation") {
+    } else if let Some(saturation) = kwargs.get::<&tera::Value>("saturation")? {
         let saturation = Deserialize::deserialize(saturation.clone())
             .map_err(|e| tera::Error::message(e.to_string()))?;
         Ok(tera::value::Value::try_from_serializable(
             &color.sub_saturation(saturation)?,
         )?)
-    } else if let Some(lightness) = args.get("lightness") {
+    } else if let Some(lightness) = kwargs.get::<&tera::Value>("lightness")? {
         let lightness = Deserialize::deserialize(lightness.clone())
             .map_err(|e| tera::Error::message(e.to_string()))?;
         Ok(tera::value::Value::try_from_serializable(
             &color.sub_lightness(lightness)?,
         )?)
-    } else if let Some(opacity) = args.get("opacity") {
+    } else if let Some(opacity) = kwargs.get::<&tera::Value>("opacity")? {
         let opacity = Deserialize::deserialize(opacity.clone())
             .map_err(|e| tera::Error::message(e.to_string()))?;
         Ok(tera::value::Value::try_from_serializable(
@@ -138,7 +125,8 @@ pub fn sub(
 
 pub fn urlencode_lzma(
     value: &tera::Value,
-    _args: &HashMap<String, tera::Value>,
+    _kwargs: Kwargs,
+    _: &State,
 ) -> Result<tera::Value, tera::Error> {
     // encode the data with the following process:
     // 1. messagepack the data
@@ -164,14 +152,12 @@ pub fn urlencode_lzma(
     Ok(tera::value::Value::try_from_serializable(&encoded)?)
 }
 
-pub fn trunc(
-    value: &tera::Value,
-    args: &HashMap<String, tera::Value>,
-) -> Result<tera::Value, tera::Error> {
+pub fn trunc(value: &tera::Value, kwargs: Kwargs, _: &State) -> Result<tera::Value, tera::Error> {
     let value: f64 =
         Deserialize::deserialize(value.clone()).map_err(|e| tera::Error::message(e.to_string()))?;
     let places: usize = Deserialize::deserialize(
-        args.get("places")
+        kwargs
+            .get::<&tera::Value>("places")?
             .ok_or_else(|| tera::Error::message("number of places is required"))?
             .clone(),
     )
@@ -183,7 +169,8 @@ pub fn trunc(
 
 pub fn css_rgb(
     value: &tera::Value,
-    _args: &HashMap<String, tera::Value>,
+    _kwargs: Kwargs,
+    _: &State,
 ) -> Result<tera::Value, tera::Error> {
     let color: Color =
         Deserialize::deserialize(value.clone()).map_err(|e| tera::Error::message(e.to_string()))?;
@@ -193,10 +180,7 @@ pub fn css_rgb(
     )?)
 }
 
-pub fn hex(
-    value: &tera::Value,
-    _args: &HashMap<String, tera::Value>,
-) -> Result<tera::Value, tera::Error> {
+pub fn hex(value: &tera::Value, _kwargs: Kwargs, _: &State) -> Result<tera::Value, tera::Error> {
     let color: Color =
         Deserialize::deserialize(value.clone()).map_err(|e| tera::Error::message(e.to_string()))?;
     Ok(tera::value::Value::try_from_serializable(&color.hex)?)
@@ -204,7 +188,8 @@ pub fn hex(
 
 pub fn css_rgba(
     value: &tera::Value,
-    _args: &HashMap<String, tera::Value>,
+    _kwargs: Kwargs,
+    _: &State,
 ) -> Result<tera::Value, tera::Error> {
     let color: Color =
         Deserialize::deserialize(value.clone()).map_err(|e| tera::Error::message(e.to_string()))?;
@@ -216,7 +201,8 @@ pub fn css_rgba(
 
 pub fn css_hsl(
     value: &tera::Value,
-    _args: &HashMap<String, tera::Value>,
+    _kwargs: Kwargs,
+    _: &State,
 ) -> Result<tera::Value, tera::Error> {
     let color: Color =
         Deserialize::deserialize(value.clone()).map_err(|e| tera::Error::message(e.to_string()))?;
@@ -228,7 +214,8 @@ pub fn css_hsl(
 
 pub fn css_hsla(
     value: &tera::Value,
-    _args: &HashMap<String, tera::Value>,
+    _kwargs: Kwargs,
+    _: &State,
 ) -> Result<tera::Value, tera::Error> {
     let color: Color =
         Deserialize::deserialize(value.clone()).map_err(|e| tera::Error::message(e.to_string()))?;
