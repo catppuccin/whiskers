@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use catppuccin::FlavorName;
+use serde::Deserialize;
 
 pub type Matrix = HashMap<String, Vec<String>>;
 
@@ -35,8 +36,9 @@ pub fn from_values(
             }
             tera::Value::Object(o) => {
                 let (key, value) = o.into_iter().next().ok_or(Error::InvalidObjectElement)?;
-                let value: Vec<String> =
-                    tera::from_value(value).map_err(|_| Error::InvalidObjectElement)?;
+                let value: Vec<String> = Deserialize::deserialize(&value)
+                    .map_err(|e| tera::Error::message(e.to_string()))?
+                    .map_err(|_| Error::InvalidObjectElement)?;
                 Ok((key, value))
             }
             _ => Err(Error::InvalidElement),

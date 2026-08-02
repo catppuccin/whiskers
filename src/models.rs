@@ -88,7 +88,7 @@ macro_rules! format_hex {
 fn format_hex(r: u8, g: u8, b: u8, a: u8, hex_format: &str) -> tera::TeraResult<String> {
     Tera::one_off(
         hex_format,
-        &tera::Context::from_serialize(json!({
+        &tera::Context::from_serialize(&json!({
             "r": format!("{r:02x}"),
             "g": format!("{g:02x}"),
             "b": format!("{b:02x}"),
