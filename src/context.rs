@@ -1,19 +1,20 @@
-use serde_json::json;
-
 /// Recursively merge two tera values into one.
 #[must_use]
 pub fn merge_values(a: &tera::Value, b: &tera::Value) -> tera::Value {
-    match (a, b) {
+    match (a.as_map(), b.as_map()) {
         // if both are objects, merge them
-        (tera::Value::Object(a), tera::Value::Object(b)) => {
+        (Some(a), Some(b)) => {
             let mut result = a.clone();
             for (k, v) in b {
-                result.insert(k.clone(), merge_values(a.get(k).unwrap_or(&json!(null)), v));
+                result.insert(
+                    k.clone(),
+                    merge_values(a.get(k).unwrap_or(&tera::Value::none()), v),
+                );
             }
-            tera::Value::Object(result)
+            tera::Value::from(result)
         }
         // otherwise, use the second value
-        (_, b) => b.clone(),
+        _ => b.clone(),
     }
 }
 
