@@ -92,7 +92,7 @@ pub fn read_file_handler(
         let contents = fs::read_to_string(&path)
             .map_err(|_| format!("Failed to open file {}", path.display()))?;
         let mut content_lines: Vec<&str> = contents.lines().collect();
-        if contents.ends_with('\n') || contents.ends_with("\r\n") {
+        if contents.ends_with('\n') {
             content_lines.push("");
         } else {
             return Err(tera::Error::msg("couldn't get file ending of file"));
