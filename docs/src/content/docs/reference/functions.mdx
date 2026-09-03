@@ -43,5 +43,21 @@ of the [existing Tera built-ins](https://keats.github.io/tera/docs/#built-ins).
 
 ## `read_file` {#functions-read_file}
 
-- **Description**: Read and include the contents of a file, path is relative to the template file.
-- **Example**: `read_file(path="abc.txt")` ⇒ `abc`
+> [!WARNING]
+> Ensure the input file and template use the same line-ending format to avoid mixing line endings in the output file.
+>
+> This is rare and should only happen in specific circumstances. It should not happen if both files are opened and saved in the same editor.
+
+- **Description**: Read and include the contents of a file.
+- **Attributes**
+  - **`path`**: `string`
+    - **Description**: Path to the file to read, relative to the template file.
+  - **`start_line`**: `u64` (1-based)
+    - **Description**: First line to read.
+    - **Default**: `1`
+  - **`end_line`**: `u64`
+    - **Description**: Last line to read (inclusive).
+    - **Default**: Last line of the file
+- **Examples**
+  - `read_file(path="abc.txt")` ⇒ `abc`
+  - `read_file(path="abc.txt", first_line=1, last_line=1)` ⇒ `abc`
