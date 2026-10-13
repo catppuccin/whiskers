@@ -25,13 +25,24 @@ pub fn parse(input: &str) -> Result<Document, Error> {
             body: input.to_string(),
         });
     };
-
-    Ok(Document {
-        frontmatter: serde_yaml::from_str(frontmatter).map_err(|e| Error::InvalidYaml {
+    let serialized: HashMap<String, serde_yaml::Value> = serde_yaml::from_str(frontmatter)
+        .map_err(|e| Error::InvalidYaml {
             line: e.location().map(|l| l.line()).unwrap_or_default(),
             column: e.location().map(|l| l.column()).unwrap_or_default(),
             message: e.to_string(),
-        })?,
+        })?;
+    let tera_val = serialized
+        .into_iter()
+        .map(|(k, v)| {
+            (
+                k,
+                tera::Value::try_from_serializable(&v).expect("failed to convert value"),
+            )
+        })
+        .collect::<HashMap<_, _>>();
+
+    Ok(Document {
+        frontmatter: tera_val,
         body: body.to_string(),
     })
 }
