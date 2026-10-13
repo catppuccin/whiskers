@@ -2,25 +2,25 @@
 whiskers:
   version: ^2.0.0
 ---
-{%- macro css_rgb(v) -%}
+{%- component css_rgb(v) -%}
 rgb({{ v.r }}, {{ v.g }}, {{ v.b }})
-{%- endmacro -%}
+{%- endcomponent -%}
 
-{%- macro css_hsl(v) -%}
+{%- component css_hsl(v) -%}
 hsl({{ v.h | round }}, {{ v.s * 100 | round }}%, {{ v.l * 100 | round }}%)
-{%- endmacro -%}
+{%- endcomponent -%}
 
 # {{ flavor.name }}
 
 | Color | Hex | RGB | HSL |
 |-------|-----|-----|-----|
 {%- for _, color in flavor.colors %}
-{{ color.name }} | #{{ color.hex }} | {{ self::css_rgb(v=color.rgb) }} | {{ self::css_hsl(v=color.hsl) }} |
+{{ color.name }} | #{{ color.hex }} | {{ <css_rgb v={color.rgb}> }} | {{ <css_hsl v={color.hsl}> }} |
 {%- endfor %}
 
 {% set orange = red | add(hue=30) -%}
 {% set darkgreen = green | sub(lightness=20) -%}
-red: #{{ red.hex }} / {{ self::css_hsl(v=red.hsl) }}
-orangey: #{{ orange.hex }} / {{ self::css_hsl(v=orange.hsl) }}
-green: #{{ green.hex }} / {{ self::css_hsl(v=green.hsl) }}
-dark green: #{{ darkgreen.hex }} // {{ self::css_hsl(v=darkgreen.hsl) }}
+red: #{{ red.hex }} / {{ <css_hsl v={red.hsl}> }}
+orangey: #{{ orange.hex }} / {{ <css_hsl v={orange.hsl}> }}
+green: #{{ green.hex }} / {{ <css_hsl v={green.hsl}> }}
+dark green: #{{ darkgreen.hex }} // {{ <css_hsl v={darkgreen.hsl}> }}

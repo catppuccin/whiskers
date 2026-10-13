@@ -85,10 +85,10 @@ macro_rules! format_hex {
 }
 
 /// attempt to canonicalize a hex string, using the provided format string.
-fn format_hex(r: u8, g: u8, b: u8, a: u8, hex_format: &str) -> tera::Result<String> {
+fn format_hex(r: u8, g: u8, b: u8, a: u8, hex_format: &str) -> tera::TeraResult<String> {
     Tera::one_off(
         hex_format,
-        &tera::Context::from_serialize(json!({
+        &tera::Context::from_serialize(&json!({
             "r": format!("{r:02x}"),
             "g": format!("{g:02x}"),
             "b": format!("{b:02x}"),
@@ -148,7 +148,7 @@ fn color_from_hex_override(hex: &str, blueprint: &catppuccin::Color) -> Result<C
     })
 }
 
-fn color_from_catppuccin(color: &catppuccin::Color) -> tera::Result<Color> {
+fn color_from_catppuccin(color: &catppuccin::Color) -> tera::TeraResult<Color> {
     let hex = format_hex!(color.rgb.r, color.rgb.g, color.rgb.b, 0xFF)?;
     let rgb: RGB = color.rgb.into();
     let (int24, uint32, sint32) = rgb_to_ints(&rgb, None);
@@ -258,12 +258,12 @@ impl<'a> IntoIterator for &'a Flavor {
     }
 }
 
-fn rgb_to_hex(rgb: &RGB, opacity: u8) -> tera::Result<String> {
+fn rgb_to_hex(rgb: &RGB, opacity: u8) -> tera::TeraResult<String> {
     format_hex!(rgb.r, rgb.g, rgb.b, opacity)
 }
 
 impl Color {
-    fn from_hsla(hsla: farver::HSLA, blueprint: &Self) -> tera::Result<Self> {
+    fn from_hsla(hsla: farver::HSLA, blueprint: &Self) -> tera::TeraResult<Self> {
         let rgb = hsla.to_rgb();
         let rgb = RGB::new(rgb.r.as_u8(), rgb.g.as_u8(), rgb.b.as_u8());
         let hsl = HSL {
@@ -288,7 +288,7 @@ impl Color {
         })
     }
 
-    fn from_rgba(rgba: farver::RGBA, blueprint: &Self) -> tera::Result<Self> {
+    fn from_rgba(rgba: farver::RGBA, blueprint: &Self) -> tera::TeraResult<Self> {
         let hsl = rgba.to_hsl();
         let rgb = RGB::new(rgba.r.as_u8(), rgba.g.as_u8(), rgba.b.as_u8());
         let hsl = HSL {
@@ -313,7 +313,7 @@ impl Color {
         })
     }
 
-    pub fn mix(base: &Self, blend: &Self, amount: f64) -> tera::Result<Self> {
+    pub fn mix(base: &Self, blend: &Self, amount: f64) -> tera::TeraResult<Self> {
         let amount = (amount * 100.0).clamp(0.0, 100.0).round() as u8;
         let blueprint = base;
         let base: farver::RGBA = base.into();
@@ -323,61 +323,61 @@ impl Color {
         Self::from_rgba(result, blueprint)
     }
 
-    pub fn mod_hue(&self, hue: i32) -> tera::Result<Self> {
+    pub fn mod_hue(&self, hue: i32) -> tera::TeraResult<Self> {
         let mut hsl: farver::HSL = self.into();
         hsl.h = farver::deg(hue);
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
-    pub fn add_hue(&self, hue: i32) -> tera::Result<Self> {
+    pub fn add_hue(&self, hue: i32) -> tera::TeraResult<Self> {
         let hsl: farver::HSL = self.into();
         let hsl = hsl.spin(farver::deg(hue));
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
-    pub fn sub_hue(&self, hue: i32) -> tera::Result<Self> {
+    pub fn sub_hue(&self, hue: i32) -> tera::TeraResult<Self> {
         let hsl: farver::HSL = self.into();
         let hsl = hsl.spin(-farver::deg(hue));
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
-    pub fn mod_saturation(&self, saturation: u8) -> tera::Result<Self> {
+    pub fn mod_saturation(&self, saturation: u8) -> tera::TeraResult<Self> {
         let mut hsl: farver::HSL = self.into();
         hsl.s = farver::percent(saturation);
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
-    pub fn add_saturation(&self, saturation: u8) -> tera::Result<Self> {
+    pub fn add_saturation(&self, saturation: u8) -> tera::TeraResult<Self> {
         let hsl: farver::HSL = self.into();
         let hsl = hsl.saturate(farver::percent(saturation));
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
-    pub fn sub_saturation(&self, saturation: u8) -> tera::Result<Self> {
+    pub fn sub_saturation(&self, saturation: u8) -> tera::TeraResult<Self> {
         let hsl: farver::HSL = self.into();
         let hsl = hsl.desaturate(farver::percent(saturation));
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
-    pub fn mod_lightness(&self, lightness: u8) -> tera::Result<Self> {
+    pub fn mod_lightness(&self, lightness: u8) -> tera::TeraResult<Self> {
         let mut hsl: farver::HSL = self.into();
         hsl.l = farver::percent(lightness);
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
-    pub fn add_lightness(&self, lightness: u8) -> tera::Result<Self> {
+    pub fn add_lightness(&self, lightness: u8) -> tera::TeraResult<Self> {
         let hsl: farver::HSL = self.into();
         let hsl = hsl.lighten(farver::percent(lightness));
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
-    pub fn sub_lightness(&self, lightness: u8) -> tera::Result<Self> {
+    pub fn sub_lightness(&self, lightness: u8) -> tera::TeraResult<Self> {
         let hsl: farver::HSL = self.into();
         let hsl = hsl.darken(farver::percent(lightness));
         Self::from_hsla(hsl.to_hsla(), self)
     }
 
-    pub fn mod_opacity(&self, opacity: f32) -> tera::Result<Self> {
+    pub fn mod_opacity(&self, opacity: f32) -> tera::TeraResult<Self> {
         let opacity = (opacity * 255.0).round() as u8;
         let (int24, uint32, sint32) = rgb_to_ints(&self.rgb, Some(opacity));
         Ok(Self {
@@ -390,7 +390,7 @@ impl Color {
         })
     }
 
-    pub fn add_opacity(&self, opacity: f32) -> tera::Result<Self> {
+    pub fn add_opacity(&self, opacity: f32) -> tera::TeraResult<Self> {
         let opacity = (opacity * 255.0).round() as u8;
         let opacity = self.opacity.saturating_add(opacity);
         let (int24, uint32, sint32) = rgb_to_ints(&self.rgb, Some(opacity));
@@ -404,7 +404,7 @@ impl Color {
         })
     }
 
-    pub fn sub_opacity(&self, opacity: f32) -> tera::Result<Self> {
+    pub fn sub_opacity(&self, opacity: f32) -> tera::TeraResult<Self> {
         let opacity = (opacity * 255.0).round() as u8;
         let opacity = self.opacity.saturating_sub(opacity);
         let (int24, uint32, sint32) = rgb_to_ints(&self.rgb, Some(opacity));
