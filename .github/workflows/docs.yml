@@ -1,16 +1,19 @@
-name: Deploy Docs to GH Pages
+name: Docs
 
 on:
   push:
     branches: [main]
     paths:
       - "docs/**"
+      - ".github/workflows/docs.yml"
+  pull_request:
+    paths:
+      - "docs/**"
+      - ".github/workflows/docs.yml"
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 jobs:
   build:
@@ -26,8 +29,11 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    # don't run on forks
-    if: ${{ github.repository == 'catppuccin/whiskers' }}
+    # only deploy from main, don't run on forks
+    if: ${{ github.ref == 'refs/heads/main' && github.repository == 'catppuccin/whiskers' }}
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
