@@ -1,7 +1,6 @@
 use std::path::Path;
 
 use indexmap::IndexMap;
-use itertools::Itertools as _;
 
 use crate::{filters, functions, markdown};
 
@@ -246,6 +245,7 @@ impl markdown::TableDisplay for Function {
                             .inputs
                             .iter()
                             .map(|(k, v)| format!("{k}={v}"))
+                            .collect::<Vec<_>>()
                             .join(", "),
                         output = example.output
                     )
@@ -288,6 +288,7 @@ impl markdown::TableDisplay for Filter {
                                 .inputs
                                 .iter()
                                 .map(|(k, v)| format!("{k}={v}"))
+                                .collect::<Vec<_>>()
                                 .join(", "),
                             output = example.output
                         )

@@ -1,36 +1,15 @@
-use miette::{Diagnostic, IntoDiagnostic};
-use thiserror::Error;
-
-#[derive(Debug, Error, Diagnostic)]
-#[error("Warning: {message}")]
-#[diagnostic(severity(Warning))]
-struct Warning {
-    message: String,
-}
-
-#[derive(Debug, Error, Diagnostic)]
-#[error("Error: {message}")]
-#[diagnostic(severity(Error))]
-struct Err {
-    message: String,
-}
+use miette::{IntoDiagnostic, MietteDiagnostic, Report, Severity};
 
 pub fn warn(msg: impl Into<String>) {
-    eprintln!(
-        "{:?}",
-        miette::Report::new(Warning {
-            message: msg.into()
-        })
-    );
+    let diagnostic =
+        MietteDiagnostic::new(format!("Warning: {}", msg.into())).with_severity(Severity::Warning);
+    eprintln!("{:?}", Report::new(diagnostic));
 }
 
 pub fn err(msg: impl Into<String>) {
-    eprintln!(
-        "{:?}",
-        miette::Report::new(Err {
-            message: msg.into()
-        })
-    );
+    let diagnostic =
+        MietteDiagnostic::new(format!("Error: {}", msg.into())).with_severity(Severity::Error);
+    eprintln!("{:?}", Report::new(diagnostic));
 }
 
 pub fn set_miette_hook() -> miette::Result<()> {

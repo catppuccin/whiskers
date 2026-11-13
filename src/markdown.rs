@@ -1,7 +1,6 @@
 use std::fmt::Display;
 use std::fmt::Write as _;
 
-use itertools::Itertools as _;
 use miette::IntoDiagnostic;
 
 pub trait TableDisplay {
@@ -10,7 +9,11 @@ pub trait TableDisplay {
 }
 
 pub fn display_as_list<T: Display>(items: &[T], heading: &str) -> String {
-    let items = items.iter().map(|item| format!("* {item}")).join("\n");
+    let items = items
+        .iter()
+        .map(|item| format!("* {item}"))
+        .collect::<Vec<_>>()
+        .join("\n");
     format!("### {heading}\n\n{items}")
 }
 
@@ -44,6 +47,7 @@ pub fn display_as_table<T: TableDisplay>(items: &[T], heading: &str) -> miette::
         headings
             .iter()
             .map(|(heading, max_width)| format!("{heading:<max_width$}"))
+            .collect::<Vec<_>>()
             .join(" | ")
     )
     .into_diagnostic()?;
@@ -55,6 +59,7 @@ pub fn display_as_table<T: TableDisplay>(items: &[T], heading: &str) -> miette::
         headings
             .iter()
             .map(|(_, max_width)| "-".repeat(*max_width))
+            .collect::<Vec<_>>()
             .join(" | ")
     )
     .into_diagnostic()?;
@@ -70,6 +75,7 @@ pub fn display_as_table<T: TableDisplay>(items: &[T], heading: &str) -> miette::
                     let max_width = headings[i].1;
                     format!("{cell:<max_width$}")
                 })
+                .collect::<Vec<_>>()
                 .join(" | ")
         )
         .into_diagnostic()?;

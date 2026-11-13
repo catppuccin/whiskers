@@ -1,15 +1,13 @@
 use std::{
     collections::{hash_map::Entry, HashMap},
     env,
-    io::{Read, Write as _},
+    io::{self, Read, Write as _},
     path::{Path, PathBuf},
     process::{self, exit},
 };
 
 use catppuccin::FlavorName;
 use clap::Parser as _;
-use encoding_rs_io::DecodeReaderBytes;
-use itertools::Itertools;
 use miette::{miette, Context as _, IntoDiagnostic};
 use whiskers::{
     cli::{Args, OutputFormat},
@@ -131,15 +129,11 @@ fn main() -> miette::Result<()> {
     let template_directory =
         template_directory(&template_arg).context("Template file does not exist")?;
 
-    let mut decoder = DecodeReaderBytes::new(
-        template_arg
-            .into_reader()
-            .into_diagnostic()
-            .wrap_err("Failed to open template file")?,
-    );
-    let mut template = String::new();
-    decoder
-        .read_to_string(&mut template)
+    let reader = template_arg
+        .into_reader()
+        .into_diagnostic()
+        .wrap_err("Failed to open template file")?;
+    let template = read_template(reader)
         .into_diagnostic()
         .wrap_err("Template could not be read")?;
 
@@ -176,7 +170,7 @@ fn main() -> miette::Result<()> {
         };
 
         render_multi_output(
-            matrix,
+            &matrix,
             &filename_template,
             template_opts.skip_if.as_deref(),
             &ctx,
@@ -403,7 +397,11 @@ fn list_flavors(format: OutputFormat) -> miette::Result<()> {
             }
             // for plain output, we just list the flavor identifiers
             OutputFormat::Plain => {
-                flavors.iter().map(|f| &f.identifier).join("\n")
+                flavors
+                    .iter()
+                    .map(|f| f.identifier.as_str())
+                    .collect::<Vec<_>>()
+                    .join("\n")
             }
             // and finally for human-readable markdown, we list the flavor names
             OutputFormat::Markdown | OutputFormat::MarkdownTable => {
@@ -433,7 +431,7 @@ fn list_accents(format: OutputFormat) {
                     .into_iter()
                     .map(|c| {
                         serde_json::json!({
-                            "name": c.name,
+                            "name": c.name.to_string(),
                             "identifier": c.identifier(),
                         })
                     })
@@ -451,6 +449,7 @@ fn list_accents(format: OutputFormat) {
                 accents
                     .into_iter()
                     .map(catppuccin::Color::identifier)
+                    .collect::<Vec<_>>()
                     .join("\n")
             }
             // and finally for human-readable markdown, we list the names
@@ -462,6 +461,47 @@ fn list_accents(format: OutputFormat) {
             }
         }
     );
+}
+
+fn read_template(mut reader: impl Read) -> io::Result<String> {
+    let mut bytes = Vec::new();
+    reader.read_to_end(&mut bytes)?;
+
+    // A BOM selects lossy decoding. Input without a BOM must be valid UTF-8.
+    match bytes.as_slice() {
+        [0xEF, 0xBB, 0xBF, ..] => {
+            bytes.drain(..3);
+            Ok(String::from_utf8(bytes)
+                .unwrap_or_else(|err| String::from_utf8_lossy(err.as_bytes()).into_owned()))
+        }
+        // Require at least three bytes, as the previous BOM detector did.
+        [0xFF, 0xFE, rest @ ..] if !rest.is_empty() => Ok(decode_utf16(rest, u16::from_le_bytes)),
+        [0xFE, 0xFF, rest @ ..] if !rest.is_empty() => Ok(decode_utf16(rest, u16::from_be_bytes)),
+        _ => String::from_utf8(bytes).map_err(|_| {
+            io::Error::new(
+                io::ErrorKind::InvalidData,
+                "stream did not contain valid UTF-8",
+            )
+        }),
+    }
+}
+
+fn decode_utf16(bytes: &[u8], decode_unit: fn([u8; 2]) -> u16) -> String {
+    let (pairs, remainder) = bytes.as_chunks::<2>();
+    let units = pairs.iter().copied().map(decode_unit);
+    let ends_in_high_surrogate = units
+        .clone()
+        .next_back()
+        .is_some_and(|unit| (0xD800..=0xDBFF).contains(&unit));
+
+    let mut text: String = char::decode_utf16(units)
+        .map(|decoded| decoded.unwrap_or(char::REPLACEMENT_CHARACTER))
+        .collect();
+    // A trailing byte after a high surrogate is part of the same invalid sequence.
+    if !remainder.is_empty() && !ends_in_high_surrogate {
+        text.push(char::REPLACEMENT_CHARACTER);
+    }
+    text
 }
 
 fn template_name(template: &clap_stdin::FileOrStdin) -> String {
@@ -580,7 +620,7 @@ fn render_single_output(
 
 #[allow(clippy::too_many_arguments)]
 fn render_multi_output(
-    matrix: HashMap<String, Vec<String>>,
+    matrix: &Matrix,
     filename_template: &str,
     skip_if: Option<&str>,
     ctx: &tera::Context,
@@ -589,14 +629,9 @@ fn render_multi_output(
     template_name: &str,
     args: &Args,
 ) -> miette::Result<()> {
-    let iterables = matrix
-        .into_iter()
-        .map(|(key, iterable)| iterable.into_iter().map(move |v| (key.clone(), v)))
-        .multi_cartesian_product()
-        .collect::<Vec<_>>();
-    let mut check_results: Vec<CheckResult> = Vec::with_capacity(iterables.len());
+    let mut check_failed = false;
 
-    for iterable in iterables {
+    for iterable in matrix::combinations(matrix) {
         let mut ctx = ctx.clone();
         for (key, value) in iterable {
             // expand flavor automatically to prevent requiring:
@@ -612,7 +647,7 @@ fn render_multi_output(
                     ctx.insert(&color.identifier, &color);
                 }
             } else {
-                ctx.insert(key, &value);
+                ctx.insert(key, value);
             }
         }
 
@@ -629,14 +664,16 @@ fn render_multi_output(
             .wrap_err("Filename template render failed")?;
 
         if args.check.is_some() {
-            check_results
-                .push(check_result_with_file(&filename, &result).context("Check mode failed")?);
+            check_failed |= matches!(
+                check_result_with_file(&filename, &result).context("Check mode failed")?,
+                CheckResult::Fail
+            );
         } else {
             write_template(args.dry_run, &filename, result)?;
         }
     }
 
-    if check_results.iter().any(|r| matches!(r, CheckResult::Fail)) {
+    if check_failed {
         std::process::exit(1);
     }
 

@@ -44,6 +44,37 @@ pub fn from_values(
         .collect::<Result<Matrix, Error>>()
 }
 
+/// Iterates over every combination, with the last axis changing fastest.
+pub fn combinations(matrix: &Matrix) -> impl Iterator<Item = Vec<(&str, &str)>> {
+    let axes = matrix.iter().collect::<Vec<_>>();
+    let mut positions = vec![0; axes.len()];
+    let mut has_next = axes.iter().all(|(_, values)| !values.is_empty());
+
+    std::iter::from_fn(move || {
+        if !has_next {
+            return None;
+        }
+
+        let combination = axes
+            .iter()
+            .zip(&positions)
+            .map(|((key, values), &position)| (key.as_str(), values[position].as_str()))
+            .collect();
+
+        has_next = false;
+        for ((_, values), position) in axes.iter().zip(&mut positions).rev() {
+            *position += 1;
+            if *position < values.len() {
+                has_next = true;
+                break;
+            }
+            *position = 0;
+        }
+
+        Some(combination)
+    })
+}
+
 fn magic_iterables(only_flavor: Option<FlavorName>) -> HashMap<&'static str, Vec<String>> {
     HashMap::from([
         (
@@ -70,4 +101,41 @@ fn ctp_accents() -> Vec<String> {
         .filter(|c| c.accent)
         .map(|c| c.name.identifier().to_string())
         .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{combinations, Matrix};
+
+    #[test]
+    fn iterates_matrix_product() {
+        let matrix = Matrix::from([
+            ("flavor".into(), vec!["latte".into(), "mocha".into()]),
+            ("variant".into(), vec!["light".into(), "dark".into()]),
+        ]);
+        let mut combinations = combinations(&matrix)
+            .map(|mut combination| {
+                combination.sort_unstable();
+                combination
+            })
+            .collect::<Vec<_>>();
+        combinations.sort_unstable();
+
+        assert_eq!(
+            combinations,
+            [
+                vec![("flavor", "latte"), ("variant", "dark")],
+                vec![("flavor", "latte"), ("variant", "light")],
+                vec![("flavor", "mocha"), ("variant", "dark")],
+                vec![("flavor", "mocha"), ("variant", "light")],
+            ]
+        );
+    }
+
+    #[test]
+    fn handles_empty_axes() {
+        assert_eq!(combinations(&Matrix::new()).collect::<Vec<_>>(), [vec![]]);
+        let matrix = Matrix::from([("variant".into(), vec![])]);
+        assert_eq!(combinations(&matrix).count(), 0);
+    }
 }

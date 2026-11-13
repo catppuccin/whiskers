@@ -117,6 +117,25 @@ mod happy_path {
             .stderr(predicate::str::is_empty());
     }
 
+    #[test]
+    fn test_malformed_bom_marked_stdin_is_decoded_lossily() {
+        let cases: &[(&[u8], &str)] = &[
+            (b"\xEF\xBB\xBFa\xFFb", "a\u{FFFD}b"),
+            (b"\xFF\xFEa\x00b", "a\u{FFFD}"),
+            (b"\xFE\xFF\x00a\xD8\x3D\xDC", "a\u{FFFD}"),
+        ];
+
+        for &(bytes, expected) in cases {
+            cargo_bin_cmd!("whiskers")
+                .arg("-")
+                .write_stdin(bytes)
+                .assert()
+                .success()
+                .stdout(expected)
+                .stderr(predicate::str::is_empty());
+        }
+    }
+
     /// Test that the default hex format is rrggbb and full alpha is hidden
     #[test]
     fn test_default_hex_format() {
@@ -154,6 +173,19 @@ mod sad_path {
         cmd.assert()
             .failure()
             .stderr(predicate::str::contains("Template file does not exist"));
+    }
+
+    #[test]
+    fn test_invalid_utf8_stdin_without_recognized_bom_fails() {
+        let cases: &[&[u8]] = &[b"a\xFFb", b"\xFF\xFE", b"\xFE\xFF"];
+        for &bytes in cases {
+            cargo_bin_cmd!("whiskers")
+                .arg("-")
+                .write_stdin(bytes)
+                .assert()
+                .failure()
+                .stderr(predicate::str::contains("Template could not be read"));
+        }
     }
 
     #[test]
