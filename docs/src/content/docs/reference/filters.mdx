@@ -15,7 +15,7 @@ of the [existing Tera built-ins](https://keats.github.io/tera/docs/#built-ins).
   - **`hue`**: `i32` (degrees)
   - **`saturation`**: `u8` (0–100)
   - **`lightness`**: `u8` (0–100)
-  - **`opacity`**: `f32` (0.0–1.0)
+  - **`opacity`**: `u8` (0-100)
 - **Example**: `red | add(hue=30)` ⇒ `ff6666`
 
 ## `sub` {#filters-sub}
@@ -25,7 +25,7 @@ of the [existing Tera built-ins](https://keats.github.io/tera/docs/#built-ins).
   - **`hue`**: `i32` (degrees)
   - **`saturation`**: `u8` (0–100)
   - **`lightness`**: `u8` (0–100)
-  - **`opacity`**: `f32` (0.0–1.0)
+  - **`opacity`**: `u8` (0-100)
 - **Example**: `red | sub(hue=30)` ⇒ `d30f9b`
 
 ## `mod` {#filters-mod}
@@ -35,7 +35,7 @@ of the [existing Tera built-ins](https://keats.github.io/tera/docs/#built-ins).
   - **`hue`**: `i32` (degrees)
   - **`saturation`**: `u8` (0–100)
   - **`lightness`**: `u8` (0–100)
-  - **`opacity`**: `f32` (0.0–1.0)
+  - **`opacity`**: `u8` (0-100)
 - **Example**: `red | mod(lightness=80)` ⇒ `f8a0b3`
 
 ## `mix` {#filters-mix}
