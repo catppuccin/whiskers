@@ -55,6 +55,23 @@ mod happy_path {
             .stderr(predicate::str::is_empty());
     }
 
+    /// Test that the CLI can render a template which uses `read_file` with `start_line` and `end_line` parameters
+    #[test]
+    fn test_read_file_lines() {
+        let mut cmd = cargo_bin_cmd!("whiskers");
+        let assert = cmd
+            .args([
+                "tests/fixtures/read_file_lines/read_file_lines.tera",
+                "-f",
+                "latte",
+            ])
+            .assert();
+        assert
+            .success()
+            .stdout(include_str!("fixtures/read_file_lines/read_file_lines.txt"))
+            .stderr(predicate::str::is_empty());
+    }
+
     /// Test that the CLI can render colours in specific formats
     #[test]
     fn test_formats() {
