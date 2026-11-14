@@ -24,7 +24,6 @@ jobs:
         uses: withastro/action@v6
         with:
           path: ./docs
-          package-manager: pnpm@10.14.0
 
   deploy:
     needs: build

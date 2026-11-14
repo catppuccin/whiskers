@@ -1,6 +1,41 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
+    "config:recommended",
+    "security:minimumReleaseAgeCrate",
+    "security:minimumReleaseAgeNpm"
+  ],
+  "lockFileMaintenance": {
+    "enabled": true
+  },
+  "packageRules": [
+    {
+      "description": "bump versions in Cargo.toml as well as the lockfile",
+      "matchManagers": ["cargo"],
+      "rangeStrategy": "bump"
+    },
+    {
+      "description": "group compatible crate updates into one PR",
+      "matchManagers": ["cargo"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "rust crates"
+    },
+    {
+      "description": "group compatible npm updates into one PR",
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "docs dependencies"
+    },
+    {
+      "description": "group all action updates into one PR",
+      "matchManagers": ["github-actions"],
+      "groupName": "github actions"
+    },
+    {
+      "description": "TEMP: ignore tera v2 until we implement it ourselves in whiskers v3",
+      "matchPackageNames": ["tera"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    }
   ]
 }
