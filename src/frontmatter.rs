@@ -28,8 +28,8 @@ pub fn parse(input: &str) -> Result<Document, Error> {
 
     Ok(Document {
         frontmatter: serde_yaml::from_str(frontmatter).map_err(|e| Error::InvalidYaml {
-            line: e.location().map(|l| l.line()).unwrap_or_default(),
-            column: e.location().map(|l| l.column()).unwrap_or_default(),
+            line: e.location().map_or_default(|l| l.line()),
+            column: e.location().map_or_default(|l| l.column()),
             message: e.to_string(),
         })?,
         body: body.to_string(),
@@ -41,7 +41,7 @@ fn split(template: &str) -> Option<(&str, &str)> {
     // * line 0 is "---"
     // * there is another "---" on another line
     let template = template.trim_start();
-    let eol = LineEnding::find(template, LineEnding::LF).to_string();
+    let eol = LineEnding::find(template, LineEnding::Lf).to_string();
     let sep = "---".to_string() + &eol;
     if !template.starts_with(&sep) {
         return None;

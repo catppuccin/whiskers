@@ -2,18 +2,26 @@ name: Lint
 
 on:
   pull_request:
-    paths: ["**.rs", "**.toml", "**.lock"]
+    paths:
+      - "**.rs"
+      - "**.toml"
+      - "**.lock"
+      - ".github/workflows/lint.yml"
   push:
     branches: [main]
-    paths: ["**.rs", "**.toml", "**.lock"]
+    paths:
+      - "**.rs"
+      - "**.toml"
+      - "**.lock"
+      - ".github/workflows/lint.yml"
 
 jobs:
   rust:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
-      - uses: actions/cache@v5
+      - uses: actions/checkout@v7
+      - uses: actions-rust-lang/setup-rust-toolchain@v2
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/registry
