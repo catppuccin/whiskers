@@ -598,6 +598,8 @@ fn render_multi_output(
 
     for iterable in iterables {
         let mut ctx = ctx.clone();
+        let mut accent_identifier: Option<String> = None;
+
         for (key, value) in iterable {
             // expand flavor automatically to prevent requiring:
             // `{% set flavor = flavors[flavor] %}`
@@ -611,8 +613,22 @@ fn render_multi_output(
                 for (_, color) in flavor {
                     ctx.insert(&color.identifier, &color);
                 }
+            } else if key == "accent" {
+                accent_identifier = Some(value);
             } else {
                 ctx.insert(key, &value);
+            }
+        }
+
+        if let Some(ref identifier) = accent_identifier {
+            ctx.insert("accent", identifier);
+            if let Some(flavor_value) = ctx.get("flavor") {
+                let flavor: models::Flavor = tera::from_value(flavor_value.clone())
+                    .into_diagnostic()
+                    .context("Failed to deserialize flavor from context")?;
+                if let Some(color) = flavor.colors.get(identifier.as_str()) {
+                    ctx.insert("accent", color);
+                }
             }
         }
 
