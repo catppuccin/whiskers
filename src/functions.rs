@@ -97,12 +97,7 @@ pub fn read_file_handler(
         let path = template_directory.join(path);
         let contents = fs::read_to_string(&path)
             .map_err(|_| format!("Failed to open file {}", path.display()))?;
-        let mut content_lines: Vec<&str> = contents.lines().collect();
-        if contents.ends_with('\n') {
-            content_lines.push("");
-        } else {
-            return Err(tera::Error::msg("couldn't get file ending of file"));
-        }
+        let content_lines: Vec<&str> = contents.split_inclusive('\n').collect();
         let end_line: usize = args
             .get("end_line")
             .unwrap_or(&tera::to_value(content_lines.len())?)
@@ -118,19 +113,7 @@ pub fn read_file_handler(
                 "end_line is greater than the number of lines in the file",
             ));
         }
-        let line_ending = if contents.ends_with("\r\n") {
-            "\r\n"
-        } else if contents.ends_with('\n') {
-            "\n"
-        } else {
-            return Err(tera::Error::msg("couldn't get file ending of file"));
-        };
-        let mut lines = content_lines[start_line - 1..end_line].to_vec();
-        lines
-            .last_mut()
-            .ok_or_else(|| tera::Error::msg("could not read last value"))?
-            .to_string()
-            .push_str(line_ending);
-        Ok(tera::to_value(lines.join(line_ending))?)
+        let lines = content_lines[start_line - 1..end_line].to_vec();
+        Ok(tera::to_value(lines.join(""))?)
     }
 }
