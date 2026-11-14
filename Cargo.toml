@@ -21,7 +21,7 @@ name = "whiskers"
 path = "src/main.rs"
 
 [dependencies]
-base64 = "0.22.1"
+base64 = "0.23.0"
 catppuccin = { version = "2.7.0", features = ["css-colors", "serde"] }
 clap = { version = "4.6.0", features = ["derive"] }
 clap-stdin = "0.8.1"
