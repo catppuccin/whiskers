@@ -145,7 +145,7 @@ pub fn all_filters() -> Vec<Filter> {
             description: "Modify a color".to_string(),
             examples: vec![
                 filter_example!(red | mod(lightness=80) => "#f8a0b3"),
-                filter_example!(red | mod(opacity=0.5) => "#d20f3980"),
+                filter_example!(red | mod(opacity=50) => "#d20f3980"),
             ],
         },
         Filter {
