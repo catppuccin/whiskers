@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "version": "0.0.1",
-  "packageManager": "pnpm@10.14.0",
+  "packageManager": "pnpm@10.34.9",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
