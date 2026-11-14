@@ -1,0 +1,66 @@
+---
+title: Example Ports
+description: A list of real Catppuccin ports built with Whiskers that function as useful examples.
+---
+
+Possibly the best way to learn Whiskers is to read templates that are already
+in active use and which demonstrate different aspects of Whiskers'
+functionality.
+
+## fr33zmenu
+
+[`fr33zmenu.tera`](https://github.com/catppuccin/fr33zmenu/blob/main/fr33zmenu.tera)
+
+This is a great place to start; it simply renders one small file per flavor
+using [matrix mode](/concepts/matrix-mode) and a filename template.
+
+## Termux
+
+[`termux.tera`](https://github.com/catppuccin/termux/blob/main/termux.tera)
+
+Renders a terminal color scheme, with a `flavor.dark` condition choosing
+different colors for light and dark flavors.
+
+## Raycast
+
+[`raycast.tera`](https://github.com/catppuccin/raycast/blob/main/raycast.tera)
+
+This port uses Whiskers to render its `README.md` file, looping over each flavor
+to build the preview and usage sections.
+
+## k9s
+
+[`k9s.tera`](https://github.com/catppuccin/k9s/blob/main/k9s.tera)
+
+This is a more complex example of a template that adds a custom `variant` to the
+matrix (regular & transparent), resulting in 8 rendered files (2 variants × 4
+flavors). It also demonstrates using a [Tera
+macro](https://web.archive.org/web/20260612011004/https://keats.github.io/tera/docs/#macros)
+to apply the transparency in multiple places without repeating the condition.
+
+## lazygit
+
+[`lazygit.tera`](https://github.com/catppuccin/lazygit/blob/main/lazygit.tera)
+
+This template's matrix renders a large number of output files, with two
+variants of each combination of flavor and accent color. It also uses [check
+mode](/concepts/check-mode) in CI to ensure the committed theme files are
+consistent with the template (see [GitHub
+Actions](/resources/github-actions/)).
+
+## ImHex
+
+[`imhex.tera`](https://github.com/catppuccin/imhex/blob/main/imhex.tera)
+
+This port has a large template that makes use of several macros to keep it
+readable. [Color filters](/reference/filters) are used to derive additional
+shades from the base palette.
+
+## Cider
+
+[`templates/`](https://github.com/catppuccin/cider/tree/main/templates)
+
+A more complex port split across several templates, built with its
+[`justfile`](https://github.com/catppuccin/cider/blob/main/justfile).
+This is a good example of the [project structure](/concepts/project-structure)
+for ports that need more than one template.

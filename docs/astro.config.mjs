@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from "astro/config";
+import { unified } from "@astrojs/markdown-remark";
 import starlight from "@astrojs/starlight";
 import catppuccin from "@catppuccin/starlight";
 import { remarkHeadingId } from "remark-custom-heading-id";
@@ -10,7 +11,7 @@ import starlightChangelogs from "starlight-changelogs";
 export default defineConfig({
   site: "https://whiskers.catppuccin.com",
   markdown: {
-    remarkPlugins: [remarkHeadingId],
+    processor: unified({ remarkPlugins: [remarkHeadingId] }),
   },
   integrations: [
     starlight({
@@ -51,27 +52,27 @@ export default defineConfig({
       sidebar: [
         {
           label: "Getting Started",
-          autogenerate: { directory: "getting-started" },
+          items: [{ autogenerate: { directory: "getting-started" } }],
         },
         {
           label: "Concepts",
-          autogenerate: { directory: "concepts" },
+          items: [{ autogenerate: { directory: "concepts" } }],
         },
         {
           label: "Guides",
-          autogenerate: { directory: "guides" },
+          items: [{ autogenerate: { directory: "guides" } }],
         },
         {
           label: "Reference",
-          autogenerate: { directory: "reference" },
+          items: [{ autogenerate: { directory: "reference" } }],
         },
         {
           label: "Cookbook",
-          autogenerate: { directory: "cookbook" },
+          items: [{ autogenerate: { directory: "cookbook" } }],
         },
         {
           label: "Resources",
-          autogenerate: { directory: "resources" },
+          items: [{ autogenerate: { directory: "resources" } }],
         },
         {
           link: "/changelog/",
