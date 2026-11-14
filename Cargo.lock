@@ -181,7 +181,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e9251b71676a9c550b914c460a083a14d37c0317f30fd2037dff6c5e03541f4e"
 dependencies = [
  "css-colors",
- "itertools 0.15.0",
+ "itertools",
  "prettyplease",
  "proc-macro2",
  "quote",
@@ -203,7 +203,7 @@ dependencies = [
  "encoding_rs_io",
  "farver",
  "indexmap",
- "itertools 0.14.0",
+ "itertools",
  "lzma-rust",
  "miette",
  "predicates",
@@ -722,15 +722,6 @@ name = "is_terminal_polyfill"
 version = "1.70.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a6cb138bb79a146c1bd460005623e142ef0181e3d0219cb493e02f7d08a35695"
-
-[[package]]
-name = "itertools"
-version = "0.14.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2b192c782037fadd9cfa75548310488aabdbf3d2da73885b31bd0abd03351285"
-dependencies = [
- "either",
-]
 
 [[package]]
 name = "itertools"
