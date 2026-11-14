@@ -2,6 +2,7 @@ use std::sync::OnceLock;
 
 use farver::Color as _;
 use indexmap::IndexMap;
+use palette::{FromColor, Oklch, Srgb};
 use serde_json::json;
 use tera::Tera;
 
@@ -127,45 +128,18 @@ fn rgb_to_ints(rgb: &RGB, opacity: Option<u8>) -> (u32, u32, i32) {
     (uint24, uint32, uint32 as i32)
 }
 
-#[allow(clippy::many_single_char_names)]
 fn rgb_to_oklch(r: u8, g: u8, b: u8) -> OKLCH {
-    // sRGB -> linear RGB
-    let linearize = |c: u8| {
-        let c = f64::from(c) / 255.0;
-        if c <= 0.04045 {
-            c / 12.92
-        } else {
-            ((c + 0.055) / 1.055_f64).powf(2.4)
-        }
-    };
-    let (r, g, b) = (linearize(r), linearize(g), linearize(b));
-
-    // linear RGB -> LMS (Oklab intermediate)
-    let l = 0.051_445_992_9f64
-        .mul_add(b, 0.412_221_470_8f64.mul_add(r, 0.536_332_536_3 * g))
-        .cbrt();
-    let m = 0.107_396_956_6f64
-        .mul_add(b, 0.211_903_498_2f64.mul_add(r, 0.680_699_545_1 * g))
-        .cbrt();
-    let s = 0.629_978_700_5f64
-        .mul_add(b, 0.088_302_461_9f64.mul_add(r, 0.281_718_837_6 * g))
-        .cbrt();
-
-    // LMS -> OKLab
-    let lab_l = 0.004_072_046_8f64.mul_add(-s, 0.210_454_255_3f64.mul_add(l, 0.793_617_785_0 * m));
-    let lab_a =
-        0.450_593_709_9f64.mul_add(s, 1.977_998_495_1f64.mul_add(l, -(2.428_592_205_0 * m)));
-    let lab_b = 0.808_675_766_0f64.mul_add(-s, 0.025_904_037_1f64.mul_add(l, 0.782_771_766_2 * m));
-
-    // OKLab -> OKLCH
-    let c = lab_a.hypot(lab_b);
-    let h = lab_b.atan2(lab_a).to_degrees();
-    let h = if h < 0.0 { h + 360.0 } else { h };
+    let srgb = Srgb::new(
+        f32::from(r) / 255.0,
+        f32::from(g) / 255.0,
+        f32::from(b) / 255.0,
+    );
+    let converted: Oklch = Oklch::from_color(srgb);
 
     OKLCH {
-        l: lab_l as f32,
-        c: c as f32,
-        h: h as f32,
+        l: converted.l,
+        c: converted.chroma,
+        h: converted.hue.into_degrees(),
     }
 }
 
