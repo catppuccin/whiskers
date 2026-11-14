@@ -10,12 +10,16 @@ rgb({{ v.r }}, {{ v.g }}, {{ v.b }})
 hsl({{ v.h | round }}, {{ v.s * 100 | round }}%, {{ v.l * 100 | round }}%)
 {%- endmacro -%}
 
+{%- macro css_oklch(v) -%}
+oklch({{ v.l | trunc(places=3) }} {{ v.c | trunc(places=3) }} {{ v.h | trunc(places=3) }})
+{%- endmacro -%}
+
 # {{ flavor.name }}
 
 | Color | Hex | RGB | HSL |
 |-------|-----|-----|-----|
 {%- for _, color in flavor.colors %}
-{{ color.name }} | #{{ color.hex }} | {{ self::css_rgb(v=color.rgb) }} | {{ self::css_hsl(v=color.hsl) }} |
+{{ color.name }} | #{{ color.hex }} | {{ self::css_rgb(v=color.rgb) }} | {{ self::css_hsl(v=color.hsl) }} | {{ self::css_oklch(v=color.oklch) }} |
 {%- endfor %}
 
 {% set orange = red | add(hue=30) -%}

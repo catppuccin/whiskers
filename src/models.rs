@@ -2,6 +2,7 @@ use std::sync::OnceLock;
 
 use farver::Color as _;
 use indexmap::IndexMap;
+use palette::{FromColor, Oklch, Srgb};
 use serde_json::json;
 use tera::Tera;
 
@@ -41,6 +42,7 @@ pub struct Color {
     pub sint32: i32,
     pub rgb: RGB,
     pub hsl: HSL,
+    pub oklch: OKLCH,
     pub opacity: u8,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub code: Option<u8>,
@@ -68,6 +70,13 @@ pub struct HSL {
     pub h: u16,
     pub s: f32,
     pub l: f32,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+pub struct OKLCH {
+    pub l: f32,
+    pub c: f32,
+    pub h: f32,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -134,6 +143,21 @@ fn rgb_to_ints(rgb: &RGB, opacity: Option<u8>) -> (u32, u32, i32) {
     (uint24, uint32, uint32 as i32)
 }
 
+fn rgb_to_oklch(r: u8, g: u8, b: u8) -> OKLCH {
+    let srgb = Srgb::new(
+        f32::from(r) / 255.0,
+        f32::from(g) / 255.0,
+        f32::from(b) / 255.0,
+    );
+    let converted: Oklch = Oklch::from_color(srgb);
+
+    OKLCH {
+        l: converted.l,
+        c: converted.chroma,
+        h: converted.hue.into_degrees(),
+    }
+}
+
 fn color_from_hex_override(hex: &str, blueprint: &Color) -> Result<Color, Error> {
     let i = u32::from_str_radix(hex, 16)?;
     let rgb = RGB::new(
@@ -143,6 +167,7 @@ fn color_from_hex_override(hex: &str, blueprint: &Color) -> Result<Color, Error>
     );
     let hsl = farver::rgb(rgb.r, rgb.g, rgb.b).to_hsl();
     let hex = format_hex!(rgb.r, rgb.g, rgb.b, 0xFF)?;
+    let oklch = rgb_to_oklch(rgb.r, rgb.g, rgb.b);
     let (int24, uint32, sint32) = rgb_to_ints(&rgb, None);
     Ok(Color {
         hex,
@@ -155,6 +180,7 @@ fn color_from_hex_override(hex: &str, blueprint: &Color) -> Result<Color, Error>
             s: hsl.s.as_f32(),
             l: hsl.l.as_f32(),
         },
+        oklch,
         opacity: 0xFF,
         ..blueprint.clone()
     })
@@ -179,6 +205,11 @@ fn color_from_catppuccin(color: &catppuccin::Color) -> tera::Result<Color> {
             s: color.hsl.s as f32,
             l: color.hsl.l as f32,
         },
+        oklch: OKLCH {
+            l: color.oklch.l as f32,
+            c: color.oklch.c as f32,
+            h: color.oklch.h as f32,
+        },
         opacity: 255,
         code: None,
     })
@@ -187,6 +218,7 @@ fn color_from_catppuccin(color: &catppuccin::Color) -> tera::Result<Color> {
 fn ansi_color_from_catppuccin(ansi_color: &catppuccin::AnsiColor) -> tera::Result<Color> {
     let hex = format_hex!(ansi_color.rgb.r, ansi_color.rgb.g, ansi_color.rgb.b, 0xFF)?;
     let rgb: RGB = ansi_color.rgb.into();
+    let oklch = rgb_to_oklch(ansi_color.rgb.r, ansi_color.rgb.g, ansi_color.rgb.b);
     let (int24, uint32, sint32) = rgb_to_ints(&rgb, None);
     Ok(Color {
         name: ansi_color.name.to_string(),
@@ -203,6 +235,7 @@ fn ansi_color_from_catppuccin(ansi_color: &catppuccin::AnsiColor) -> tera::Resul
             s: ansi_color.hsl.s as f32,
             l: ansi_color.hsl.l as f32,
         },
+        oklch,
         opacity: 255,
         code: Some(ansi_color.code),
     })
@@ -341,6 +374,7 @@ impl Color {
             s: hsla.s.as_f32(),
             l: hsla.l.as_f32(),
         };
+        let oklch = rgb_to_oklch(rgb.r, rgb.g, rgb.b);
         let opacity = hsla.a.as_u8();
         let (int24, uint32, sint32) = rgb_to_ints(&rgb, Some(opacity));
         Ok(Self {
@@ -354,6 +388,7 @@ impl Color {
             sint32,
             rgb,
             hsl,
+            oklch,
             opacity,
             code: blueprint.code,
         })
@@ -367,6 +402,7 @@ impl Color {
             s: hsl.s.as_f32(),
             l: hsl.l.as_f32(),
         };
+        let oklch = rgb_to_oklch(rgb.r, rgb.g, rgb.b);
         let opacity = rgba.a.as_u8();
         let (int24, uint32, sint32) = rgb_to_ints(&rgb, Some(opacity));
         Ok(Self {
@@ -380,6 +416,7 @@ impl Color {
             sint32,
             rgb,
             hsl,
+            oklch,
             opacity,
             code: blueprint.code,
         })

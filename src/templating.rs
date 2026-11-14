@@ -58,12 +58,14 @@ pub fn make_engine(template_directory: &Path) -> tera::Tera {
     tera.register_filter("css_rgba", filters::css_rgba);
     tera.register_filter("css_hsl", filters::css_hsl);
     tera.register_filter("css_hsla", filters::css_hsla);
+    tera.register_filter("css_oklch", filters::css_oklch);
     tera.register_function("if", functions::if_fn);
     tera.register_function("object", functions::object);
     tera.register_function("css_rgb", functions::css_rgb);
     tera.register_function("css_rgba", functions::css_rgba);
     tera.register_function("css_hsl", functions::css_hsl);
     tera.register_function("css_hsla", functions::css_hsla);
+    tera.register_function("css_oklch", functions::css_oklch);
     tera.register_function(
         "read_file",
         functions::read_file_handler(template_directory.to_owned()),
@@ -110,6 +112,13 @@ pub fn all_functions() -> Vec<Function> {
             name: "css_hsla".to_string(),
             description: "Convert a color to an HSLA CSS string".to_string(),
             examples: vec![function_example!(css_hsla(color=red) => "hsla(347, 87%, 44%, 1.00)")],
+        },
+        Function {
+            name: "css_oklch".to_string(),
+            description: "Convert a color to an OKLCH CSS string".to_string(),
+            examples: vec![
+                function_example!(css_oklch(color=red) => "oklch(0.755592 0.12970214 2.764165)"),
+            ],
         },
         Function {
             name: "read_file".to_string(),
@@ -191,6 +200,13 @@ pub fn all_filters() -> Vec<Filter> {
             name: "css_hsla".to_string(),
             description: "Convert a color to an HSLA CSS string".to_string(),
             examples: vec![filter_example!(red | css_hsla => "hsla(347, 87%, 44%, 1.00)")],
+        },
+        Filter {
+            name: "css_oklch".to_string(),
+            description: "Convert a color to an OKLCH CSS string".to_string(),
+            examples: vec![
+                filter_example!(red | css_oklch => "oklch(0.755592 0.12970214 2.764165)"),
+            ],
         },
     ]
 }
