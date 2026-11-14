@@ -218,6 +218,7 @@ fn color_from_catppuccin(color: &catppuccin::Color) -> tera::Result<Color> {
 fn ansi_color_from_catppuccin(ansi_color: &catppuccin::AnsiColor) -> tera::Result<Color> {
     let hex = format_hex!(ansi_color.rgb.r, ansi_color.rgb.g, ansi_color.rgb.b, 0xFF)?;
     let rgb: RGB = ansi_color.rgb.into();
+    let oklch = rgb_to_oklch(ansi_color.rgb.r, ansi_color.rgb.g, ansi_color.rgb.b);
     let (int24, uint32, sint32) = rgb_to_ints(&rgb, None);
     Ok(Color {
         name: ansi_color.name.to_string(),
@@ -234,6 +235,7 @@ fn ansi_color_from_catppuccin(ansi_color: &catppuccin::AnsiColor) -> tera::Resul
             s: ansi_color.hsl.s as f32,
             l: ansi_color.hsl.l as f32,
         },
+        oklch,
         opacity: 255,
         code: Some(ansi_color.code),
     })
