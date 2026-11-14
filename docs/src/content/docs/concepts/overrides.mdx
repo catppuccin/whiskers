@@ -69,3 +69,20 @@ Mocha.
   "OLEDppuccin" or "Americano", a popular override to make the background(s)
   black/near-black.
 </Aside>
+
+[ANSI colors](/reference/context-variables#flavor-ansi-colors) can be
+overridden in the same way by prefixing their identifier with `ansi_`:
+
+```json
+{
+  "mocha": {
+    "red": "ff0000",
+    "ansi_red": "ee0000",
+    "ansi_bright_red": "ff5555"
+  }
+}
+```
+
+Overriding a palette color doesn't change the ANSI color of the same name, so
+the example above overrides `red` and `ansi_red` separately. ANSI overrides
+also apply to [`ansi_color_pairs`](/reference/context-variables#flavor-ansi-color-pairs).

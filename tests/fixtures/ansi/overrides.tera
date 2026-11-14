@@ -1,0 +1,10 @@
+---
+whiskers:
+  version: "^2"
+  hex_format: "#{{r}}{{g}}{{b}}{{z}}"
+---
+palette red: {{ red.hex }}
+ansi red: [{{ flavor.ansi_colors.red.code }}] {{ flavor.ansi_colors.red.hex }}
+ansi bright red: [{{ flavor.ansi_colors.bright_red.code }}] {{ flavor.ansi_colors.bright_red.hex }}
+red pair: {{ flavor.ansi_color_pairs.red.normal.hex }} | {{ flavor.ansi_color_pairs.red.bright.hex }}
+filters: {{ flavor.ansi_colors.red | css_rgb }} {{ flavor.ansi_colors.red | mod(opacity=0.5) | get(key="hex") }} [{{ flavor.ansi_colors.red | mod(opacity=0.5) | get(key="code") }}]

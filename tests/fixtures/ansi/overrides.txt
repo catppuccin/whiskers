@@ -1,0 +1,5 @@
+palette red: #ff0000
+ansi red: [1] #ee0000
+ansi bright red: [9] #ff5555
+red pair: #ee0000 | #ff5555
+filters: rgb(238, 0, 0) #ee000080 [1]

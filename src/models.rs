@@ -7,6 +7,8 @@ use tera::Tera;
 
 use crate::cli::ColorOverrides;
 
+const ANSI_OVERRIDE_PREFIX: &str = "ansi_";
+
 // a frankenstein mix of Catppuccin & farver types to get all the
 // functionality we want.
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
@@ -23,7 +25,7 @@ pub struct Flavor {
     pub dark: bool,
     pub light: bool,
     pub colors: IndexMap<String, Color>,
-    pub ansi_colors: IndexMap<String, AnsiColor>,
+    pub ansi_colors: IndexMap<String, Color>,
     pub ansi_color_pairs: IndexMap<String, AnsiColorPair>,
 }
 
@@ -40,19 +42,8 @@ pub struct Color {
     pub rgb: RGB,
     pub hsl: HSL,
     pub opacity: u8,
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
-pub struct AnsiColor {
-    pub name: String,
-    pub identifier: String,
-    pub code: u8,
-    pub hex: String,
-    pub int24: u32,
-    pub uint32: u32,
-    pub sint32: i32,
-    pub rgb: RGB,
-    pub hsl: HSL,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub code: Option<u8>,
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
@@ -60,8 +51,8 @@ pub struct AnsiColorPair {
     pub name: String,
     pub identifier: String,
     pub order: u32,
-    pub normal: AnsiColor,
-    pub bright: AnsiColor,
+    pub normal: Color,
+    pub bright: Color,
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
@@ -143,7 +134,7 @@ fn rgb_to_ints(rgb: &RGB, opacity: Option<u8>) -> (u32, u32, i32) {
     (uint24, uint32, uint32 as i32)
 }
 
-fn color_from_hex_override(hex: &str, blueprint: &catppuccin::Color) -> Result<Color, Error> {
+fn color_from_hex_override(hex: &str, blueprint: &Color) -> Result<Color, Error> {
     let i = u32::from_str_radix(hex, 16)?;
     let rgb = RGB::new(
         ((i >> 16) & 0xFF) as u8,
@@ -154,10 +145,6 @@ fn color_from_hex_override(hex: &str, blueprint: &catppuccin::Color) -> Result<C
     let hex = format_hex!(rgb.r, rgb.g, rgb.b, 0xFF)?;
     let (int24, uint32, sint32) = rgb_to_ints(&rgb, None);
     Ok(Color {
-        name: blueprint.name.to_string(),
-        identifier: blueprint.name.identifier().to_string(),
-        order: blueprint.order,
-        accent: blueprint.accent,
         hex,
         int24,
         uint32,
@@ -169,6 +156,7 @@ fn color_from_hex_override(hex: &str, blueprint: &catppuccin::Color) -> Result<C
             l: hsl.l.as_f32(),
         },
         opacity: 0xFF,
+        ..blueprint.clone()
     })
 }
 
@@ -192,17 +180,19 @@ fn color_from_catppuccin(color: &catppuccin::Color) -> tera::Result<Color> {
             l: color.hsl.l as f32,
         },
         opacity: 255,
+        code: None,
     })
 }
 
-fn ansi_color_from_catppuccin(ansi_color: &catppuccin::AnsiColor) -> tera::Result<AnsiColor> {
+fn ansi_color_from_catppuccin(ansi_color: &catppuccin::AnsiColor) -> tera::Result<Color> {
     let hex = format_hex!(ansi_color.rgb.r, ansi_color.rgb.g, ansi_color.rgb.b, 0xFF)?;
     let rgb: RGB = ansi_color.rgb.into();
     let (int24, uint32, sint32) = rgb_to_ints(&rgb, None);
-    Ok(AnsiColor {
+    Ok(Color {
         name: ansi_color.name.to_string(),
         identifier: ansi_color.name.identifier().to_string(),
-        code: ansi_color.code,
+        order: ansi_color.code.into(),
+        accent: false,
         hex,
         int24,
         uint32,
@@ -213,74 +203,78 @@ fn ansi_color_from_catppuccin(ansi_color: &catppuccin::AnsiColor) -> tera::Resul
             s: ansi_color.hsl.s as f32,
             l: ansi_color.hsl.l as f32,
         },
-    })
-}
-
-fn ansi_color_pair_from_catppuccin(
-    ansi_color_pair: &catppuccin::AnsiColorPair,
-) -> tera::Result<AnsiColorPair> {
-    Ok(AnsiColorPair {
-        name: ansi_color_pair.name.to_string(),
-        identifier: ansi_color_pair.name.identifier().to_string(),
-        order: ansi_color_pair.order,
-        normal: ansi_color_from_catppuccin(&ansi_color_pair.normal)?,
-        bright: ansi_color_from_catppuccin(&ansi_color_pair.bright)?,
+        opacity: 255,
+        code: Some(ansi_color.code),
     })
 }
 
 /// Build a [`Palette`] from [`catppuccin::PALETTE`], optionally applying color overrides.
 pub fn build_palette(color_overrides: Option<&ColorOverrides>) -> Result<Palette, Error> {
-    // make a `Color` from a `catppuccin::Color`, taking into account `color_overrides`.
-    // overrides apply in this order:
+    // apply any override for `key` to `base`. overrides apply in this order:
     // 1. base color
     // 2. "all" override
     // 3. flavor override
-    let make_color =
-        |color: &catppuccin::Color, flavor_name: catppuccin::FlavorName| -> Result<Color, Error> {
-            let flavor_override = color_overrides
-                .map(|co| match flavor_name {
-                    catppuccin::FlavorName::Latte => &co.latte,
-                    catppuccin::FlavorName::Frappe => &co.frappe,
-                    catppuccin::FlavorName::Macchiato => &co.macchiato,
-                    catppuccin::FlavorName::Mocha => &co.mocha,
-                })
-                .and_then(|o| o.get(color.name.identifier()).cloned())
-                .map(|s| color_from_hex_override(&s, color))
+    let with_overrides =
+        |base: Color, key: &str, flavor_name: catppuccin::FlavorName| -> Result<Color, Error> {
+            let Some(co) = color_overrides else {
+                return Ok(base);
+            };
+
+            let flavor_overrides = match flavor_name {
+                catppuccin::FlavorName::Latte => &co.latte,
+                catppuccin::FlavorName::Frappe => &co.frappe,
+                catppuccin::FlavorName::Macchiato => &co.macchiato,
+                catppuccin::FlavorName::Mocha => &co.mocha,
+            };
+
+            let flavor_override = flavor_overrides
+                .get(key)
+                .map(|hex| color_from_hex_override(hex, &base))
+                .transpose()?;
+            let all_override = co
+                .all
+                .get(key)
+                .map(|hex| color_from_hex_override(hex, &base))
                 .transpose()?;
 
-            let all_override = color_overrides
-                .and_then(|co| co.all.get(color.name.identifier()).cloned())
-                .map(|s| color_from_hex_override(&s, color))
-                .transpose()?;
-
-            let base_color = color_from_catppuccin(color)?;
-
-            Ok(flavor_override.or(all_override).unwrap_or(base_color))
+            Ok(flavor_override.or(all_override).unwrap_or(base))
         };
 
     let mut flavors = IndexMap::new();
     for flavor in &catppuccin::PALETTE {
         let mut colors = IndexMap::new();
         for color in &flavor.colors {
+            let identifier = color.name.identifier();
             colors.insert(
-                color.name.identifier().to_string(),
-                make_color(color, flavor.name)?,
+                identifier.to_string(),
+                with_overrides(color_from_catppuccin(color)?, identifier, flavor.name)?,
             );
         }
 
         let mut ansi_colors = IndexMap::new();
         for ansi_color in &flavor.ansi_colors {
+            let identifier = ansi_color.name.identifier();
             ansi_colors.insert(
-                ansi_color.name.identifier().to_string(),
-                ansi_color_from_catppuccin(ansi_color)?,
+                identifier.to_string(),
+                with_overrides(
+                    ansi_color_from_catppuccin(ansi_color)?,
+                    &format!("{ANSI_OVERRIDE_PREFIX}{identifier}"),
+                    flavor.name,
+                )?,
             );
         }
 
         let mut ansi_color_pairs = IndexMap::new();
-        for ansi_color_pair in &flavor.ansi_colors.all_pairs() {
+        for pair in &flavor.ansi_colors.all_pairs() {
             ansi_color_pairs.insert(
-                ansi_color_pair.name.identifier().to_string(),
-                ansi_color_pair_from_catppuccin(ansi_color_pair)?,
+                pair.name.identifier().to_string(),
+                AnsiColorPair {
+                    name: pair.name.to_string(),
+                    identifier: pair.name.identifier().to_string(),
+                    order: pair.order,
+                    normal: ansi_colors[pair.normal.name.identifier()].clone(),
+                    bright: ansi_colors[pair.bright.name.identifier()].clone(),
+                },
             );
         }
 
@@ -361,6 +355,7 @@ impl Color {
             rgb,
             hsl,
             opacity,
+            code: blueprint.code,
         })
     }
 
@@ -386,6 +381,7 @@ impl Color {
             rgb,
             hsl,
             opacity,
+            code: blueprint.code,
         })
     }
 
