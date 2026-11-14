@@ -366,12 +366,9 @@ checksum = "22c2bbfc5708f23437b074ba4e699b14fd6d7181a61695bccc8d944b78739236"
 
 [[package]]
 name = "detect-newline-style"
-version = "0.1.2"
+version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1124f25c3615ab547669f878088cef84850679327f79eccc70412c25a6643749"
-dependencies = [
- "regex",
-]
+checksum = "507554f8b7906bf918427dbbd190f6cbd3144ac6b6ed32e5b9998537776c0833"
 
 [[package]]
 name = "deunicode"
