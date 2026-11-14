@@ -141,9 +141,9 @@ dependencies = [
 
 [[package]]
 name = "base64"
-version = "0.22.1"
+version = "0.23.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6"
+checksum = "ac07cdecf99051d9a5238b80f35af32cdeba5b336e55d957b318b50137e18da5"
 
 [[package]]
 name = "bitflags"
@@ -181,7 +181,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e9251b71676a9c550b914c460a083a14d37c0317f30fd2037dff6c5e03541f4e"
 dependencies = [
  "css-colors",
- "itertools 0.15.0",
+ "itertools",
  "prettyplease",
  "proc-macro2",
  "quote",
@@ -203,7 +203,7 @@ dependencies = [
  "encoding_rs_io",
  "farver",
  "indexmap",
- "itertools 0.14.0",
+ "itertools",
  "lzma-rust",
  "miette",
  "predicates",
@@ -278,9 +278,9 @@ dependencies = [
 
 [[package]]
 name = "clap-stdin"
-version = "0.8.1"
+version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3c597a504c7d12819c50d2e1f78719afb6e01d4e14cbc94eb4c5f6a850494d1c"
+checksum = "8c2ac992a16c441fd881327203b5b59a06e23c359acbd7d7558db7f761711205"
 dependencies = [
  "thiserror",
 ]
@@ -366,12 +366,9 @@ checksum = "22c2bbfc5708f23437b074ba4e699b14fd6d7181a61695bccc8d944b78739236"
 
 [[package]]
 name = "detect-newline-style"
-version = "0.1.2"
+version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1124f25c3615ab547669f878088cef84850679327f79eccc70412c25a6643749"
-dependencies = [
- "regex",
-]
+checksum = "507554f8b7906bf918427dbbd190f6cbd3144ac6b6ed32e5b9998537776c0833"
 
 [[package]]
 name = "deunicode"
@@ -722,15 +719,6 @@ name = "is_terminal_polyfill"
 version = "1.70.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a6cb138bb79a146c1bd460005623e142ef0181e3d0219cb493e02f7d08a35695"
-
-[[package]]
-name = "itertools"
-version = "0.14.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2b192c782037fadd9cfa75548310488aabdbf3d2da73885b31bd0abd03351285"
-dependencies = [
- "either",
-]
 
 [[package]]
 name = "itertools"

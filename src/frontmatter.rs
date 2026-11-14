@@ -41,7 +41,7 @@ fn split(template: &str) -> Option<(&str, &str)> {
     // * line 0 is "---"
     // * there is another "---" on another line
     let template = template.trim_start();
-    let eol = LineEnding::find(template, LineEnding::LF).to_string();
+    let eol = LineEnding::find(template, LineEnding::Lf).to_string();
     let sep = "---".to_string() + &eol;
     if !template.starts_with(&sep) {
         return None;
