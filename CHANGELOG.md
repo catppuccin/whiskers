@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.9.1](https://github.com/catppuccin/whiskers/compare/v2.9.0...v2.9.1) (2026-11-14)
+
+
+### Bug Fixes
+
+* **deps:** update rust crates ([#200](https://github.com/catppuccin/whiskers/issues/200)) ([5219c94](https://github.com/catppuccin/whiskers/commit/5219c9465007664b91d7831db2b1466276f39ee2))
+* **templating:** fully remove rgb_array ([#179](https://github.com/catppuccin/whiskers/issues/179)) ([233654f](https://github.com/catppuccin/whiskers/commit/233654f3cd8101f572e6842dce426c56c86ff98b))
+
 ## [2.9.0](https://github.com/catppuccin/whiskers/compare/v2.8.0...v2.9.0) (2026-03-20)
 
 
