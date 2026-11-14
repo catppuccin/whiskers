@@ -81,6 +81,12 @@ pub fn read_file_handler(
                 .ok_or_else(|| tera::Error::msg("path is required"))?
                 .clone(),
         )?;
+        if !args.contains_key("start_line") && !args.contains_key("end_line") {
+            let path = template_directory.join(&path);
+            let contents = fs::read_to_string(&path)
+                .map_err(|_| format!("Failed to open file {}", path.display()))?;
+            return Ok(tera::to_value(contents)?);
+        }
         let start_line: usize = args
             .get("start_line")
             .unwrap_or(&tera::to_value(1)?)
